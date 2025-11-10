@@ -122,9 +122,14 @@ export PATH=$HOME/.local/bin:$PATH
 eval "$(starship init zsh)"
 
 # Auto-start tmux if not already inside tmux
-# Usa exec per sostituire il processo shell con tmux
-# Quando esci da tmux, chiudi anche il terminale
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     # Try to attach to existing session named "default" or create a new one
-    exec tmux attach-session -t default 2>/dev/null || exec tmux new-session -s default
+    if tmux has-session -t default 2>/dev/null; then
+        # Session already exists: create a new window in the current directory
+        tmux new-window -t default -c "$PWD" 2>/dev/null
+        tmux attach-session -t default
+    else
+        # Session does not exist: create a new session in the current directory
+        tmux new-session -s default -c "$PWD"
+    fi
 fi
