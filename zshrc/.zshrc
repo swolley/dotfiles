@@ -130,17 +130,14 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
         cd ~
     fi
     
-    # Create a unique session name for each terminal using the shell PID
-    # Each terminal gets its own session, so changing windows in one terminal
-    # doesn't affect others
-    SESSION_NAME="t-$$"
-    
-    # Try to attach to existing session or create a new one
-    if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-        # Session already exists: attach to it
-        exec tmux attach-session -t "$SESSION_NAME"
+    # Use shared "default" session
+    # All terminals attach to the same session, so you can reattach to a closed session
+    # Standard tmux behavior: all terminals see the same active window
+    if tmux has-session -t default 2>/dev/null; then
+        # Session already exists: attach to it (will show the last active window)
+        exec tmux attach-session -t default
     else
         # Session does not exist: create a new session in the current directory
-        exec tmux new-session -s "$SESSION_NAME" -c "$PWD"
+        exec tmux new-session -s default -c "$PWD"
     fi
 fi
