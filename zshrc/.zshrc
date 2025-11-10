@@ -1,5 +1,5 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Commentato per usare Starship invece di Powerlevel10k
+# Commented out to use Starship instead of Powerlevel10k
 # if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
 #   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 # fi
@@ -115,21 +115,32 @@ source ~/.zshrc_customs.zsh
 export PATH=$HOME/.local/bin:$PATH
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# Commentato per usare Starship invece di Powerlevel10k
+# Commented out to use Starship instead of Powerlevel10k
 # [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Initialize Starship prompt
 eval "$(starship init zsh)"
 
 # Auto-start tmux if not already inside tmux
+# Usa exec per sostituire il processo shell con tmux
+# Quando esci da tmux, chiudi anche il terminale
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-    # Try to attach to existing session named "default" or create a new one
-    if tmux has-session -t default 2>/dev/null; then
-        # Session already exists: create a new window in the current directory
-        tmux new-window -t default -c "$PWD" 2>/dev/null
-        tmux attach-session -t default
+    # Verifica che la directory corrente esista, altrimenti usa la home
+    if [ ! -d "$PWD" ]; then
+        cd ~
+    fi
+    
+    # Create a unique session name for each terminal using the shell PID
+    # Each terminal gets its own session, so changing windows in one terminal
+    # doesn't affect others
+    SESSION_NAME="t-$$"
+    
+    # Try to attach to existing session or create a new one
+    if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        # Session already exists: attach to it
+        exec tmux attach-session -t "$SESSION_NAME"
     else
         # Session does not exist: create a new session in the current directory
-        tmux new-session -s default -c "$PWD"
+        exec tmux new-session -s "$SESSION_NAME" -c "$PWD"
     fi
 fi
