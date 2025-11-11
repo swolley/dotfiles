@@ -24,7 +24,7 @@ ENABLE_CORRECTION="true"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
-plugins=(sudo git archlinux zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(sudo git archlinux zsh-autosuggestions zsh-syntax-highlighting copyfile)
 
 source $ZSH/oh-my-zsh.sh
 
