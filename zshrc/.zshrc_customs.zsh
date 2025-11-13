@@ -8,8 +8,8 @@ alias ports='netstat -tulanp'
 
 alias art="php artisan"
 
-#alias ff="fzf --preview 'cat {}'"
-alias ff="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+# alias ff="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+alias ff="fzf --preview 'bat -n --color=always {}' --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
 alias ..="cd .."
 alias ...="cd ../.."
