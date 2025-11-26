@@ -56,10 +56,42 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     fi
     
     # Use shared "default" session
-    # All terminals attach to the same session without creating new windows
+    # If session exists:
+    #   - If opened from Nautilus (different directory): find or create window in that directory
+    #   - If normal terminal (same directory): attach to existing session
     if tmux has-session -t default 2>/dev/null; then
-        # Session already exists: attach to it (no new windows)
-        exec tmux attach-session -t default
+        # Session already exists
+        ACTIVE_WINDOW_DIR=$(tmux display-message -t default -p '#{pane_current_path}' 2>/dev/null)
+        
+        # Check if current directory is different from active window (probably opened from Nautilus)
+        if [ -n "$ACTIVE_WINDOW_DIR" ] && [ "$PWD" != "$ACTIVE_WINDOW_DIR" ]; then
+            # Different directory: try to find existing window in this directory
+            EXISTING_WINDOW=""
+            while IFS= read -r line; do
+                window_index=$(echo "$line" | cut -d' ' -f1)
+                window_path=$(echo "$line" | cut -d' ' -f2-)
+                if [ "$window_path" = "$PWD" ]; then
+                    EXISTING_WINDOW="$window_index"
+                    break
+                fi
+            done < <(tmux list-windows -t default -F '#{window_index} #{pane_current_path}' 2>/dev/null)
+            
+            if [ -n "$EXISTING_WINDOW" ]; then
+                # Found existing window in this directory: attach to it
+                exec tmux attach-session -t default \; select-window -t "$EXISTING_WINDOW"
+            else
+                # No window in this directory: create a new one (opened from Nautilus)
+                NEW_WINDOW=$(tmux new-window -t default -c "$PWD" -P -F '#{window_index}' 2>/dev/null)
+                if [ -n "$NEW_WINDOW" ]; then
+                    exec tmux attach-session -t default \; select-window -t "$NEW_WINDOW"
+                else
+                    exec tmux attach-session -t default
+                fi
+            fi
+        else
+            # Same directory as active window: normal terminal, just attach (no new windows)
+            exec tmux attach-session -t default
+        fi
     else
         # Session does not exist: create a new session in the current directory
         exec tmux new-session -s default -c "$PWD"
