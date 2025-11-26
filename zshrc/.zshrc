@@ -56,28 +56,10 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     fi
     
     # Use shared "default" session
-    # All terminals attach to the same session, so you can reattach to a closed session
-    # Standard tmux behavior: all terminals see the same active window
+    # All terminals attach to the same session without creating new windows
     if tmux has-session -t default 2>/dev/null; then
-        # Session already exists
-        # Check if current directory is different from the active window's directory
-        # If different, probably opened from Nautilus - create a new window
-        # Otherwise, attach to the last active window (normal terminal)
-        ACTIVE_WINDOW_DIR=$(tmux display-message -t default -p '#{pane_current_path}' 2>/dev/null)
-        if [ -n "$ACTIVE_WINDOW_DIR" ] && [ "$PWD" != "$ACTIVE_WINDOW_DIR" ]; then
-            # Different directory from active window: create a new window (probably from Nautilus)
-            NEW_WINDOW=$(tmux new-window -t default -c "$PWD" -P -F '#{window_index}' 2>/dev/null)
-            if [ -n "$NEW_WINDOW" ]; then
-                # Attach to the specific window we just created (in the current directory)
-                exec tmux attach-session -t default \; select-window -t "$NEW_WINDOW"
-            else
-                # Fallback: attach to the session
-                exec tmux attach-session -t default
-            fi
-        else
-            # Same directory as active window: attach to the last active window (normal terminal)
-            exec tmux attach-session -t default
-        fi
+        # Session already exists: attach to it (no new windows)
+        exec tmux attach-session -t default
     else
         # Session does not exist: create a new session in the current directory
         exec tmux new-session -s default -c "$PWD"
