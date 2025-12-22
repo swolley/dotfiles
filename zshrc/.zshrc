@@ -45,6 +45,10 @@ source ~/.zshrc_customs.zsh
 
 export PATH=$HOME/.local/bin:$PATH
 
+# Java configuration
+export JAVA_HOME=$(ls -d /usr/lib/jvm/java-* | sort -V | tail -n 1)
+export PATH=$PATH:$JAVA_HOME/bin
+
 # Initialize Starship prompt
 eval "$(starship init zsh)"
 
