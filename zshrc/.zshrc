@@ -43,6 +43,26 @@ source $ZSH/oh-my-zsh.sh
 
 source ~/.zshrc_customs.zsh
 
+# nvm (Node Version Manager) - portable: pacman (Arch) or official install (~/.nvm)
+if [[ -f /usr/share/nvm/init-nvm.sh ]]; then
+  source /usr/share/nvm/init-nvm.sh
+elif [[ -f "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]]; then
+  export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+  source "$NVM_DIR/nvm.sh"
+fi
+
+# Auto-switch Node version from .nvmrc when entering a directory (only if nvm is available)
+if command -v nvm &>/dev/null; then
+  autoload -U add-zsh-hook
+  load-nvmrc() {
+    if [[ -r .nvmrc && -f .nvmrc ]]; then
+      nvm use
+    fi
+  }
+  add-zsh-hook chpwd load-nvmrc
+  load-nvmrc  # run on shell start if already in a directory with .nvmrc
+fi
+
 export PATH=$HOME/.local/bin:$PATH
 
 # Java configuration
