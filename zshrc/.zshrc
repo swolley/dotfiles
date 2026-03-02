@@ -101,3 +101,7 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
         exec tmux new-session -s default -c "$PWD"
     fi
 fi
+
+# Force Intel graphics and prevent NVIDIA driver loading
+export MESA_LOADER_DRIVER_OVERRIDE=iris
+export GBM_BACKEND=iris
