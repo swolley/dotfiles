@@ -52,13 +52,21 @@ elif [[ -f "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]]; then
 fi
 
 # Auto-switch Node version from .nvmrc when entering a directory (only if nvm is available)
-if command -v nvm &>/dev/null; then
+# Use zsh function check: nvm is a function, not an executable
+if (( $+functions[nvm] )); then
   autoload -U add-zsh-hook
+
+  # Switch only when in a Node context: .nvmrc (use that version) or package.json (use default). Otherwise leave version unchanged.
   load-nvmrc() {
-    if [[ -r .nvmrc && -f .nvmrc ]]; then
-      nvm use
+    if [[ -f .nvmrc ]]; then
+      local node_version
+      node_version=$(cat .nvmrc | tr -d '\n\r' | xargs)
+      nvm use "$node_version" &>/dev/null
+    elif [[ -f package.json ]]; then
+      nvm use default &>/dev/null
     fi
   }
+
   add-zsh-hook chpwd load-nvmrc
   load-nvmrc  # run on shell start if already in a directory with .nvmrc
 fi
