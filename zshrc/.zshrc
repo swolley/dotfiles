@@ -61,9 +61,9 @@ if (( $+functions[nvm] )); then
     if [[ -f .nvmrc ]]; then
       local node_version
       node_version=$(cat .nvmrc | tr -d '\n\r' | xargs)
-      nvm use "$node_version" &>/dev/null
+      nvm use "$node_version" 1>/dev/null
     elif [[ -f package.json ]]; then
-      nvm use default &>/dev/null
+      nvm use default 1>/dev/null
     fi
   }
 
