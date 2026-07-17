@@ -9,6 +9,7 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 ```text
 .dotfiles/
 ├── gitmux/          → ~/.gitmux.conf
+├── kitty/           → ~/.config/kitty/
 ├── nvim/            → ~/.config/nvim/
 ├── starship/        → ~/.config/starship.toml
 ├── tmux/            → ~/.tmux.conf, ~/.tmux/
@@ -112,7 +113,14 @@ stow -R zshrc
 | Package | Linked paths |
 | --- | --- |
 | `gitmux` | `~/.gitmux.conf` |
+| `kitty` | `~/.config/kitty/` |
 | `nvim` | `~/.config/nvim/` |
 | `starship` | `~/.config/starship.toml` |
 | `tmux` | `~/.tmux.conf`, `~/.tmux/` |
 | `zshrc` | `~/.zshrc`, `~/.zshrc_customs.zsh` |
+
+## Theme notes
+
+Prompt, tmux status, gitmux and kitty share a **noctalia green** palette
+(`#88d990` accent, `#131313` background). Catppuccin was removed from these
+configs; rounded prompt segments come from Starship Nerd Font glyphs.
