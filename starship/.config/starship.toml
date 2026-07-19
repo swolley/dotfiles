@@ -1,13 +1,22 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Connected powerline: carets between segments, rounded only at the end.
-# Runtime versions (node/php/…) come from a script so caret colors always match.
+# Noctalia green powerline — screenshot layout:
+# username → directory → runtimes → time (soft surfaces, not teal/yellow)
 format = """
 $username\
 [](bg:accent fg:surface)\
 $directory\
-[](fg:accent bg:surface2)\
-${custom.runtimes}\
+[](fg:accent bg:surface)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[](fg:surface bg:surface2)\
 $docker_context\
 $time\
 [ ](fg:surface2)"""
@@ -46,26 +55,61 @@ disabled = true
 [git_status]
 disabled = true
 
-# Built by runtimes.sh — ANSI powerline with correct caret colors
-[custom.runtimes]
-command = "~/.config/starship/runtimes.sh"
-when = true
-shell = ["bash", "--noprofile", "--norc"]
-format = "$output"
-ignore_timeout = true
-description = "Alternating gray runtime versions"
+[nodejs]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
 
-# Only when docker context is active; continues into time (surface2)
+[c]
+symbol = " "
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[php]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[java]
+symbol = " "
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[kotlin]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[haskell]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
+[python]
+symbol = ""
+style = "bg:surface"
+format = '[[ $symbol( $version) ](fg:text bg:surface)]($style)'
+
 [docker_context]
 symbol = ""
-style = "bg:surface"
-format = '[](fg:surface2 bg:surface)[ $symbol( $context) ](fg:text bg:surface)[](fg:surface bg:surface2)'
+style = "bg:surface2"
+format = '[](fg:surface bg:surface2)[ $symbol( $context) ](fg:text bg:surface2)'
 
 [time]
 disabled = false
 time_format = "%R"
 style = "bg:surface2"
-format = '[  $time ](fg:text bg:surface2)'
+format = '[[  $time ](fg:text bg:surface2)]($style)'
 
 [line_break]
 disabled = true

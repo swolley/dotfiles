@@ -121,6 +121,6 @@ stow -R zshrc
 
 ## Theme notes
 
-Prompt, tmux status, gitmux and kitty share a **noctalia green** palette
-(`#88d990` accent, `#131313` background). Catppuccin was removed from these
-configs; rounded prompt segments come from Starship Nerd Font glyphs.
+Prompt, tmux status, gitmux, kitty and Neovim share a **noctalia green** palette
+(`#8fbf98` accent, `#1c1c1e` background). Rounded prompt / status segments use
+Nerd Font glyphs; Neovim loads it via `base16-nvim` as `noctalia-green`.
