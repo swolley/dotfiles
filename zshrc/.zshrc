@@ -24,8 +24,7 @@ ENABLE_CORRECTION="false"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
-plugins=(sudo git archlinux zsh-autosuggestions zsh-syntax-highlighting copyfile)
-
+plugins=(sudo git archlinux zsh-autosuggestions zsh-syntax-highlighting copyfile laravel)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration

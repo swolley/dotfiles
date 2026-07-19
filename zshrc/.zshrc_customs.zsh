@@ -17,6 +17,8 @@ alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 
+alias service-status='SYSTEMD_COLORS=16 systemctl list-units --type=service --all --no-pager | grep --color=never -vE "systemd-|dracut-|initrd-|modprobe@|getty@|user@"'
+
 mount() {
 	if [ $# -eq 0 ] || [ "$1" = "-l" ] || [ "$1" = "--show-labels" ]; then
 		command mount | column -t
@@ -185,10 +187,3 @@ html() {
         cd /srv/http
     fi
 }
-
-# NVIDIA Wayland support
-export __GLX_VENDOR_LIBRARY_NAME=nvidia
-export GBM_BACKEND=nvidia-drm
-export __GL_GSYNC_ALLOWED=0
-export __GL_THREADED_OPTIMIZATIONS=1
-export __GL_YIELD=NOTHING
