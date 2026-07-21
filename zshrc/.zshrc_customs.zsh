@@ -1,8 +1,28 @@
 #most of this aliases are for arch linux
 
-alias eos-update="command eos-update --nvidia --paru --descriptions"
-#commented, I created a command because of gnome update extensions
-#alias eos-check="/usr/bin/checkupdates && /usr/bin/paru -Qua"
+# Prefer paru, fall back to yay — keeps these helpers shareable across machines.
+if command -v paru >/dev/null 2>&1; then
+	AUR_HELPER=paru
+elif command -v yay >/dev/null 2>&1; then
+	AUR_HELPER=yay
+else
+	AUR_HELPER=
+fi
+
+eos-update() {
+	if [[ -z "$AUR_HELPER" ]]; then
+		echo "❌ No AUR helper found (install paru or yay)"
+		return 1
+	fi
+	# eos-update accepts --paru / --yay (same as --helper=<name>)
+	command eos-update "--$AUR_HELPER" --descriptions "$@"
+}
+
+# commented, I created a command because of gnome update extensions
+#eos-check() {
+#	[[ -n "$AUR_HELPER" ]] || { echo "❌ No AUR helper found"; return 1; }
+#	/usr/bin/checkupdates && command "$AUR_HELPER" -Qua
+#}
 
 alias ports='netstat -tulanp'
 
@@ -28,7 +48,12 @@ mount() {
 }
 
 eos-search() {
-	paru search "$@"
+	if [[ -z "$AUR_HELPER" ]]; then
+		echo "❌ No AUR helper found (install paru or yay)"
+		return 1
+	fi
+	# -Ss works the same on paru and yay (unlike paru's "search" subcommand)
+	command "$AUR_HELPER" -Ss "$@" || echo "No matches found"
 }
 
 __pkgmgr() {
@@ -157,14 +182,10 @@ __safe_autoremove() {
 #    __pkgmgr "pacman" "$@"
 #}
 
-#TODO: not completed
-#paru() {
-#    __pkgmgr "paru" "$@"
-#}
-
-#TODO: not completed
-#yay() {
-#    __pkgmgr "yay" "$@"
+# Unified AUR helper wrapper (uses detected paru/yay)
+#aur() {
+#    [[ -n "$AUR_HELPER" ]] || { echo "❌ No AUR helper found"; return 1; }
+#    __pkgmgr "$AUR_HELPER" "$@"
 #}
 
 html() {
