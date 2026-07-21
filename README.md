@@ -10,10 +10,12 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 .dotfiles/
 ├── gitmux/          → ~/.gitmux.conf
 ├── kitty/           → ~/.config/kitty/
+├── niri/            → ~/.config/niri/, ~/.config/xdg-desktop-portal/
 ├── nvim/            → ~/.config/nvim/
 ├── starship/        → ~/.config/starship.toml
 ├── tmux/            → ~/.tmux.conf, ~/.tmux/
-└── zshrc/           → ~/.zshrc, ~/.zshrc_customs.zsh
+├── zshrc/           → ~/.zshrc, ~/.zshrc_customs.zsh
+└── install-niri.sh  → Niri + Noctalia package installer (stow-safe)
 ```
 
 ## Prerequisites
@@ -114,6 +116,7 @@ stow -R zshrc
 | --- | --- |
 | `gitmux` | `~/.gitmux.conf` |
 | `kitty` | `~/.config/kitty/` |
+| `niri` | `~/.config/niri/`, `~/.config/xdg-desktop-portal/niri-portals.conf` |
 | `nvim` | `~/.config/nvim/` |
 | `starship` | `~/.config/starship.toml` |
 | `tmux` | `~/.tmux.conf`, `~/.tmux/` |
@@ -124,3 +127,51 @@ stow -R zshrc
 Prompt, tmux status, gitmux, kitty and Neovim share a **noctalia green** palette
 (`#8fbf98` accent, `#1c1c1e` background). Rounded prompt / status segments use
 Nerd Font glyphs; Neovim loads it via `base16-nvim` as `noctalia-green`.
+
+## Kitty notes
+
+`kitty.conf` sets `hide_window_decorations yes`, so on GNOME you get no title bar and no
+minimize/maximize/close buttons (Mutter does not draw them). That is intentional for a
+tiling compositor look. To restore the normal GNOME window chrome while testing on GNOME,
+set `hide_window_decorations no` (or remove the line) and restart kitty. On niri you will
+usually want decorations hidden again.
+
+## Inspiration
+
+Niri + Noctalia direction (and the soft green accent idea) was inspired by:
+
+- [prasangeet/endeavouros-niri](https://github.com/prasangeet/endeavouros-niri)
+
+This repo is **not** a fork: shell stack stays zsh/tmux/starship, configs are managed with
+GNU Stow, and package/UI choices differ (e.g. Nautilus instead of Dolphin for now).
+
+## Niri installer
+
+Stow-safe helper for Arch / EndeavourOS (does **not** wipe `~/.config`, does **not**
+replace GNOME):
+
+```bash
+cd ~/.dotfiles
+./install-niri.sh           # also runs pacman -Syu
+./install-niri.sh --no-update
+```
+
+What it installs:
+- pacman: `niri`, `xwayland-satellite`, portals, swaybg/swayidle, grim/slurp,
+  pipewire stack, `kitty`, `bibata-cursor-theme`, …
+- AUR (via `yay`): `quickshell`, `noctalia-shell`
+- stow: `kitty` and `niri` (config + portals)
+
+What it deliberately skips:
+- Dolphin, Ark, Breeze / KDE Qt stack, JetBrains Mono, fish
+- Blind copy of third-party nvim/fish configs
+
+## Niri notes (future)
+
+- For now keep **Nautilus** + **File Roller** (GNOME). Do **not** install Dolphin or Ark
+  with the first niri setup; `config.kdl` binds `Mod+E` to `nautilus`.
+- Later optional trial: **Dolphin** + **Ark** (+ Breeze) as a more power-user file manager /
+  archive stack. Worth trying if split panes, folder filters, or richer context actions are
+  missing from Nautilus — then switch the niri bind from Nautilus to Dolphin.
+- Stow package `niri/` is ready (pre-install). Run `./install-niri.sh` when you want packages,
+  then `stow niri` (the installer does this), log into Niri, and tune monitor/wallpaper.
