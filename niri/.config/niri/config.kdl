@@ -67,7 +67,8 @@ layer-rule {
 }
 
 cursor {
-    xcursor-theme "Bibata-Modern-Ice"
+    // Same cursor family as GNOME (org.gnome.desktop.interface cursor-theme)
+    xcursor-theme "Qogir"
     xcursor-size 24
 }
 

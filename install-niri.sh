@@ -67,8 +67,9 @@ This installer will:
 This installer will NOT:
   • remove or replace GNOME
   • rm -rf ~/.config or overwrite stowed configs blindly
-  • install Dolphin, Ark, Breeze, JetBrains Mono, or fish
+  • install Dolphin, Ark, Breeze, Bibata, JetBrains Mono, or fish
   • replace your Neovim / zsh / tmux / starship setup
+  • replace your GNOME icon/cursor themes (keep Qogir / Qogir-Dark)
 
 File manager in Niri should stay Nautilus for now.
 EOF
@@ -107,7 +108,8 @@ fi
 section "Installing pacman packages"
 
 # Intentionally excluded: dolphin, ark, breeze*, kde-cli-tools, polkit-kde-agent,
-# ttf-jetbrains-mono, fish, neovim overwrite, qt KDE stack for Dolphin.
+# bibata-cursor-theme, ttf-jetbrains-mono, fish, neovim overwrite, qt KDE stack.
+# Cursor/icons: keep the existing GNOME setup (Qogir / Qogir-Dark).
 PACMAN_PKGS=(
   niri
   xwayland-satellite
@@ -127,7 +129,6 @@ PACMAN_PKGS=(
   pipewire-jack
   wireplumber
   kitty
-  bibata-cursor-theme
   polkit
   polkit-gnome
 )

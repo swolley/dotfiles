@@ -158,16 +158,20 @@ cd ~/.dotfiles
 
 What it installs:
 - pacman: `niri`, `xwayland-satellite`, portals, swaybg/swayidle, grim/slurp,
-  pipewire stack, `kitty`, `bibata-cursor-theme`, …
+  pipewire stack, `kitty`, `polkit-gnome`, …
 - AUR (via `yay`): `quickshell`, `noctalia-shell`
 - stow: `kitty` and `niri` (config + portals)
 
 What it deliberately skips:
-- Dolphin, Ark, Breeze / KDE Qt stack, JetBrains Mono, fish
+- Dolphin, Ark, Breeze / KDE Qt stack, Bibata cursors, JetBrains Mono, fish
 - Blind copy of third-party nvim/fish configs
+- Replacing GNOME **Qogir** cursor / **Qogir-Dark** icons (kept as-is)
 
 ## Niri notes (future)
 
+- Cursor / icons: keep GNOME **Qogir** + **Qogir-Dark** for now (`config.kdl` sets
+  `xcursor-theme "Qogir"`). Noctalia bar/dock icons can be pointed at the same theme
+  later from noctalia settings (`Mod+S`) if needed.
 - For now keep **Nautilus** + **File Roller** (GNOME). Do **not** install Dolphin or Ark
   with the first niri setup; `config.kdl` binds `Mod+E` to `nautilus`.
 - Later optional trial: **Dolphin** + **Ark** (+ Breeze) as a more power-user file manager /
