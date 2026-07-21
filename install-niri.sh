@@ -61,7 +61,9 @@ cat <<'EOF'
 This installer will:
   • update the system (unless --no-update)
   • install Niri / Wayland / portal / utility packages
-  • install AUR packages: quickshell, noctalia-shell
+  • install AUR packages: noctalia-qs, noctalia-shell
+  • remove upstream quickshell / quickshell-git if present
+    (they conflict with noctalia-qs — Noctalia's required fork)
   • stow kitty (and niri if that package exists in this repo)
 
 This installer will NOT:
@@ -70,6 +72,7 @@ This installer will NOT:
   • install Dolphin, Ark, Breeze, Bibata, JetBrains Mono, or fish
   • replace your Neovim / zsh / tmux / starship setup
   • replace your GNOME icon/cursor themes (keep Qogir / Qogir-Dark)
+  • install official Arch quickshell (incompatible with Noctalia ≥ 4.6)
 
 File manager in Niri should stay Nautilus for now.
 EOF
@@ -137,10 +140,17 @@ sudo pacman -S --needed --noconfirm "${PACMAN_PKGS[@]}"
 success "Pacman packages installed (or already present)"
 
 # ---------------------------------------------------------------------------
-section "Checking yay (AUR helper)"
+section "Checking AUR helper"
 
-if ! command -v yay >/dev/null 2>&1; then
-  warn "yay not found. Installing from AUR..."
+AUR_HELPER=""
+if command -v paru >/dev/null 2>&1; then
+  AUR_HELPER="paru"
+  success "Using paru"
+elif command -v yay >/dev/null 2>&1; then
+  AUR_HELPER="yay"
+  success "Using yay (paru not found)"
+else
+  warn "No AUR helper found. Installing yay from AUR as fallback..."
   tmp_dir="$(mktemp -d)"
   git clone https://aur.archlinux.org/yay.git "$tmp_dir/yay"
   (
@@ -148,16 +158,54 @@ if ! command -v yay >/dev/null 2>&1; then
     makepkg -si --noconfirm
   )
   rm -rf "$tmp_dir"
+  AUR_HELPER="yay"
   success "yay installed"
-else
-  success "yay already installed"
 fi
+
+# ---------------------------------------------------------------------------
+section "Resolving Quickshell / Noctalia conflicts"
+
+# Noctalia ≥ 4.6 requires noctalia-qs (fork). Official quickshell packages
+# conflict with it and must not be installed alongside noctalia-shell.
+remove_conflicting_quickshell() {
+  local pkg="$1"
+  # pacman -Q matches Provides, so noctalia-qs answers as "quickshell".
+  # Only remove when the real installed package name matches.
+  local installed
+  installed="$(pacman -Qq "$pkg" 2>/dev/null || true)"
+  if [[ "$installed" != "$pkg" ]]; then
+    return 0
+  fi
+  warn "Removing conflicting package: $pkg"
+  sudo pacman -Rdd --noconfirm "$pkg"
+  success "Removed $pkg"
+}
+
+remove_conflicting_quickshell quickshell
+remove_conflicting_quickshell quickshell-git
 
 # ---------------------------------------------------------------------------
 section "Installing AUR packages"
 
-yay -S --needed --noconfirm quickshell noctalia-shell
-success "AUR packages installed (or already present)"
+# noctalia-shell pulls noctalia-qs; list both explicitly for clarity.
+# Never install Arch extra/quickshell here.
+"$AUR_HELPER" -S --needed --noconfirm noctalia-qs noctalia-shell
+success "AUR packages installed via $AUR_HELPER (or already present)"
+
+if ! pacman -Q noctalia-qs >/dev/null 2>&1; then
+  error "noctalia-qs is not installed — Noctalia cannot run without it"
+  exit 1
+fi
+if [[ "$(pacman -Qq quickshell 2>/dev/null || true)" == "quickshell" ]] \
+  || [[ "$(pacman -Qq quickshell-git 2>/dev/null || true)" == "quickshell-git" ]]; then
+  error "Upstream quickshell is still present and conflicts with noctalia-qs"
+  exit 1
+fi
+if ! command -v qs >/dev/null 2>&1; then
+  error "qs binary not found after installing noctalia-qs"
+  exit 1
+fi
+success "Runtime OK: noctalia-qs provides qs ($(pacman -Q noctalia-qs))"
 
 # ---------------------------------------------------------------------------
 section "Stowing configs from this repo"
