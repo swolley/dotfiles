@@ -136,6 +136,20 @@ tiling compositor look. To restore the normal GNOME window chrome while testing 
 set `hide_window_decorations no` (or remove the line) and restart kitty. On niri you will
 usually want decorations hidden again.
 
+## Tmux: grab text from dense logs
+
+Two TPM plugins help when you scroll long logs and need to copy paths, URLs, hashes, etc.:
+
+| Shortcut | Plugin | What it does |
+| --- | --- | --- |
+| `Prefix` (`Ctrl+s`) then `F` | [tmux-fingers](https://github.com/Morantron/tmux-fingers) | Highlights matches on screen; press the hint letter to copy |
+| `Alt+f` | tmux-fingers | Same, without prefix |
+| `Prefix` then `J` | tmux-fingers | Jump cursor to a match |
+| `Prefix` then `Tab` | [extrakto](https://github.com/laktak/extrakto) | Fuzzy-find tokens from scrollback (`fzf`); Enter copies |
+| `Alt+e` | extrakto | Same, without prefix |
+
+Requires **fzf** (`pacman -S fzf`). After pulling these plugins, in tmux run `Prefix` then `I` (TPM install), then `Prefix` then `r` to reload.
+
 ## Inspiration
 
 Niri + Noctalia direction (and the soft green accent idea) was inspired by:
