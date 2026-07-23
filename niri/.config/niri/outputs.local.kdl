@@ -1,0 +1,22 @@
+// Per-machine monitor layout for niri.
+// Shared dotfiles keep this file mostly empty so every host can boot with
+// automatic output placement. When you need fixed modes/scale/positions:
+//
+//   1. Log into niri
+//   2. Run: niri msg outputs
+//   3. Copy blocks from outputs.local.kdl.example below (or that file)
+//   4. Keep machine-specific edits local (do not commit), OR add
+//      hosts/<hostname>.kdl and symlink it to this file (see README)
+//
+// Example (commented):
+//
+// output "eDP-1" {
+//     mode "1920x1080@60"
+//     scale 1
+// }
+//
+// output "HDMI-A-1" {
+//     mode "2560x1440@60"
+//     scale 1
+//     position x=1920 y=0
+// }

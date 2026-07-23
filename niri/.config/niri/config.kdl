@@ -10,8 +10,8 @@ prefer-no-csd
 // Polkit agent (GNOME legacy — installed by install-niri.sh as polkit-gnome)
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
-// Wallpaper: prefer ~/Immagini/Firefox_wallpaper.png, else solid soft background
-spawn-sh-at-startup "swaybg -i \"$HOME/Immagini/Firefox_wallpaper.png\" -m fill 2>/dev/null || swaybg -c '#1c1c1e'"
+// Wallpaper: try common paths, else solid soft background
+spawn-sh-at-startup "f=\"$HOME/Immagini/Firefox_wallpaper.png\"; [ -f \"$f\" ] || f=\"$HOME/Pictures/Firefox_wallpaper.png\"; [ -f \"$f\" ] && swaybg -i \"$f\" -m fill || swaybg -c '#1c1c1e'"
 
 spawn-at-startup "xwayland-satellite"
 
@@ -20,7 +20,11 @@ spawn-at-startup "swayidle" "-w" \
     "timeout" "600" "systemctl suspend" \
     "before-sleep" "qs -c noctalia-shell ipc call lockScreen lock"
 
-spawn-at-startup "qs" "-c" "noctalia-shell"
+// Shell UI (bar/dock/launcher). If this fails you get a bare gray desktop.
+spawn-sh-at-startup "qs -c noctalia-shell || notify-send 'Noctalia failed' 'qs -c noctalia-shell did not start — check noctalia-qs/noctalia-shell' 2>/dev/null || true"
+
+// Convenience: open a terminal on login (also Ctrl+Alt+T / Super+Return)
+spawn-at-startup "kitty"
 
 environment {
     QT_QPA_PLATFORM "wayland"
@@ -29,9 +33,10 @@ environment {
     XDG_SESSION_TYPE "wayland"
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
 
-    // Intel (Meteor Lake) — do NOT set NVIDIA GBM/GLX vars on this machine
-    MESA_LOADER_DRIVER_OVERRIDE "iris"
-    GBM_BACKEND "iris"
+    // Do NOT force Intel iris here — this config is shared across machines.
+    // On Intel-only boxes you may optionally set:
+    // MESA_LOADER_DRIVER_OVERRIDE "iris"
+    // GBM_BACKEND "iris"
 }
 
 input {
@@ -72,12 +77,10 @@ cursor {
     xcursor-size 24
 }
 
-// Uncomment and adjust after: niri msg outputs
-/-output "eDP-1" {
-    // mode "1920x1080@60"
-    // scale 1
-    transform "normal"
-}
+// Per-machine monitors live in outputs.local.kdl (see README).
+// Empty file = niri auto-places outputs (safe default for shared dots).
+include "./outputs.local.kdl"
+
 
 layout {
     gaps 10
@@ -187,6 +190,8 @@ binds {
         toggle-window-floating;
     }
 
+    // Terminal (GNOME-style Ctrl+Alt+T + tiling Mod+Return)
+    Ctrl+Alt+T { spawn "kitty"; }
     Mod+Return { spawn "kitty"; }
 
     Mod+F {

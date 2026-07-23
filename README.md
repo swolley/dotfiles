@@ -191,5 +191,40 @@ What it deliberately skips:
 - Later optional trial: **Dolphin** + **Ark** (+ Breeze) as a more power-user file manager /
   archive stack. Worth trying if split panes, folder filters, or richer context actions are
   missing from Nautilus — then switch the niri bind from Nautilus to Dolphin.
-- Stow package `niri/` is ready (pre-install). Run `./install-niri.sh` when you want packages,
+- Stow package `niri/` is ready. Run `./install-niri.sh` when you want packages,
   then `stow niri` (the installer does this), log into Niri, and tune monitor/wallpaper.
+- Kitty starts with the Niri session (`spawn-at-startup`); also `Ctrl+Alt+T` and
+  `Super+Return`.
+
+## Troubleshooting
+
+### Blank gray desktop, mouse only, no bar / no shortcuts feel “dead”
+
+1. **Noctalia did not start** — from a TTY or GNOME check:
+   ```bash
+   pacman -Q noctalia-qs noctalia-shell
+   command -v qs
+   qs -c noctalia-shell
+   ```
+   Fix packages (`noctalia-qs` fork, not stock Arch `quickshell`), then re-login to Niri.
+2. **Wrong GPU env** — do not force `MESA_LOADER_DRIVER_OVERRIDE=iris` /
+   `GBM_BACKEND=iris` on non-Intel machines (kept out of shared `config.kdl`).
+3. **Right-click on empty desktop** does nothing by design (no GNOME desktop menu).
+4. **Mod key is Super (Windows key)** for most binds. Terminal: `Ctrl+Alt+T` or
+   `Super+Return`. If kitty autostart is on, a terminal should already be open.
+
+### Monitors differ between PCs
+
+Shared `config.kdl` must not hardcode one machine’s layout. Use
+`niri/.config/niri/outputs.local.kdl` after `niri msg outputs` (see
+`outputs.local.kdl.example`). Leave it empty for auto-placement. Keep host-specific
+edits uncommitted, or add `hosts/<hostname>.kdl` and:
+
+```bash
+cd ~/.config/niri   # or the stow package dir
+ln -sfn "hosts/$(hostname -s).kdl" outputs.local.kdl
+```
+
+### Kitty has no GNOME title bar
+
+See **Kitty notes** above (`hide_window_decorations yes`).
