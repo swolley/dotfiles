@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# aur-wrap — run paru (preferred) or yay, then recover oracle-instantclient
+# exact-version pin failures via aur-coinstall.
+#
+# Wired from ~/.dotfiles/zshrc/.zshrc_customs.zsh (paru/yay functions).
+# Env:
+#   AUR_HELPER     paru|yay (optional; auto-detected if unset)
+#   AUR_COINSTALL  path to aur-coinstall (optional)
+set -euo pipefail
+
+# Resolve real script dir even when invoked via symlink.
+SOURCE=${BASH_SOURCE[0]}
+if command -v readlink >/dev/null 2>&1; then
+  SOURCE=$(readlink -f "$SOURCE")
+fi
+SCRIPT_DIR=$(cd "$(dirname "$SOURCE")" && pwd)
+readonly COINSTALL="${AUR_COINSTALL:-$SCRIPT_DIR/aur-coinstall}"
+
+die() {
+  printf 'aur-wrap: %s\n' "$*" >&2
+  exit 1
+}
+
+log() {
+  printf '==> aur-wrap: %s\n' "$*" >&2
+}
+
+# Prefer: AUR_HELPER env → basename if paru|yay → paru → yay
+# Always resolve to /usr/bin/* when possible to avoid alias recursion.
+resolve_helper() {
+  local base cand
+  base=$(basename "$0")
+
+  if [[ -n ${AUR_HELPER:-} ]]; then
+    cand=$AUR_HELPER
+  elif [[ $base == paru || $base == yay ]]; then
+    cand=$base
+  elif command -v paru >/dev/null 2>&1; then
+    cand=paru
+  elif command -v yay >/dev/null 2>&1; then
+    cand=yay
+  else
+    die 'né paru né yay trovati in PATH'
+  fi
+
+  if [[ -x /usr/bin/$cand ]]; then
+    printf '%s' "/usr/bin/$cand"
+    return 0
+  fi
+  type -P "$cand" 2>/dev/null || die "helper non eseguibile: $cand"
+}
+
+# pacman/paru/yay messages (IT + EN) for Instant Client pin break
+is_oracle_pin_failure() {
+  local logf=$1
+  grep -Eq 'oracle-instantclient-basic' "$logf" || return 1
+  grep -Eq 'oracle-instantclient-sdk' "$logf" || return 1
+  grep -Eqi \
+    'interrompe la dipendenza|breaks dependency|impossibile soddisfare le dipendenze|could not satisfy dependencies|Dipendenze mancanti|Missing dependencies' \
+    "$logf"
+}
+
+args_assume_yes() {
+  local a
+  for a in "$@"; do
+    case $a in
+      -y|--noconfirm) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+prompt_recover() {
+  if args_assume_yes "$@"; then
+    return 0
+  fi
+  if [[ ! -t 0 ]]; then
+    log 'TTY assente: salto recovery (rilancia con -y o da terminale)'
+    return 1
+  fi
+  local reply
+  read -r -p 'aur-wrap: errore pin Oracle Instant Client. Eseguo aur-coinstall instantclient? [Y/n] ' reply
+  [[ -z $reply || $reply == [yY] || $reply == [yY][eE][sS] ]]
+}
+
+prompt_rerun() {
+  if args_assume_yes "$@"; then
+    return 0
+  fi
+  if [[ ! -t 0 ]]; then
+    return 1
+  fi
+  local reply
+  read -r -p 'aur-wrap: rilancio il comando originale? [Y/n] ' reply
+  [[ -z $reply || $reply == [yY] || $reply == [yY][eE][sS] ]]
+}
+
+[[ -x $COINSTALL ]] || die "aur-coinstall non trovato/eseguibile: $COINSTALL"
+
+HELPER=$(resolve_helper)
+log "helper: $HELPER"
+
+TMP=$(mktemp -t aur-wrap.XXXXXX)
+trap 'rm -f "$TMP"' EXIT
+
+set +e
+"$HELPER" "$@" 2>&1 | tee "$TMP"
+EC=${PIPESTATUS[0]}
+set -e
+
+if [[ $EC -eq 0 ]]; then
+  exit 0
+fi
+
+if ! is_oracle_pin_failure "$TMP"; then
+  exit "$EC"
+fi
+
+log 'rilevato fallimento dipendenze oracle-instantclient (basic/sdk)'
+
+if ! prompt_recover "$@"; then
+  exit "$EC"
+fi
+
+co_opts=()
+if args_assume_yes "$@"; then
+  co_opts+=(-y)
+fi
+
+"$COINSTALL" "${co_opts[@]}" instantclient
+CO_EC=$?
+if [[ $CO_EC -ne 0 ]]; then
+  die "aur-coinstall fallito (exit $CO_EC)"
+fi
+
+if prompt_rerun "$@"; then
+  log "rilancio: $HELPER $*"
+  exec "$HELPER" "$@"
+fi
+
+exit 0

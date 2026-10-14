@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+# pkg — unified pacman / paru / yay front-end with safe orphan removal.
+#
+# Usage:
+#   pkg <pacman|paru|yay> <action> [args...]
+#   pkg paru search nginx
+#   pkg paru install foo bar
+#   pkg paru autoremove
+#   pkg paru -Syu          # raw flags passed through
+#
+# Actions: search | update | install | remove | info | autoremove | installed
+#
+# When AUR_WRAP is set/executable, paru/yay go through aur-wrap (Oracle pin recovery).
+set -euo pipefail
+
+die() {
+  printf 'pkg: %s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+Usage: pkg <pacman|paru|yay> <action|flags> [args...]
+
+Actions:
+  search <query>       -Ss
+  update               -Su
+  install <pkgs...>    -S
+  remove <pkgs...>     -R
+  info <pkg>           -Si
+  installed [query]    -Qs
+  autoremove           interactive orphan cleanup (-Qtdq / -Rns)
+
+Raw flags (starting with -) are passed to the package manager as-is.
+
+Env:
+  AUR_WRAP   path to aur-wrap (optional; used for paru/yay)
+EOF
+}
+
+run_pkgmgr() {
+  local pkgmgr=$1
+  shift
+
+  if [[ ($pkgmgr == paru || $pkgmgr == yay) && -n ${AUR_WRAP:-} && -x ${AUR_WRAP} ]]; then
+    AUR_HELPER=$pkgmgr "$AUR_WRAP" "$@"
+    return $?
+  fi
+
+  if [[ -x /usr/bin/$pkgmgr ]]; then
+    "/usr/bin/$pkgmgr" "$@"
+    return $?
+  fi
+
+  command "$pkgmgr" "$@"
+}
+
+safe_autoremove() {
+  local pkgmgr=$1
+  local orphans orphan_count choice confirm remove_pkg pkg
+
+  echo "🔍 Checking for orphaned packages..."
+
+  orphans=$(run_pkgmgr "$pkgmgr" -Qtdq 2>/dev/null || true)
+
+  echo "📋 Checking orphaned packages:"
+  if [[ -n $orphans ]]; then
+    while IFS= read -r pkg; do
+      [[ -n $pkg ]] || continue
+      echo "  - $pkg"
+    done <<<"$orphans"
+    orphan_count=$(grep -cve '^$' <<<"$orphans")
+  else
+    orphan_count=0
+  fi
+
+  if [[ $orphan_count -eq 0 ]]; then
+    echo "✅ No orphaned packages found."
+    return 0
+  fi
+
+  echo ""
+  echo "⚠️  WARNING: $orphan_count orphaned packages found."
+  echo "💡 Suggestion: Check each package manually before removing it."
+  echo ""
+  echo "Available options:"
+  echo "1) Remove ALL the orphaned packages (RISKY)"
+  echo "2) Confirm orphaned packages removal one by one"
+  echo "3) Show orphaned packages details"
+  echo "4) Cancel"
+  echo ""
+
+  printf "Choose an option (1-4): "
+  read -r choice
+
+  case $choice in
+    1)
+      echo "⚠️  Removing ALL the orphaned packages, are you sure? (y/N): "
+      read -r confirm
+      if [[ $confirm =~ ^[YySs]$ ]]; then
+        # shellcheck disable=SC2086
+        run_pkgmgr "$pkgmgr" -Rns $orphans
+      else
+        echo "❌ Operation cancelled."
+      fi
+      ;;
+    2)
+      echo "🔍 Individual confirmation removal..."
+      while IFS= read -r pkg; do
+        [[ -n $pkg ]] || continue
+        echo ""
+        echo "📦 Package: $pkg"
+        run_pkgmgr "$pkgmgr" -Si "$pkg" 2>/dev/null | head -10 || true
+        echo ""
+        printf "Remove %s? (y/N): " "$pkg"
+        read -r remove_pkg
+        if [[ $remove_pkg =~ ^[YySs]$ ]]; then
+          run_pkgmgr "$pkgmgr" -Rns "$pkg"
+        else
+          echo "⏭️  Skipped: $pkg"
+        fi
+      done <<<"$orphans"
+      ;;
+    3)
+      echo "📋 Orphaned packages details:"
+      while IFS= read -r pkg; do
+        [[ -n $pkg ]] || continue
+        echo ""
+        echo "📦 $pkg"
+        run_pkgmgr "$pkgmgr" -Si "$pkg" 2>/dev/null || true
+        echo "----------------------------------------"
+      done <<<"$orphans"
+      ;;
+    4)
+      echo "❌ Operation cancelled."
+      ;;
+    *)
+      echo "❌ Invalid option. Operation cancelled."
+      return 1
+      ;;
+  esac
+}
+
+[[ $# -ge 1 ]] || {
+  usage
+  die 'missing package manager name'
+}
+
+PKGMGR=$1
+shift
+
+case $PKGMGR in
+  pacman|paru|yay) ;;
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  *)
+    die "unsupported package manager: $PKGMGR (use pacman, paru, or yay)"
+    ;;
+esac
+
+# Raw passthrough: pkg paru -Syu / pkg paru -Ss foo
+if [[ $# -ge 1 && $1 == -* ]]; then
+  run_pkgmgr "$PKGMGR" "$@"
+  exit $?
+fi
+
+[[ $# -ge 1 ]] || {
+  usage
+  die 'missing action'
+}
+
+ACTION=$1
+shift
+
+case $ACTION in
+  search)
+    run_pkgmgr "$PKGMGR" -Ss "$@" || echo "No matches found"
+    ;;
+  update)
+    run_pkgmgr "$PKGMGR" -Su "$@"
+    ;;
+  install)
+    [[ $# -ge 1 ]] || die 'install requires package names'
+    run_pkgmgr "$PKGMGR" -S "$@"
+    ;;
+  remove)
+    [[ $# -ge 1 ]] || die 'remove requires package names'
+    run_pkgmgr "$PKGMGR" -R "$@"
+    ;;
+  info)
+    [[ $# -ge 1 ]] || die 'info requires a package name'
+    run_pkgmgr "$PKGMGR" -Si "$@" || echo "No matches found"
+    ;;
+  autoremove)
+    safe_autoremove "$PKGMGR" "$@"
+    ;;
+  installed)
+    run_pkgmgr "$PKGMGR" -Qs "$@"
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    die "invalid action: $ACTION"
+    ;;
+esac

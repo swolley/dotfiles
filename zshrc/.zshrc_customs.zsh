@@ -8,6 +8,36 @@ elif command -v yay >/dev/null 2>&1; then
 else
 	AUR_HELPER=
 fi
+export AUR_HELPER
+
+# AUR scripts live in the shared dotfiles repo (not ~/Documenti).
+DOTFILES_SCRIPTS="${DOTFILES_SCRIPTS:-$HOME/.dotfiles/scripts}"
+AUR_WRAP="${AUR_WRAP:-$DOTFILES_SCRIPTS/aur-wrap}"
+PKG_BIN="${PKG_BIN:-$DOTFILES_SCRIPTS/pkg}"
+export DOTFILES_SCRIPTS AUR_WRAP
+
+# Wrap paru/yay: on oracle-instantclient exact-version pin failures, offer aur-coinstall.
+if [[ -n "$AUR_HELPER" && -x "$AUR_WRAP" ]]; then
+	paru() {
+		AUR_HELPER=paru "$AUR_WRAP" "$@"
+	}
+	yay() {
+		AUR_HELPER=yay "$AUR_WRAP" "$@"
+	}
+fi
+
+# Unified AUR helper (search|install|remove|autoremove|… or raw flags like -Syu)
+aur() {
+	if [[ -z "$AUR_HELPER" ]]; then
+		echo "❌ No AUR helper found (install paru or yay)"
+		return 1
+	fi
+	if [[ ! -x "$PKG_BIN" ]]; then
+		echo "❌ pkg script missing: $PKG_BIN"
+		return 1
+	fi
+	"$PKG_BIN" "$AUR_HELPER" "$@"
+}
 
 eos-update() {
 	if [[ -z "$AUR_HELPER" ]]; then
@@ -52,141 +82,8 @@ eos-search() {
 		echo "❌ No AUR helper found (install paru or yay)"
 		return 1
 	fi
-	# -Ss works the same on paru and yay (unlike paru's "search" subcommand)
-	command "$AUR_HELPER" -Ss "$@" || echo "No matches found"
+	aur search "$@"
 }
-
-__pkgmgr() {
-	local pkgmgr="$1"
-	local action="$2"
-
-	shift 1
-
-	if [[ "$@" == -* ]]; then
-    	command "$pkgmgr" "$@"
-	else
-		shift 1
-
-		if [ "$action" = "search" ]; then
-			command "$pkgmgr" -Ss "$@" || echo "No matches found"
-		elif [ "$action" = "update" ]; then
-			command "$pkgmgr" -Su "$@"
-		elif [ "$action" = "install" ]; then
-			command "$pkgmgr" -S "$@"
-		elif [ "$action" = "remove" ]; then
-			command "$pkgmgr" -R "$@"
-		elif [ "$action" = "info" ]; then
-			command "$pkgmgr" -Si "$@" || echo "No matches found"
-		elif [ "$action" = "autoremove" ]; then
-			__safe_autoremove "$pkgmgr" "$@"
-		elif [ "$action" = "installed" ]; then
-			command "$pkgmgr" -Qs "$@"
-		else
-			echo "❌ Invalid option: $action"
-		fi
-	fi
-
-}
-
-__safe_autoremove() {
-	local pkgmgr="$1"
-	shift
-	
-	echo "🔍 Checking for orphaned packages..."
-	
-	local orphans
-	orphans=$(command "$pkgmgr" -Qtdq 2>/dev/null)
-	
-	echo "📋 Checking orphaned packages:"
-	if [ -n "$orphans" ]; then
-		echo "$orphans" | while read -r pkg; do
-			if [ -n "$pkg" ]; then
-				echo "  - $pkg"
-			fi
-		done
-	fi
-	
-	local orphan_count
-	orphan_count=$(echo "$orphans" | wc -l)
-	
-	if [ "$orphan_count" -eq 0 ] || [ -z "$orphans" ]; then
-		echo "✅ No orphaned packages found."
-		return 0
-	fi
-	
-	echo ""
-	echo "⚠️  WARNING: $orphan_count orphaned packages found."
-	echo "💡 Suggestion: Check each package manually before removing it."
-	echo ""
-	
-	echo "Available options:"
-	echo "1) Remove ALL the orphaned packages (RISKY)"
-	echo "2) Confirm orphaned packages removal one by one"
-	echo "3) Show orphaned packages details"
-	echo "4) Cancel"
-	echo ""
-	
-	printf "Choose an option (1-4): "
-	read choice
-	
-	case "$choice" in
-		1)
-			echo "⚠️  Removing ALL the orphaned packages, are you sure? (y/N): "
-			read confirm
-			if [[ "$confirm" =~ ^[YySs]$ ]]; then
-				command "$pkgmgr" -Rns $(echo "$orphans" | tr '\n' ' ')
-			else
-				echo "❌ Operation cancelled."
-			fi
-			;;
-		2)
-			echo "🔍 Individual confirmation removal..."
-			echo "$orphans" | while read -r pkg; do
-				if [ -n "$pkg" ]; then
-					echo ""
-					echo "📦 Package: $pkg"
-					command "$pkgmgr" -Si "$pkg" 2>/dev/null | head -10
-					echo ""
-					printf "Remove $pkg? (y/N): "
-					read remove_pkg
-					if [[ "$remove_pkg" =~ ^[YySs]$ ]]; then
-						command "$pkgmgr" -Rns "$pkg"
-					else
-						echo "⏭️  Skipped: $pkg"
-					fi
-				fi
-			done
-			;;
-		3)
-			echo "📋 Orphaned packages details:"
-			echo "$orphans" | while read -r pkg; do
-				if [ -n "$pkg" ]; then
-					echo ""
-					echo "📦 $pkg"
-					command "$pkgmgr" -Si "$pkg" 2>/dev/null
-					echo "----------------------------------------"
-				fi
-			done
-			;;
-		4)
-			echo "❌ Operation cancelled."
-			;;
-		*)
-			echo "❌ Invalid option. Operation cancelled."
-			;;
-	esac
-}
-
-#TODO: not completed
-#pacman() {
-#    __pkgmgr "pacman" "$@"
-#}
-
-# Unified AUR helper wrapper (uses detected paru/yay)
-#aur() {
-#    [[ -n "$AUR_HELPER" ]] || { echo "❌ No AUR helper found"; return 1; }
-#    __pkgmgr "$AUR_HELPER" "$@"
-#}
 
 html() {
 	local base_path="/srv/http"

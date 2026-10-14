@@ -1,0 +1,354 @@
+#!/usr/bin/env bash
+# aur-coinstall — build and install AUR packages in one pacman transaction.
+#
+# Solves exact-version pins (e.g. sdk depends on basic=$pkgver) where the AUR
+# helper installs packages one-by-one and makepkg refuses to build until the
+# peer is already installed.
+#
+# Usage:
+#   aur-coinstall instantclient
+#   aur-coinstall oracle-instantclient
+#   aur-coinstall oracle-instantclient-basic oracle-instantclient-sdk
+#   aur-coinstall -y --no-sync pkg-a pkg-b
+#   aur-coinstall --dry-run instantclient
+set -euo pipefail
+
+DRY_RUN=0
+ASSUME_YES=0
+NO_SYNC=0
+RAW_ARGS=()
+PACKAGES=()
+
+# Alias / family → co-install set (space-separated). Matching is case-insensitive;
+# a single member of a family expands to the whole family.
+declare -A COINSTALL_ALIASES=(
+  [instantclient]='oracle-instantclient-basic oracle-instantclient-sdk'
+  [oracle-instantclient]='oracle-instantclient-basic oracle-instantclient-sdk'
+  [oracle-instantclient-basic]='oracle-instantclient-basic oracle-instantclient-sdk'
+  [oracle-instantclient-sdk]='oracle-instantclient-basic oracle-instantclient-sdk'
+)
+
+usage() {
+  cat <<'EOF'
+Usage: aur-coinstall [options] <pkg|alias> [...]
+
+Build AUR packages with makepkg -fd (skip dep checks), then install all
+resulting .pkg.tar.* archives in a single pacman -U transaction.
+
+Aliases (expand automatically):
+  instantclient, oracle-instantclient
+      → oracle-instantclient-basic + oracle-instantclient-sdk
+  oracle-instantclient-basic | oracle-instantclient-sdk
+      → same pair (keeps exact-version pins in sync)
+
+Options:
+  -y, --yes         Pass --noconfirm to pacman
+  --no-sync         Do not refresh PKGBUILDs; use existing cache dirs
+  --dry-run         Show planned actions; do not build or install
+  -h, --help        Show this help
+
+Env:
+  AUR_HELPER        paru|yay (default: paru if present, else yay)
+  AUR_CACHE         Override clone/cache root
+EOF
+}
+
+die() {
+  printf 'aur-coinstall: %s\n' "$*" >&2
+  exit 1
+}
+
+log() {
+  printf '==> %s\n' "$*" >&2
+}
+
+warn() {
+  printf ':: %s\n' "$*" >&2
+}
+
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1 || die "comando richiesto non trovato: $1"
+}
+
+resolve_helper() {
+  local cand=${AUR_HELPER:-}
+  if [[ -z $cand ]]; then
+    if command -v paru >/dev/null 2>&1; then
+      cand=paru
+    elif command -v yay >/dev/null 2>&1; then
+      cand=yay
+    else
+      die 'né paru né yay trovati in PATH'
+    fi
+  fi
+  if [[ -x /usr/bin/$cand ]]; then
+    printf '%s' "/usr/bin/$cand"
+    return 0
+  fi
+  type -P "$cand" 2>/dev/null || die "helper non eseguibile: $cand"
+}
+
+resolve_cache() {
+  if [[ -n ${AUR_CACHE:-} ]]; then
+    printf '%s' "$AUR_CACHE"
+    return 0
+  fi
+  local helper_base
+  helper_base=$(basename "$HELPER")
+  case $helper_base in
+    paru) printf '%s' "${XDG_CACHE_HOME:-$HOME/.cache}/paru/clone" ;;
+    yay)  printf '%s' "${XDG_CACHE_HOME:-$HOME/.cache}/yay" ;;
+    *)    printf '%s' "${XDG_CACHE_HOME:-$HOME/.cache}/yay" ;;
+  esac
+}
+
+pkgbuild_version() {
+  local dir=$1
+  # shellcheck disable=SC1090
+  (cd "$dir" && source ./PKGBUILD && printf '%s-%s' "$pkgver" "$pkgrel")
+}
+
+pkgbuild_pkgname() {
+  local dir=$1
+  # shellcheck disable=SC1090
+  (cd "$dir" && source ./PKGBUILD && {
+    if declare -p pkgname 2>/dev/null | grep -q '^declare -a'; then
+      printf '%s' "${pkgname[0]}"
+    else
+      printf '%s' "$pkgname"
+    fi
+  })
+}
+
+find_built_archive() {
+  local dir=$1
+  local name=$2
+  local ver=$3
+  local match
+
+  match=$(find "$dir" -maxdepth 1 -type f \
+    \( -name "${name}-${ver}-*.pkg.tar.zst" \
+       -o -name "${name}-${ver}-*.pkg.tar.xz" \
+       -o -name "${name}-${ver}-*.pkg.tar.gz" \) \
+    | sort | tail -n1)
+
+  [[ -n $match ]] || return 1
+  printf '%s' "$match"
+}
+
+sync_pkg() {
+  local pkg=$1
+  local dest="$AUR_CACHE_DIR/$pkg"
+
+  if [[ $NO_SYNC -eq 1 ]]; then
+    [[ -f $dest/PKGBUILD ]] || die "PKGBUILD assente (usa sync): $dest"
+    return 0
+  fi
+
+  mkdir -p "$AUR_CACHE_DIR"
+  log "Sync PKGBUILD: $pkg"
+  if [[ -d $dest/.git ]]; then
+    git -C "$dest" pull --ff-only || warn "git pull fallito per $pkg, uso cache locale"
+  elif [[ -f $dest/PKGBUILD ]]; then
+    local tmp
+    tmp=$(mktemp -d)
+    (cd "$tmp" && "$HELPER" -G "$pkg") || die "$HELPER -G fallito per $pkg"
+    rsync -a --delete "$tmp/$pkg/" "$dest/"
+    rm -rf "$tmp"
+  else
+    (cd "$AUR_CACHE_DIR" && "$HELPER" -G "$pkg") || die "$HELPER -G fallito per $pkg"
+  fi
+
+  [[ -f $dest/PKGBUILD ]] || die "PKGBUILD mancante dopo sync: $dest"
+}
+
+build_pkg() {
+  local pkg=$1
+  local dir="$AUR_CACHE_DIR/$pkg"
+  local name ver archive
+
+  name=$(pkgbuild_pkgname "$dir")
+  ver=$(pkgbuild_version "$dir")
+
+  if archive=$(find_built_archive "$dir" "$name" "$ver"); then
+    log "Già buildato: $(basename "$archive")"
+    printf '%s' "$archive"
+    return 0
+  fi
+
+  log "Build (makepkg -fd): $pkg ($name $ver)"
+  if [[ $DRY_RUN -eq 1 ]]; then
+    warn "[dry-run] skip build $pkg"
+    printf '%s' "$dir/${name}-${ver}-x86_64.pkg.tar.zst"
+    return 0
+  fi
+
+  (cd "$dir" && makepkg -fd) || die "makepkg fallito: $pkg"
+
+  archive=$(find_built_archive "$dir" "$name" "$ver") \
+    || die "archivio non trovato dopo build: $name-$ver in $dir"
+
+  printf '%s' "$archive"
+}
+
+confirm_install() {
+  local archives=("$@")
+  local a
+
+  printf '\nPacchetti da installare insieme:\n'
+  for a in "${archives[@]}"; do
+    printf '  - %s\n' "$(basename "$a")"
+  done
+  printf '\n'
+
+  if [[ $ASSUME_YES -eq 1 ]]; then
+    return 0
+  fi
+
+  local reply
+  read -r -p 'Procedere con pacman -U? [y/N] ' reply
+  [[ $reply == [yY] || $reply == [yY][eE][sS] ]] || die 'annullato'
+}
+
+normalize_token() {
+  local t=${1,,}
+  t=${t%/}
+  t=${t%%=*}
+  printf '%s' "$t"
+}
+
+expand_token() {
+  local raw=$1
+  local key members m
+  key=$(normalize_token "$raw")
+
+  if [[ -v COINSTALL_ALIASES[$key] ]]; then
+    # shellcheck disable=SC2206
+    members=(${COINSTALL_ALIASES[$key]})
+    for m in "${members[@]}"; do
+      printf '%s\n' "$m"
+    done
+    return 0
+  fi
+
+  printf '%s\n' "$raw"
+}
+
+expand_packages() {
+  local -a expanded=()
+  local -A seen=()
+  local arg pkg
+
+  for arg in "${RAW_ARGS[@]}"; do
+    while IFS= read -r pkg; do
+      [[ -n $pkg ]] || continue
+      if [[ -z ${seen[$pkg]+x} ]]; then
+        seen[$pkg]=1
+        expanded+=("$pkg")
+      fi
+    done < <(expand_token "$arg")
+  done
+
+  if [[ ${#expanded[@]} -lt 2 ]]; then
+    usage
+    die "servono almeno due pacchetti (o un alias come 'instantclient'); ricevuti: ${expanded[*]:-nessuno}"
+  fi
+
+  if [[ ${#RAW_ARGS[@]} -eq 1 ]] || [[ ${expanded[*]} != "${RAW_ARGS[*]}" ]]; then
+    log "Espansione: ${RAW_ARGS[*]} → ${expanded[*]}"
+  fi
+
+  PACKAGES=("${expanded[@]}")
+}
+
+# --- argv ---
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -y|--yes)
+      ASSUME_YES=1
+      shift
+      ;;
+    --no-sync)
+      NO_SYNC=1
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    --)
+      shift
+      RAW_ARGS+=("$@")
+      break
+      ;;
+    -*)
+      die "opzione sconosciuta: $1"
+      ;;
+    *)
+      RAW_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+[[ ${#RAW_ARGS[@]} -ge 1 ]] || {
+  usage
+  die 'specifica almeno un pacchetto o alias'
+}
+
+expand_packages
+
+HELPER=$(resolve_helper)
+AUR_CACHE_DIR=$(resolve_cache)
+
+need_cmd makepkg
+need_cmd pacman
+need_cmd find
+if [[ $NO_SYNC -eq 0 ]]; then
+  need_cmd git
+  need_cmd rsync
+fi
+
+log "Helper: $HELPER"
+log "Cache: $AUR_CACHE_DIR"
+log "Pacchetti: ${PACKAGES[*]}"
+
+ARCHIVES=()
+for pkg in "${PACKAGES[@]}"; do
+  sync_pkg "$pkg"
+done
+
+for pkg in "${PACKAGES[@]}"; do
+  archive=$(build_pkg "$pkg")
+  ARCHIVES+=("$archive")
+done
+
+if [[ $DRY_RUN -eq 1 ]]; then
+  printf '\n[dry-run] pacchetti:\n' >&2
+  for a in "${ARCHIVES[@]}"; do
+    printf '  - %s\n' "$(basename "$a")" >&2
+  done
+  log "[dry-run] pacman -U ${ARCHIVES[*]}"
+  exit 0
+fi
+
+confirm_install "${ARCHIVES[@]}"
+
+log "Installazione in una sola transazione..."
+pacman_opts=(-U)
+if [[ $ASSUME_YES -eq 1 ]]; then
+  pacman_opts+=(--noconfirm)
+fi
+
+if [[ $EUID -eq 0 ]]; then
+  pacman "${pacman_opts[@]}" "${ARCHIVES[@]}"
+else
+  sudo pacman "${pacman_opts[@]}" "${ARCHIVES[@]}"
+fi
+
+log "Fatto."
+pacman -Q "${PACKAGES[@]}" 2>/dev/null || true
