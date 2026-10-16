@@ -10,18 +10,16 @@ prefer-no-csd
 // Polkit agent (GNOME legacy — installed by install-niri.sh as polkit-gnome)
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
-// Wallpaper: try common paths, else solid soft background
-spawn-sh-at-startup "f=\"$HOME/Immagini/Firefox_wallpaper.png\"; [ -f \"$f\" ] || f=\"$HOME/Pictures/Firefox_wallpaper.png\"; [ -f \"$f\" ] && swaybg -i \"$f\" -m fill || swaybg -c '#1c1c1e'"
-
 spawn-at-startup "xwayland-satellite"
 
 spawn-at-startup "swayidle" "-w" \
-    "timeout" "300" "qs -c noctalia-shell ipc call lockScreen lock" \
+    "timeout" "300" "noctalia msg session lock" \
     "timeout" "600" "systemctl suspend" \
-    "before-sleep" "qs -c noctalia-shell ipc call lockScreen lock"
+    "before-sleep" "noctalia msg session lock"
 
-// Shell UI (bar/dock/launcher). If this fails you get a bare gray desktop.
-spawn-sh-at-startup "qs -c noctalia-shell || notify-send 'Noctalia failed' 'qs -c noctalia-shell did not start — check noctalia-qs/noctalia-shell' 2>/dev/null || true"
+// Noctalia v5 (extra/noctalia). Wallpaper is managed by the shell — no swaybg.
+// --daemon returns after UI init so later spawn-at-startup lines are not blocked.
+spawn-sh-at-startup "noctalia --daemon || notify-send 'Noctalia failed' 'noctalia --daemon did not start — check extra/noctalia' 2>/dev/null || true"
 
 // Convenience: open a terminal on login (also Ctrl+Alt+T / Super+Return)
 spawn-at-startup "kitty"
@@ -63,11 +61,13 @@ input {
 }
 
 overview {
+    // Fallback tint; Noctalia wallpaper sits in the backdrop via layer-rule below.
     backdrop-color "#1c1c1e"
 }
 
+// Stationary Noctalia wallpaper visible in overview (docs: compositor-settings/niri).
 layer-rule {
-    match namespace="^wallpaper$"
+    match namespace="^noctalia-wallpaper$"
     place-within-backdrop true
 }
 
@@ -83,6 +83,9 @@ include "./outputs.local.kdl"
 
 
 layout {
+    // Let Noctalia wallpaper show through (pair with noctalia-wallpaper layer-rule).
+    background-color "transparent"
+
     gaps 10
 
     center-focused-column "on-overflow"
@@ -178,6 +181,19 @@ window-rule {
     clip-to-geometry true
 }
 
+// Floating Noctalia settings window (official niri compositor settings).
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
+}
+
+debug {
+    // Allows notification actions and window activation from Noctalia.
+    honor-xdg-activation-with-invalid-serial
+}
+
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
@@ -198,16 +214,17 @@ binds {
         maximize-column;
     }
 
+    // Noctalia v5 IPC: https://docs.noctalia.dev/noctalia/ipc/
     Mod+D {
-        spawn-sh "qs -c noctalia-shell ipc call launcher toggle";
+        spawn-sh "noctalia msg panel-toggle launcher";
     }
 
     Mod+L {
-        spawn-sh "qs -c noctalia-shell ipc call lockScreen lock";
+        spawn-sh "noctalia msg session lock";
     }
 
     Mod+Shift+L {
-        spawn-sh "qs -c noctalia-shell ipc call sessionMenu lockAndSuspend";
+        spawn-sh "noctalia msg session lock-and-suspend";
     }
 
     Mod+X {
@@ -223,111 +240,104 @@ binds {
     }
 
     XF86AudioRaiseVolume allow-when-locked=true {
-        spawn-sh "qs -c noctalia-shell ipc call volume increase";
+        spawn-sh "noctalia msg volume-up";
     }
     XF86AudioLowerVolume allow-when-locked=true {
-        spawn-sh "qs -c noctalia-shell ipc call volume decrease";
+        spawn-sh "noctalia msg volume-down";
     }
     XF86AudioMute allow-when-locked=true {
-        spawn-sh "qs -c noctalia-shell ipc call volume muteOutput";
+        spawn-sh "noctalia msg volume-mute";
     }
     XF86AudioMicMute allow-when-locked=true {
-        spawn-sh "qs -c noctalia-shell ipc call volume muteInput";
+        spawn-sh "noctalia msg mic-mute";
     }
 
-    XF86AudioPlay { spawn-sh "qs -c noctalia-shell ipc call media playPause"; }
-    XF86AudioNext { spawn-sh "qs -c noctalia-shell ipc call media next"; }
-    XF86AudioPrev { spawn-sh "qs -c noctalia-shell ipc call media previous"; }
+    XF86AudioPlay { spawn-sh "noctalia msg media toggle"; }
+    XF86AudioNext { spawn-sh "noctalia msg media next"; }
+    XF86AudioPrev { spawn-sh "noctalia msg media previous"; }
 
     XF86MonBrightnessUp allow-when-locked=true {
-        spawn-sh "qs -c noctalia-shell ipc call brightness increase || brightnessctl s +10%";
+        spawn-sh "noctalia msg brightness-up || brightnessctl s +10%";
     }
     XF86MonBrightnessDown allow-when-locked=true {
-        spawn-sh "qs -c noctalia-shell ipc call brightness decrease || brightnessctl s 10%-";
+        spawn-sh "noctalia msg brightness-down || brightnessctl s 10%-";
     }
 
     Mod+N {
-        spawn-sh "qs -c noctalia-shell ipc call nightLight toggle";
+        spawn-sh "noctalia msg nightlight-toggle";
     }
 
     Mod+V {
-        spawn-sh "qs -c noctalia-shell ipc call launcher clipboard";
+        spawn-sh "noctalia msg panel-toggle clipboard";
     }
 
     Mod+Period {
-        spawn-sh "qs -c noctalia-shell ipc call launcher emoji";
+        spawn-sh "noctalia msg panel-toggle launcher \"/emo \"";
     }
 
     Mod+C {
-        spawn-sh "qs -c noctalia-shell ipc call controlCenter toggle";
+        spawn-sh "noctalia msg panel-toggle control-center";
     }
 
     Mod+M {
-        spawn-sh "qs -c noctalia-shell ipc call volume togglePanel";
+        spawn-sh "noctalia msg panel-toggle control-center audio";
     }
 
     Mod+S {
-        spawn-sh "qs -c noctalia-shell ipc call settings toggle";
+        spawn-sh "noctalia msg settings-toggle";
     }
 
     Mod+Shift+J {
-        spawn-sh "qs -c noctalia-shell ipc call bar toggle";
+        spawn-sh "noctalia msg bar-toggle";
     }
 
     Mod+O {
-        spawn-sh "qs -c noctalia-shell ipc call dock toggle";
+        spawn-sh "noctalia msg dock-toggle";
     }
 
     Mod+G {
-        spawn-sh "qs -c noctalia-shell ipc call desktopWidgets toggle";
+        spawn-sh "noctalia msg desktop-widgets-toggle";
     }
 
     Mod+W {
-        spawn-sh "qs -c noctalia-shell ipc call wifi toggle";
+        spawn-sh "noctalia msg wifi-toggle";
     }
 
     Mod+Shift+W {
-        spawn-sh "qs -c noctalia-shell ipc call network togglePanel";
+        spawn-sh "noctalia msg panel-toggle control-center network";
     }
 
     Mod+B {
-        spawn-sh "qs -c noctalia-shell ipc call bluetooth toggle";
+        spawn-sh "noctalia msg bluetooth-toggle";
     }
 
     Mod+Shift+B {
-        spawn-sh "qs -c noctalia-shell ipc call bluetooth togglePanel";
+        spawn-sh "noctalia msg panel-toggle control-center bluetooth";
     }
 
     Mod+Shift+D {
-        spawn-sh "qs -c noctalia-shell ipc call notifications toggleDND";
+        spawn-sh "noctalia msg notification-dnd-toggle";
     }
 
     Mod+Shift+BackSpace {
-        spawn-sh "qs -c noctalia-shell ipc call notifications dismissAll";
+        spawn-sh "noctalia msg notification-clear-active";
     }
 
     Mod+T {
-        spawn-sh "qs -c noctalia-shell ipc call darkMode toggle";
+        spawn-sh "noctalia msg theme-mode-toggle";
     }
 
     Mod+Ctrl+T {
-        spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle";
+        spawn-sh "noctalia msg panel-toggle wallpaper";
     }
 
     Mod+Ctrl+Alt+T {
-        spawn-sh "qs -c noctalia-shell ipc call wallpaper random";
+        spawn-sh "noctalia msg wallpaper-random";
     }
 
+    // v4 had wallpaper automation; v5 has no IPC equivalent → next wallpaper.
     Mod+A {
-        spawn-sh "qs -c noctalia-shell ipc call wallpaper toggleAutomation";
-    }
-
-    Mod+Minus {
-        spawn-sh "qs -c noctalia-shell ipc call zoom zoomOut";
-    }
-
-    Mod+equal {
-        spawn-sh "qs -c noctalia-shell ipc call zoom zoomIn";
+        spawn-sh "noctalia msg wallpaper-next";
     }
 
     Mod+Left  { focus-column-left; }
@@ -370,7 +380,7 @@ binds {
         toggle-keyboard-shortcuts-inhibit;
     }
 
-    Ctrl+Alt+Delete { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
+    Ctrl+Alt+Delete { spawn-sh "noctalia msg panel-toggle session"; }
 }
 
 include "./noctalia.kdl"

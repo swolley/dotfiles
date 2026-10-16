@@ -3,8 +3,8 @@
 # Does NOT wipe ~/.config and does NOT replace GNOME.
 #
 # Usage (from repo root):
-#   ./install-niri.sh
-#   ./install-niri.sh --no-update
+#   ./scripts/install-niri.sh
+#   ./scripts/install-niri.sh --no-update
 
 set -euo pipefail
 
@@ -15,7 +15,8 @@ BLUE="\033[1;34m"
 CYAN="\033[1;36m"
 RESET="\033[0m"
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Script lives in scripts/; stow packages are at the repo root.
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DO_UPDATE=1
 
 section() {
@@ -31,7 +32,7 @@ error() { echo -e "${RED}✖${RESET} $1"; }
 
 usage() {
   cat <<'EOF'
-Usage: ./install-niri.sh [--no-update] [--help]
+Usage: ./scripts/install-niri.sh [--no-update] [--help]
 
   --no-update   Skip pacman -Syu
   --help        Show this help
@@ -61,9 +62,9 @@ cat <<'EOF'
 This installer will:
   • update the system (unless --no-update)
   • install Niri / Wayland / portal / utility packages
-  • install AUR packages: noctalia-qs, noctalia-shell
-  • remove upstream quickshell / quickshell-git if present
-    (they conflict with noctalia-qs — Noctalia's required fork)
+  • install Noctalia v5 from extra/noctalia (pacman, no AUR)
+  • optionally remove leftover Noctalia v4 AUR packages
+    (noctalia-shell, noctalia-qs, quickshell, quickshell-git)
   • stow kitty (and niri if that package exists in this repo)
 
 This installer will NOT:
@@ -72,9 +73,11 @@ This installer will NOT:
   • install Dolphin, Ark, Breeze, Bibata, JetBrains Mono, or fish
   • replace your Neovim / zsh / tmux / starship setup
   • replace your GNOME icon/cursor themes (keep Qogir / Qogir-Dark)
-  • install official Arch quickshell (incompatible with Noctalia ≥ 4.6)
+  • migrate Noctalia v4 settings automatically (v5 config is separate)
 
 File manager in Niri should stay Nautilus for now.
+
+This repo's niri config already targets v5 (noctalia --daemon / noctalia msg).
 EOF
 echo -e "${RESET}"
 
@@ -115,6 +118,7 @@ section "Installing pacman packages"
 # Cursor/icons: keep the existing GNOME setup (Qogir / Qogir-Dark).
 PACMAN_PKGS=(
   niri
+  noctalia
   xwayland-satellite
   wl-clipboard
   xdg-desktop-portal
@@ -140,72 +144,55 @@ sudo pacman -S --needed --noconfirm "${PACMAN_PKGS[@]}"
 success "Pacman packages installed (or already present)"
 
 # ---------------------------------------------------------------------------
-section "Checking AUR helper"
+section "Cleaning leftover Noctalia v4 packages (optional)"
 
-AUR_HELPER=""
-if command -v paru >/dev/null 2>&1; then
-  AUR_HELPER="paru"
-  success "Using paru"
-elif command -v yay >/dev/null 2>&1; then
-  AUR_HELPER="yay"
-  success "Using yay (paru not found)"
-else
-  warn "No AUR helper found. Installing yay from AUR as fallback..."
-  tmp_dir="$(mktemp -d)"
-  git clone https://aur.archlinux.org/yay.git "$tmp_dir/yay"
-  (
-    cd "$tmp_dir/yay"
-    makepkg -si --noconfirm
-  )
-  rm -rf "$tmp_dir"
-  AUR_HELPER="yay"
-  success "yay installed"
-fi
-
-# ---------------------------------------------------------------------------
-section "Resolving Quickshell / Noctalia conflicts"
-
-# Noctalia ≥ 4.6 requires noctalia-qs (fork). Official quickshell packages
-# conflict with it and must not be installed alongside noctalia-shell.
-remove_conflicting_quickshell() {
+# v5 (extra/noctalia) is a separate native shell; v4 AUR packages are unused.
+# Remove only exact package names (pacman -Q matches Provides).
+remove_pkg_if_exact() {
   local pkg="$1"
-  # pacman -Q matches Provides, so noctalia-qs answers as "quickshell".
-  # Only remove when the real installed package name matches.
   local installed
   installed="$(pacman -Qq "$pkg" 2>/dev/null || true)"
   if [[ "$installed" != "$pkg" ]]; then
     return 0
   fi
-  warn "Removing conflicting package: $pkg"
+  warn "Removing leftover v4 package: $pkg"
   sudo pacman -Rdd --noconfirm "$pkg"
   success "Removed $pkg"
 }
 
-remove_conflicting_quickshell quickshell
-remove_conflicting_quickshell quickshell-git
+LEGACY_V4_PKGS=()
+for pkg in noctalia-shell noctalia-qs quickshell quickshell-git; do
+  if [[ "$(pacman -Qq "$pkg" 2>/dev/null || true)" == "$pkg" ]]; then
+    LEGACY_V4_PKGS+=("$pkg")
+  fi
+done
+
+if ((${#LEGACY_V4_PKGS[@]} > 0)); then
+  warn "Found Noctalia v4 leftovers: ${LEGACY_V4_PKGS[*]}"
+  read -r -p "Remove them? (y/N): " remove_legacy
+  if [[ "$remove_legacy" == "y" || "$remove_legacy" == "Y" ]]; then
+    for pkg in "${LEGACY_V4_PKGS[@]}"; do
+      remove_pkg_if_exact "$pkg"
+    done
+  else
+    warn "Keeping v4 packages (v4 and v5 can coexist; update keybinds to use one)"
+  fi
+else
+  success "No Noctalia v4 leftovers found"
+fi
 
 # ---------------------------------------------------------------------------
-section "Installing AUR packages"
+section "Verifying Noctalia v5"
 
-# noctalia-shell pulls noctalia-qs; list both explicitly for clarity.
-# Never install Arch extra/quickshell here.
-"$AUR_HELPER" -S --needed --noconfirm noctalia-qs noctalia-shell
-success "AUR packages installed via $AUR_HELPER (or already present)"
-
-if ! pacman -Q noctalia-qs >/dev/null 2>&1; then
-  error "noctalia-qs is not installed — Noctalia cannot run without it"
+if ! pacman -Q noctalia >/dev/null 2>&1; then
+  error "extra/noctalia is not installed"
   exit 1
 fi
-if [[ "$(pacman -Qq quickshell 2>/dev/null || true)" == "quickshell" ]] \
-  || [[ "$(pacman -Qq quickshell-git 2>/dev/null || true)" == "quickshell-git" ]]; then
-  error "Upstream quickshell is still present and conflicts with noctalia-qs"
+if ! command -v noctalia >/dev/null 2>&1; then
+  error "noctalia binary not found after installing extra/noctalia"
   exit 1
 fi
-if ! command -v qs >/dev/null 2>&1; then
-  error "qs binary not found after installing noctalia-qs"
-  exit 1
-fi
-success "Runtime OK: noctalia-qs provides qs ($(pacman -Q noctalia-qs))"
+success "Runtime OK: $(pacman -Q noctalia) → $(command -v noctalia)"
 
 # ---------------------------------------------------------------------------
 section "Stowing configs from this repo"
@@ -236,11 +223,12 @@ echo -e "${CYAN}Next steps:${RESET}"
 cat <<'EOF'
 1. Log out of GNOME.
 2. At the login screen, choose the Niri session (keep GNOME as fallback).
-3. On first login, expect a minimal compositor until noctalia starts.
-4. Edit ~/.config/niri/config.kdl after first login:
-   - wallpaper (default: ~/Immagini/Firefox_wallpaper.png or solid #1c1c1e)
-   - monitor: uncomment output after \`niri msg outputs\`
-   - Mod+Return → kitty, Mod+E → nautilus
+3. Noctalia should autostart via noctalia --daemon (stowed niri config).
+   IPC reference: https://docs.noctalia.dev/noctalia/ipc/
+4. After first login, tune ~/.config/niri/config.kdl:
+   - wallpaper via Noctalia settings (Mod+S) or panel Mod+Ctrl+T
+   - monitor: edit outputs.local.kdl after \`niri msg outputs\`
+   - Mod+Return → kitty, Mod+E → nautilus, Mod+D → launcher
 5. Intel GPU only: NVIDIA env vars are already omitted from this config.
 
 Optional later:

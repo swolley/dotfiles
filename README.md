@@ -166,15 +166,16 @@ replace GNOME):
 
 ```bash
 cd ~/.dotfiles
-./install-niri.sh           # also runs pacman -Syu
-./install-niri.sh --no-update
+./scripts/install-niri.sh           # also runs pacman -Syu
+./scripts/install-niri.sh --no-update
 ```
 
 What it installs:
-- pacman: `niri`, `xwayland-satellite`, portals, swaybg/swayidle, grim/slurp,
-  pipewire stack, `kitty`, `polkit-gnome`, …
-- AUR (via `yay`): `quickshell`, `noctalia-shell`
+- pacman: `niri`, `noctalia` (v5 from `extra/`), `xwayland-satellite`, portals,
+  swaybg/swayidle, grim/slurp, pipewire stack, `kitty`, `polkit-gnome`, …
 - stow: `kitty` and `niri` (config + portals)
+- optionally removes leftover Noctalia v4 AUR packages (`noctalia-shell`,
+  `noctalia-qs`, `quickshell`, `quickshell-git`)
 
 What it deliberately skips:
 - Dolphin, Ark, Breeze / KDE Qt stack, Bibata cursors, JetBrains Mono, fish
@@ -191,8 +192,9 @@ What it deliberately skips:
 - Later optional trial: **Dolphin** + **Ark** (+ Breeze) as a more power-user file manager /
   archive stack. Worth trying if split panes, folder filters, or richer context actions are
   missing from Nautilus — then switch the niri bind from Nautilus to Dolphin.
-- Stow package `niri/` is ready. Run `./install-niri.sh` when you want packages,
-  then `stow niri` (the installer does this), log into Niri, and tune monitor/wallpaper.
+- Stow package `niri/` is ready. Run `./scripts/install-niri.sh` when you want
+  packages, then `stow niri` (the installer does this), log into Niri, and tune
+  monitor/wallpaper (wallpaper is owned by Noctalia v5, not swaybg).
 - Kitty starts with the Niri session (`spawn-at-startup`); also `Ctrl+Alt+T` and
   `Super+Return`.
 
@@ -202,11 +204,12 @@ What it deliberately skips:
 
 1. **Noctalia did not start** — from a TTY or GNOME check:
    ```bash
-   pacman -Q noctalia-qs noctalia-shell
-   command -v qs
-   qs -c noctalia-shell
+   pacman -Q noctalia
+   command -v noctalia
+   noctalia --daemon
    ```
-   Fix packages (`noctalia-qs` fork, not stock Arch `quickshell`), then re-login to Niri.
+   Needs `extra/noctalia` (v5). Keybinds use `noctalia msg …` (not the old
+   `qs -c noctalia-shell`). Then re-login to Niri.
 2. **Wrong GPU env** — do not force `MESA_LOADER_DRIVER_OVERRIDE=iris` /
    `GBM_BACKEND=iris` on non-Intel machines (kept out of shared `config.kdl`).
 3. **Right-click on empty desktop** does nothing by design (no GNOME desktop menu).
