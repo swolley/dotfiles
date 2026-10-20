@@ -27,6 +27,9 @@ ENABLE_CORRECTION="false"
 plugins=(sudo git archlinux zsh-autosuggestions zsh-syntax-highlighting copyfile laravel)
 source $ZSH/oh-my-zsh.sh
 
+# zsh-syntax-highlighting: readable comments (default fg=black,bold is nearly invisible on dark themes)
+ZSH_HIGHLIGHT_STYLES[comment]='fg=247'
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
