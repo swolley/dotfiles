@@ -1,35 +1,32 @@
-// Soft noctalia green — aligned with starship / tmux / kitty / nvim
 layout {
+
     focus-ring {
-        active-color   "#8fbf98"
-        inactive-color "#1c1c1e"
-        urgent-color   "#ffb4ab"
+        active-color   "#37f499"
+        inactive-color "#212337"
+        urgent-color   "#f16c75"
     }
 
     border {
-        active-color   "#8fbf98"
-        inactive-color "#3a3b3e"
-        urgent-color   "#ffb4ab"
+        active-color   "#37f499"
+        inactive-color "#212337"
+        urgent-color   "#f16c75"
     }
 
-    shadow {
-        color "#00000070"
-    }
 
     tab-indicator {
-        active-color   "#8fbf98"
-        inactive-color "#2a2b2e"
-        urgent-color   "#ffb4ab"
+        active-color   "#37f499"
+        inactive-color "#05733e"
+        urgent-color   "#f16c75"
     }
 
     insert-hint {
-        color "#8fbf9880"
+        color "#37f49980"
     }
 }
 
 recent-windows {
     highlight {
-        active-color "#8fbf98"
-        urgent-color "#ffb4ab"
+        active-color "#37f499"
+        urgent-color "#f16c75"
     }
 }

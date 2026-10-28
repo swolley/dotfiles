@@ -7,21 +7,21 @@
 
 prefer-no-csd
 
-// Polkit agent (GNOME legacy — installed by install-niri.sh as polkit-gnome)
-spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+// noctalia v5 integra polkit agent, wallpaper daemon, idle manager e lock
+// screen: niente helper esterni (erano polkit-gnome, swaybg, swayidle).
+// Per riattivarli: config.kdl.bak-v4-quickshell.
 
 spawn-at-startup "xwayland-satellite"
 
-spawn-at-startup "swayidle" "-w" \
-    "timeout" "300" "noctalia msg session lock" \
-    "timeout" "600" "systemctl suspend" \
-    "before-sleep" "noctalia msg session lock"
-
-// Noctalia v5 (extra/noctalia). Wallpaper is managed by the shell — no swaybg.
-// --daemon returns after UI init so later spawn-at-startup lines are not blocked.
-spawn-sh-at-startup "noctalia --daemon || notify-send 'Noctalia failed' 'noctalia --daemon did not start — check extra/noctalia' 2>/dev/null || true"
+// Shell UI (bar/dock/launcher/notifiche/lock).
+// Lo script avvia noctalia e, se muore, apre una kitty con le ultime righe
+// di log e scrive sul journal. NON usa notify-send: in v5 il demone di
+// notifica e' noctalia stesso, quindi non puo' annunciare il proprio
+// fallimento e ti ritroveresti col desktop vuoto senza spiegazione.
+spawn-sh-at-startup "$HOME/.config/niri/start-noctalia.sh"
 
 // Convenience: open a terminal on login (also Ctrl+Alt+T / Super+Return)
+// Non serve piu' come rete di sicurezza: se ne occupa start-noctalia.sh.
 spawn-at-startup "kitty"
 
 environment {
@@ -89,6 +89,10 @@ layout {
     gaps 10
 
     center-focused-column "on-overflow"
+
+    // Con una sola finestra aperta la tiene al centro invece che a sinistra:
+    // riduce lo spaesamento arrivando da un desktop tradizionale.
+    always-center-single-column
 
     preset-column-widths {
         proportion 0.33333
@@ -272,7 +276,7 @@ binds {
     }
 
     Mod+Period {
-        spawn-sh "noctalia msg panel-toggle launcher \"/emo \"";
+        spawn-sh "noctalia msg panel-toggle launcher /emo";
     }
 
     Mod+C {
@@ -335,10 +339,15 @@ binds {
         spawn-sh "noctalia msg wallpaper-random";
     }
 
-    // v4 had wallpaper automation; v5 has no IPC equivalent → next wallpaper.
-    Mod+A {
-        spawn-sh "noctalia msg wallpaper-next";
-    }
+    // Mod+A e' libero: era `wallpaper toggleAutomation` di noctalia v4,
+    // senza equivalente in v5.
+
+    // Larghezza colonne: preset 1/3, 1/2, 2/3 (vedi preset-column-widths)
+    Mod+R       { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-column-width-back; }
+    Mod+Minus   { set-column-width "-10%"; }
+    Mod+plus    { set-column-width "+10%"; }  // layout it: + e' un tasto diretto, = e' Shift+0
+    Mod+Ctrl+F  { expand-column-to-available-width; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }
@@ -349,6 +358,16 @@ binds {
     Mod+Ctrl+Down  { move-window-down; }
     Mod+Ctrl+Up    { move-window-up; }
     Mod+Ctrl+Right { move-column-right; }
+
+    // Monitor: LG a sinistra, portatile a destra, striscia BOE sotto il portatile
+    Mod+Shift+Left       { focus-monitor-left; }
+    Mod+Shift+Right      { focus-monitor-right; }
+    Mod+Shift+Up         { focus-monitor-up; }
+    Mod+Shift+Down       { focus-monitor-down; }
+    Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
+    Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
+    Mod+Shift+Ctrl+Up    { move-column-to-monitor-up; }
+    Mod+Shift+Ctrl+Down  { move-column-to-monitor-down; }
 
     Mod+Q repeat=false { close-window; }
 
@@ -383,4 +402,6 @@ binds {
     Ctrl+Alt+Delete { spawn-sh "noctalia msg panel-toggle session"; }
 }
 
-include "./noctalia.kdl"
+
+
+include "noctalia.kdl"
