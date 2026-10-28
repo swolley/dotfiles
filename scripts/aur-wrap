@@ -95,6 +95,25 @@ prompt_rerun() {
   [[ -z $reply || $reply == [yY] || $reply == [yY][eE][sS] ]]
 }
 
+# tee breaks isatty(); force color when our stdout is still a terminal.
+# Skip if the caller already set --color / --color=*.
+args_have_color() {
+  local a
+  for a in "$@"; do
+    case $a in
+      --color|--color=*) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+# Build argv for HELPER: optional --color=always + original args.
+helper_argv=()
+if [[ -t 1 ]] && ! args_have_color "$@"; then
+  helper_argv+=(--color=always)
+fi
+helper_argv+=("$@")
+
 [[ -x $COINSTALL ]] || die "aur-coinstall non trovato/eseguibile: $COINSTALL"
 
 HELPER=$(resolve_helper)
@@ -104,7 +123,7 @@ TMP=$(mktemp -t aur-wrap.XXXXXX)
 trap 'rm -f "$TMP"' EXIT
 
 set +e
-"$HELPER" "$@" 2>&1 | tee "$TMP"
+"$HELPER" "${helper_argv[@]}" 2>&1 | tee "$TMP"
 EC=${PIPESTATUS[0]}
 set -e
 
@@ -134,8 +153,8 @@ if [[ $CO_EC -ne 0 ]]; then
 fi
 
 if prompt_rerun "$@"; then
-  log "rilancio: $HELPER $*"
-  exec "$HELPER" "$@"
+  log "rilancio: $HELPER ${helper_argv[*]}"
+  exec "$HELPER" "${helper_argv[@]}"
 fi
 
 exit 0
