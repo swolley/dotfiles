@@ -1,22 +1,35 @@
 // Per-machine monitor layout for niri.
-// Shared dotfiles keep this file mostly empty so every host can boot with
-// automatic output placement. When you need fixed modes/scale/positions:
+// Replica la disposizione attiva in GNOME (mutter, coordinate logiche),
+// tutti gli schermi a scala 1.25:
 //
-//   1. Log into niri
-//   2. Run: niri msg outputs
-//   3. Copy blocks from outputs.local.kdl.example below (or that file)
-//   4. Keep machine-specific edits local (do not commit), OR add
-//      hosts/<hostname>.kdl and symlink it to this file (see README)
+//   +--------------------------+--------+
+//   |                          | eDP-1  |  y=748
+//   |      DP-2  LG 4K         +--------+
+//   |      (0,0) principale    | DP-1   |  y=1612
+//   +--------------------------+--------+
+//                              x=3072
 //
-// Example (commented):
-//
-// output "eDP-1" {
-//     mode "1920x1080@60"
-//     scale 1
-// }
-//
-// output "HDMI-A-1" {
-//     mode "2560x1440@60"
-//     scale 1
-//     position x=1920 y=0
-// }
+// Backup del file precedente: outputs.local.kdl.bak-prima-layout-gnome
+
+// LG HDR 4K. GNOME lo tiene a 30 Hz; qui niente frequenza fissa,
+// cosi' niri usa quella preferita dal monitor (al primo avvio ha scelto 60 Hz).
+output "DP-2" {
+    mode "3840x2160"
+    scale 1.25
+    position x=0 y=0
+    focus-at-startup
+}
+
+// Schermo del portatile (AU Optronics)
+output "eDP-1" {
+    mode "1920x1080@60.049"
+    scale 1.25
+    position x=3072 y=748
+}
+
+// Striscia BOE 1920x515, sotto il portatile
+output "DP-1" {
+    mode "1920x515@60.075"
+    scale 1.25
+    position x=3072 y=1612
+}
