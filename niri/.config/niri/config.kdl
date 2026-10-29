@@ -22,7 +22,7 @@ spawn-sh-at-startup "$HOME/.config/niri/start-noctalia.sh"
 
 // Convenience: open a terminal on login (also Ctrl+Alt+T / Super+Return)
 // Non serve piu' come rete di sicurezza: se ne occupa start-noctalia.sh.
-spawn-at-startup "kitty"
+spawn-sh-at-startup "$HOME/.config/niri/terminal.sh focus"
 
 environment {
     QT_QPA_PLATFORM "wayland"
@@ -211,8 +211,10 @@ binds {
     }
 
     // Terminal (GNOME-style Ctrl+Alt+T + tiling Mod+Return)
-    Ctrl+Alt+T { spawn "kitty"; }
-    Mod+Return { spawn "kitty"; }
+    // Terminale unico: se c'e' gia' una kitty le da' il focus.
+    Ctrl+Alt+T       { spawn-sh "$HOME/.config/niri/terminal.sh focus"; }
+    Mod+Return       { spawn-sh "$HOME/.config/niri/terminal.sh focus"; }
+    Mod+Shift+Return { spawn-sh "$HOME/.config/niri/terminal.sh new"; }
 
     Mod+F {
         maximize-column;
