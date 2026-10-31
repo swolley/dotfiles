@@ -1,0 +1,4 @@
+# Node, npm e pnpm dall'ultima stabile nei repo.
+nodejs
+npm
+pnpm

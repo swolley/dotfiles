@@ -1,0 +1,26 @@
+# Applicazioni grafiche.
+firefox
+google-chrome
+obsidian
+code
+dbeaver
+inkscape
+krita
+picard
+quodlibet
+tidal-hifi
+transmission-gtk
+nicotine+
+easyeffects
+# catena di plugin audio usata da easyeffects
+lsp-plugins
+# mixer audio: profili e instradamento per applicazione
+pavucontrol
+# tastiere meccaniche programmabili
+qmk
+vial-appimage
+bottles
+mission-center
+claude-code
+claude-desktop
+openai-codex

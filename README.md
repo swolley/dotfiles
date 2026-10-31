@@ -9,13 +9,15 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 ```text
 .dotfiles/
 ├── gitmux/          → ~/.gitmux.conf
+├── easyeffects/     → ~/.config/easyeffects/db/, ~/.local/share/easyeffects/
 ├── kitty/           → ~/.config/kitty/
 ├── niri/            → ~/.config/niri/, ~/.config/xdg-desktop-portal/
+├── noctalia/        → ~/.config/noctalia/
 ├── nvim/            → ~/.config/nvim/
 ├── starship/        → ~/.config/starship.toml
 ├── tmux/            → ~/.tmux.conf, ~/.tmux/
 ├── zshrc/           → ~/.zshrc, ~/.zshrc_customs.zsh
-└── install-niri.sh  → Niri + Noctalia package installer (stow-safe)
+└── scripts/         → setup-machine.sh, install-niri.sh, pkg, aur-wrap
 ```
 
 ## Prerequisites
@@ -110,13 +112,36 @@ stow -R zshrc
 
 `--adopt` moves the conflicting file from `$HOME` into the package. Review the diff carefully before committing.
 
+## Nuova macchina
+
+Dopo aver clonato il repo, `scripts/setup-machine.sh` installa i pacchetti,
+abilita i servizi e applica gli stow. Chiede gruppo per gruppo, tranne `base`
+che installa sempre.
+
+```bash
+./scripts/setup-machine.sh            # interattivo
+./scripts/setup-machine.sh --list     # elenca i gruppi
+./scripts/setup-machine.sh --dry-run  # mostra i comandi senza eseguirli
+./scripts/setup-machine.sh --yes --only base,niri-noctalia,dev-php
+```
+
+Le liste stanno in `scripts/packages/*.txt`, una per gruppo, un pacchetto per
+riga. I linguaggi non hanno versioni fissate: i repo portano sempre l'ultima
+stabile. Per aggiungere software, modifica il file del gruppo giusto.
+
+Restano fuori, perche' dipendono dalla macchina o da segreti: shell di default,
+chiavi SSH e GPG, disposizione dei monitor, modalita' NVIDIA e gli override di
+noctalia in `~/.local/state/noctalia/settings.toml`.
+
 ## Packages in this repo
 
 | Package | Linked paths |
 | --- | --- |
 | `gitmux` | `~/.gitmux.conf` |
+| `easyeffects` | `~/.config/easyeffects/db/`, `~/.local/share/easyeffects/` (preset, impulsi, autoload), autostart |
 | `kitty` | `~/.config/kitty/` |
 | `niri` | `~/.config/niri/`, `~/.config/xdg-desktop-portal/niri-portals.conf` |
+| `noctalia` | `~/.config/noctalia/config.toml`, `~/.config/noctalia/palettes/`, autostart |
 | `nvim` | `~/.config/nvim/` |
 | `starship` | `~/.config/starship.toml` |
 | `tmux` | `~/.tmux.conf`, `~/.tmux/` |

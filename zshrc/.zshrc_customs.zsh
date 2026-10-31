@@ -105,3 +105,7 @@ html() {
         cd /srv/http
     fi
 }
+
+# Porta nei dotfiles le impostazioni di noctalia cambiate dall'interfaccia:
+# la shell scrive in ~/.local/state/noctalia/settings.toml, che non e' nel repo.
+alias noctalia-sync="$DOTFILES_SCRIPTS/noctalia-sync"

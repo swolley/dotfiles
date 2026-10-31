@@ -1,0 +1,48 @@
+# Sessione GNOME completa, con le estensioni e le app che usi.
+gnome-shell
+gnome-shell-extensions
+gdm
+gnome-control-center
+gnome-tweaks
+extension-manager
+gnome-browser-connector
+dconf-editor
+nautilus
+sushi
+gnome-text-editor
+gnome-console
+gnome-terminal
+gnome-calculator
+gnome-clocks
+gnome-disk-utility
+gnome-keyring
+seahorse
+file-roller
+loupe
+evince
+totem
+gvfs
+gvfs-afc
+gvfs-gphoto2
+gvfs-mtp
+gvfs-nfs
+gvfs-smb
+xdg-desktop-portal
+xdg-desktop-portal-gnome
+xdg-user-dirs
+xdg-user-dirs-gtk
+xdg-utils
+adwaita-icon-theme
+gnome-themes-extra
+cantarell-fonts
+power-profiles-daemon
+network-manager-applet
+networkmanager
+# VPN: OpenVPN per il lavoro; WireGuard e' nativo in NetworkManager,
+# wireguard-tools serve per wg e wg-quick da riga di comando
+networkmanager-openvpn
+wireguard-tools
+# estensioni GNOME da AUR
+gnome-shell-extension-arch-update
+gnome-shell-extension-dash-to-dock
+gnome-shell-extension-gsconnect

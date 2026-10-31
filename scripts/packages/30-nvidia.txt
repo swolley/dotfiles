@@ -1,0 +1,9 @@
+# GPU NVIDIA su portatile Optimus. nvidia-open e' il modulo precompilato:
+# niente DKMS, niente ricompilazione a ogni aggiornamento del kernel.
+nvidia-open
+nvidia-utils
+nvidia-settings
+nvidia-prime
+nvidia-inst
+nvidia-hook
+envycontrol

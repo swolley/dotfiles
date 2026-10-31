@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""Sposta nei dotfiles le impostazioni di noctalia fatte dall'interfaccia.
+
+La shell scrive sempre in ~/.local/state/noctalia/settings.toml, che ha la
+precedenza sul config.toml condiviso. Questo script sposta nel repo i blocchi
+portabili e lascia nello stato solo quelli legati a questa macchina.
+
+Uso:
+  noctalia-sync            mostra cosa sposterebbe e chiede conferma
+  noctalia-sync --dry-run  mostra e basta
+  noctalia-sync --yes      sposta senza chiedere
+"""
+import re
+import shutil
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+
+STATE = Path.home() / ".local/state/noctalia/settings.toml"
+SHARED = Path.home() / ".config/noctalia/config.toml"
+
+# Blocchi che restano locali: nomi dei monitor, geometrie calcolate sulla
+# risoluzione, sfondi correnti, impostazioni per singolo plugin con percorsi.
+LOCAL = [
+    re.compile(r"^\s*\[bar\.[a-z_]+\.monitor\."),
+    re.compile(r"^\s*\[dock\.monitor\."),
+    re.compile(r"^\s*\[lockscreen_widgets"),
+    re.compile(r"^\s*\[notification\]"),
+    re.compile(r"^\s*\[osd\]"),
+    re.compile(r"^\s*\[wallpaper\.(last|monitors)"),
+]
+HEADER = re.compile(r"^\s*\[")
+
+
+def blocks(text):
+    """Spezza un TOML in (preambolo, [(intestazione, righe), ...])."""
+    pre, out, cur = [], [], None
+    for line in text.split("\n"):
+        if HEADER.match(line):
+            if cur:
+                out.append(cur)
+            cur = [line]
+        elif cur is None:
+            pre.append(line)
+        else:
+            cur.append(line)
+    if cur:
+        out.append(cur)
+    return pre, [(b[0].strip(), b) for b in out]
+
+
+def render(bs):
+    out = []
+    for _, b in bs:
+        b = list(b)
+        while b and not b[-1].strip():
+            b.pop()
+        out += b + [""]
+    return "\n".join(out).rstrip("\n") + "\n"
+
+
+def main():
+    args = sys.argv[1:]
+    dry = "--dry-run" in args or "-n" in args
+    assume_yes = "--yes" in args or "-y" in args
+
+    for f in (STATE, SHARED):
+        if not f.exists():
+            sys.exit(f"manca {f}")
+    if not SHARED.is_symlink():
+        print(f"nota: {SHARED} non e' un symlink ai dotfiles", file=sys.stderr)
+
+    pre_state, st_blocks = blocks(STATE.read_text())
+    pre_shared, sh_blocks = blocks(SHARED.read_text())
+
+    movable = [(h, b) for h, b in st_blocks if not any(p.match(h) for p in LOCAL)]
+    if not movable:
+        print("niente da spostare: lo stato contiene solo impostazioni di questa macchina")
+        return
+
+    print("Da spostare nei dotfiles:")
+    for h, _ in movable:
+        print("   ", h)
+    if dry:
+        return
+    if not assume_yes:
+        if input("Procedo? [S/n] ").strip().lower() in ("n", "no"):
+            return
+
+    # Nel repo: sostituisce i blocchi omonimi, aggiunge i nuovi in coda.
+    # Le tabelle di array ([[x]]) possono ripetersi: si spostano come gruppo.
+    gruppi = {}
+    for h, b in movable:
+        gruppi.setdefault(h, []).append(b)
+
+    risultato, visti = [], set()
+    for h, b in sh_blocks:
+        if h in gruppi:
+            if h not in visti:
+                risultato += [(h, x) for x in gruppi[h]]
+                visti.add(h)
+        else:
+            risultato.append((h, b))
+    for h, bs in gruppi.items():
+        if h not in visti:
+            risultato += [(h, x) for x in bs]
+            visti.add(h)
+
+    restano = [(h, b) for h, b in st_blocks if any(p.match(h) for p in LOCAL)]
+
+    prima = subprocess.run(["noctalia", "config", "export", "full"],
+                           capture_output=True, text=True).stdout
+
+    shutil.copy2(STATE, str(STATE) + ".bak-sync")
+    shutil.copy2(SHARED, str(SHARED) + ".bak-sync")
+    SHARED.write_text("\n".join(pre_shared).rstrip("\n") + "\n\n" + render(risultato))
+    STATE.write_text("\n".join(x for x in pre_state if x.strip()) + "\n\n" + render(restano))
+
+    for f in (STATE, SHARED):
+        tomllib.loads(f.read_text())
+
+    dopo = subprocess.run(["noctalia", "config", "export", "full"],
+                          capture_output=True, text=True).stdout
+    if prima and prima != dopo:
+        print("ATTENZIONE: la configurazione effettiva e' cambiata. Ripristino i backup.",
+              file=sys.stderr)
+        shutil.copy2(str(STATE) + ".bak-sync", STATE)
+        shutil.copy2(str(SHARED) + ".bak-sync", SHARED)
+        sys.exit(1)
+
+    print(f"spostati {len(movable)} blocchi; configurazione effettiva invariata")
+    print("ricordati di committare i dotfiles")
+
+
+if __name__ == "__main__":
+    main()

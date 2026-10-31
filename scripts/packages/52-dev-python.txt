@@ -1,0 +1,4 @@
+# Python con uv per ambienti e dipendenze.
+python
+python-pip
+uv

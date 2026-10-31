@@ -1,0 +1,20 @@
+# Sessione niri con la shell noctalia.
+niri
+noctalia
+xwayland-satellite
+xdg-desktop-portal-wlr
+nwg-displays
+brightnessctl
+grim
+slurp
+# font usati dalla shell e dal terminale
+ttf-adwaitamono-nerd
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+noto-fonts-extra
+
+# strumenti usati dai plugin della shell (screen-toolkit: selettore colore)
+hyprpicker
+# luminosita' dei monitor esterni via DDC/CI (va poi attivata in noctalia)
+ddcutil

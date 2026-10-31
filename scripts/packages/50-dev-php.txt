@@ -1,0 +1,11 @@
+# PHP e Laravel. I repo portano sempre l'ultima stabile: niente versione fissata.
+php
+php-gd
+php-imagick
+php-pgsql
+php-redis
+php-sodium
+php-sqlite
+php-yaml
+xdebug
+composer

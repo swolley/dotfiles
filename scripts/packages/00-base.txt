@@ -1,0 +1,57 @@
+# Base: shell, strumenti da riga di comando, gestione pacchetti.
+# Installato sempre, senza chiedere.
+base-devel
+git
+stow
+zsh
+bash-completion
+starship
+tmux
+neovim
+kitty
+bat
+fzf
+jq
+tree
+less
+pv
+rsync
+wget
+httpie
+plocate
+pkgfile
+man-db
+man-pages
+tldr
+duf
+glances
+nmap
+bind
+inetutils
+openssh
+unzip
+unrar
+diffutils
+nano
+nano-syntax-highlighting
+wl-clipboard
+xclip
+# git: strumenti accessori
+lazygit
+lazydocker
+github-cli
+git-cliff
+git-filter-repo
+meld
+gitmux-bin
+# pacman: manutenzione
+pacman-contrib
+reflector
+downgrade
+rebuild-detector
+# correttore ortografico usato dalle app GTK
+aspell
+aspell-it
+aspell-en
+# proxy che riduce i token nelle sessioni con Claude (vedi CLAUDE.md)
+rtk-bin
