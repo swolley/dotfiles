@@ -1,0 +1,169 @@
+# Configurazione noctalia condivisa (dotfiles).
+# Gli override specifici della macchina stanno in
+# ~/.local/state/noctalia/settings.toml, che ha la precedenza su questo file.
+
+[accessibility]
+ui_scale = 1.0
+
+[bar.default]
+end = [
+    "media",
+    "usage",
+    "tray",
+    "notifications",
+    "clipboard",
+    "network",
+    "bluetooth",
+    "volume",
+    "brightness",
+    "battery",
+    "control-center",
+    "session"
+]
+font_scale = 0.84999998845160007
+font_weight = 400
+thickness = 26
+
+[brightness]
+# luminosita' dei monitor esterni via DDC/CI (richiede ddcutil)
+enable_ddcutil = true
+sync_all_monitors = true
+
+[desktop_widgets]
+enabled = false
+schema_version = 2
+widget_order = []
+
+    [desktop_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [desktop_widgets.widget]
+
+[dock]
+enabled = false
+pinned = [ "firefox", "code-oss", "com.anthropic.Claude", "obsidian", "org.gnome.Nautilus" ]
+reserve_space = false
+show_dots = true
+smart_auto_hide = true
+
+[lockscreen]
+fingerprint = false
+
+[plugin_settings."ayagmar/headroom"]
+bar_accounts = "all"
+bar_style = "value"
+provider_antigravity = "off"
+
+[plugins]
+enabled = [ "ayagmar/headroom", "alexander/screen-toolkit" ]
+
+[shell]
+avatar_path = "/home/swolley/Documenti/swolley.jpg"
+button_borders = false
+card_borders = false
+font_family = "Adwaita Sans"
+lang = "it"
+niri_overview_close_on_launch_enabled = true
+niri_overview_type_to_launch_enabled = true
+
+    [shell.launcher]
+    app_grid = true
+    categories = true
+    default_view = "all"
+    fetch_exchange_rates = false
+    search_position = "top"
+    show_icons = true
+    sort_by_usage = false
+    track_usage = false
+    width = 1100
+
+    [shell.screenshot]
+    confirm_region = true
+    directory = "/home/swolley/Immagini/Schermate"
+    remember_last_region = true
+
+    [shell.window_switcher]
+    mru = true
+
+[theme]
+builtin = "Eldritch"
+community_palette = "Oxocarbon"
+custom_palette = "adwaita-starship"
+mode = "dark"
+source = "custom"
+wallpaper_scheme = "m3-content"
+
+    [theme.templates]
+    builtin_ids = [ "gtk3", "gtk4", "niri", "qt" ]
+    community_ids = [ "claude-code", "obsidian", "vscode" ]
+
+[wallpaper]
+fill_color = "#000000"
+
+    [wallpaper.automation]
+    enabled = true
+    recursive = false
+
+    [wallpaper.default]
+    path = "/home/swolley/Immagini/Schermate/Schermata del 2026-08-30 01-32-20.png"
+
+[widget.battery]
+display_mode = "none"
+
+[widget.brightness]
+enabled = false
+
+[widget.clipboard]
+enabled = false
+
+[widget.control-center]
+glyph = "adjustments"
+
+[widget.media]
+hide_when_no_media = true
+
+[widget.network]
+enabled = false
+
+[widget.usage]
+type = "ayagmar/headroom:usage"
+
+[widget.volume]
+enabled = false
+
+[widget.wallpaper]
+enabled = false
+    # Barra a scomparsa solo sui monitor secondari; sull'LG (DP-2) resta fissa.
+
+[notification]
+# scala del riquadro, testo compreso: non esiste un font_size a parte
+scale = 0.85
+
+[audio]
+enable_screenshot_sounds = false
+
+[[control_center.shortcuts]]
+type = "wifi"
+
+[[control_center.shortcuts]]
+type = "bluetooth"
+
+[[control_center.shortcuts]]
+type = "caffeine"
+
+[[control_center.shortcuts]]
+type = "power_profile"
+
+[[control_center.shortcuts]]
+type = "audio"
+
+[[control_center.shortcuts]]
+type = "mic_mute"
+
+[location]
+auto_locate = true
+
+[plugin_settings."alexander/screen-toolkit"]
+hide-when-unused = true

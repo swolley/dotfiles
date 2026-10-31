@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Disattiva temi noctalia in GNOME
+Exec=sh -c '"$HOME/.config/niri/theme-session.sh" gnome'
+OnlyShowIn=GNOME;
+X-GNOME-Autostart-Phase=Initialization
+NoDisplay=true
