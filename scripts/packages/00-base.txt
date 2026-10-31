@@ -49,6 +49,11 @@ pacman-contrib
 reflector
 downgrade
 rebuild-detector
+# shell: analisi statica e test degli script di questo repo
+shellcheck
+bats
+bats-support
+bats-assert
 # correttore ortografico usato dalle app GTK
 aspell
 aspell-it

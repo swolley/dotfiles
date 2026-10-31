@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Terminale (istanza unica)
+Comment=Apre una sessione tmux nella kitty gia' aperta, invece di una finestra nuova
+Exec=sh -c "exec \"\$HOME/.config/niri/terminal.sh\" cwd \"\$PWD\""
+Icon=kitty
+Terminal=false
+Categories=System;TerminalEmulator;
+NoDisplay=true

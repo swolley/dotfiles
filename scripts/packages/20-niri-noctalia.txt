@@ -4,6 +4,10 @@ noctalia
 xwayland-satellite
 xdg-desktop-portal-wlr
 nwg-displays
+# gestore file e la sua voce "Apri nel terminale", configurabile:
+# quella di gnome-terminal e' cablata e aprirebbe una finestra nuova
+nautilus
+nautilus-open-any-terminal
 brightnessctl
 grim
 slurp
@@ -18,3 +22,8 @@ noto-fonts-extra
 hyprpicker
 # luminosita' dei monitor esterni via DDC/CI (va poi attivata in noctalia)
 ddcutil
+
+# portachiavi: senza, VS Code e gli altri Electron non salvano le credenziali
+# (in GNOME lo avvia la shell; sotto niri parte dal socket systemd utente)
+gnome-keyring
+libsecret

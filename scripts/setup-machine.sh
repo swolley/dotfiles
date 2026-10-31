@@ -160,6 +160,23 @@ configure_monitors() {
   fi
 }
 
+configure_nautilus_terminal() {
+  local schema=com.github.stunkymonkey.nautilus-open-any-terminal
+  local cmd="$HOME/.config/niri/terminal.sh cwd"
+  if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
+    warn "nautilus-open-any-terminal non installato, salto"
+    return
+  fi
+  info "collego \"Apri nel terminale\" allo script del terminale unico"
+  run gsettings set "$schema" terminal custom
+  run gsettings set "$schema" custom-local-command "$cmd"
+  run gsettings set "$schema" new-tab false
+  if pacman -Qq gnome-terminal >/dev/null 2>&1; then
+    warn "gnome-terminal e' installato: il menu mostrera' due voci \"Apri nel terminale\""
+    warn "rimuovilo con: sudo pacman -Rns gnome-terminal"
+  fi
+}
+
 setup_shell() {
   local zsh=/usr/bin/zsh
   [ -x "$zsh" ] || { warn "zsh non installato, salto"; return; }
@@ -275,6 +292,9 @@ setup_shell
 
 section "Monitor e barra"
 configure_monitors
+
+section "Nautilus"
+configure_nautilus_terminal
 
 section "Fatto"
 cat <<'EOF'

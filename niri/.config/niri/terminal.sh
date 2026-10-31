@@ -1,8 +1,10 @@
 #!/bin/sh
 # Un solo terminale. Mod+Return gli da' il focus invece di aprirne un altro;
 # Mod+Shift+Return crea una nuova sessione tmux dentro la stessa finestra.
-#   terminal.sh focus  -> focus alla kitty esistente, o la apre su tmux
-#   terminal.sh new    -> nuova sessione tmux, e focus alla finestra
+#   terminal.sh focus      -> focus alla kitty esistente, o la apre su tmux
+#   terminal.sh new        -> nuova sessione tmux, e focus alla finestra
+#   terminal.sh cwd [dir]  -> come new, ma nella cartella indicata (default: $PWD);
+#                             la usa Nautilus per "Apri nel terminale"
 SESSION=main
 
 kitty_id() {
@@ -15,11 +17,16 @@ last_client() {  # il client tmux usato piu' di recente
     | sort -rn | head -1 | cut -d' ' -f2-
 }
 
-open_kitty() {   # si aggancia a una sessione esistente, altrimenti la crea
+open_kitty() {   # $1 = cartella iniziale (facoltativa)
+                 # si aggancia a una sessione esistente, altrimenti la crea
   target=$(tmux ls -F '#{session_last_attached} #{session_name}' 2>/dev/null \
     | sort -rn | head -1 | cut -d' ' -f2-)
   [ -n "$target" ] || target=$SESSION
-  setsid kitty -- tmux new-session -A -s "$target" >/dev/null 2>&1 &
+  if [ -n "${1:-}" ]; then
+    setsid kitty -- tmux new-session -A -s "$target" -c "$1" >/dev/null 2>&1 &
+  else
+    setsid kitty -- tmux new-session -A -s "$target" >/dev/null 2>&1 &
+  fi
 }
 
 id=$(kitty_id)
@@ -32,16 +39,22 @@ case "${1:-focus}" in
       open_kitty
     fi
     ;;
-  new)
+  new|cwd)
+    if [ "$1" = cwd ]; then
+      dir="${2:-$PWD}"
+    else
+      dir="$HOME"
+    fi
+    [ -d "$dir" ] || dir="$HOME"
     if [ -n "$id" ] && tmux has-session 2>/dev/null; then
-      name=$(tmux new-session -d -P -F '#{session_name}' -c "$HOME")
+      name=$(tmux new-session -d -P -F '#{session_name}' -c "$dir")
       client=$(last_client)
       [ -n "$client" ] && tmux switch-client -c "$client" -t "$name"
       niri msg action focus-window --id "$id"
     else
-      open_kitty
+      open_kitty "$dir"
     fi
     ;;
   *)
-    echo "uso: $0 {focus|new}" >&2; exit 1 ;;
+    echo "uso: $0 {focus|new|cwd [dir]}" >&2; exit 1 ;;
 esac

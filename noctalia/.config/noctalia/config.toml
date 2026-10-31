@@ -63,6 +63,7 @@ enabled = [ "ayagmar/headroom", "alexander/screen-toolkit" ]
 avatar_path = "/home/swolley/Documenti/swolley.jpg"
 button_borders = false
 card_borders = false
+date_format = "%A %d %B %Y"
 font_family = "Adwaita Sans"
 lang = "it"
 niri_overview_close_on_launch_enabled = true
@@ -167,3 +168,15 @@ auto_locate = true
 
 [plugin_settings."alexander/screen-toolkit"]
 hide-when-unused = true
+
+[control_center]
+sidebar = "full"
+sidebar_section = "full"
+width = 800
+
+[shell.panel]
+open_near_click_control_center = true
+
+[widget.clock]
+format = "{:%a %d %b %Y  %H:%M}"
+type = "clock"
