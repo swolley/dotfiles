@@ -60,6 +60,59 @@ def render(bs):
     return "\n".join(out).rstrip("\n") + "\n"
 
 
+KEY = re.compile(r"^\s*([A-Za-z0-9_.\"'-]+)\s*=")
+
+
+def voci(blocco):
+    """Spezza il corpo di un blocco in voci (chiave, righe).
+
+    Commenti e righe vuote si attaccano alla chiave che precedono, cosi' una
+    chiave sostituita si porta dietro il proprio commento. Le chiavi col valore
+    su piu' righe (array) si riconoscono contando le parentesi ancora aperte.
+    """
+    out, buf, sospese, chiave, aperte = [], [], [], None, 0
+    for riga in blocco[1:]:
+        commento = riga.lstrip().startswith("#")
+        if aperte == 0 and (commento or not riga.strip()):
+            sospese.append(riga)
+            continue
+        if aperte == 0 and KEY.match(riga):
+            if buf:
+                out.append((chiave, buf))
+            buf, chiave = sospese + [riga], KEY.match(riga).group(1)
+        else:
+            buf += sospese + [riga]
+        sospese = []
+        if not commento:
+            aperte += riga.count("[") - riga.count("]")
+    if buf:
+        out.append((chiave, buf))
+    if sospese:
+        out.append((None, sospese))
+    return out
+
+
+def unisci(repo, stato):
+    """Fonde un blocco del repo con l'omonimo dello stato.
+
+    Lo stato vince sulle chiavi che definisce, ma le chiavi presenti solo nel
+    repo vanno conservate: sostituire il blocco intero le perderebbe, e la
+    configurazione effettiva cambierebbe.
+    """
+    da_stato = {k: righe for k, righe in voci(stato) if k is not None}
+    fuso, usate = [repo[0]], set()
+    for k, righe in voci(repo):
+        if k is not None and k in da_stato:
+            fuso += da_stato[k]
+            usate.add(k)
+        else:
+            fuso += righe
+    for k, righe in voci(stato):
+        if k is not None and k not in usate:
+            fuso += righe
+    return fuso
+
+
 def main():
     args = sys.argv[1:]
     dry = "--dry-run" in args or "-n" in args
@@ -98,7 +151,13 @@ def main():
     for h, b in sh_blocks:
         if h in gruppi:
             if h not in visti:
-                risultato += [(h, x) for x in gruppi[h]]
+                # Una tabella normale si fonde chiave per chiave; le tabelle di
+                # array ([[x]]) si ripetono e non hanno chiavi confrontabili,
+                # quindi si sostituisce il gruppo per intero.
+                if h.startswith("[[") or len(gruppi[h]) > 1:
+                    risultato += [(h, x) for x in gruppi[h]]
+                else:
+                    risultato.append((h, unisci(b, gruppi[h][0])))
                 visti.add(h)
         else:
             risultato.append((h, b))

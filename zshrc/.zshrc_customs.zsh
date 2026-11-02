@@ -48,18 +48,16 @@ eos-update() {
 	command eos-update "--$AUR_HELPER" --descriptions "$@"
 }
 
-# commented, I created a command because of gnome update extensions
-#eos-check() {
-#	[[ -n "$AUR_HELPER" ]] || { echo "❌ No AUR helper found"; return 1; }
-#	/usr/bin/checkupdates && command "$AUR_HELPER" -Qua
-#}
-
 alias ports='netstat -tulanp'
 
 alias art="php artisan"
 
 # alias ff="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias ff="fzf --preview 'bat -n --color=always {}' --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+
+# Colori fzf generati dal template noctalia: va sourciato dopo le altre
+# opzioni, perche' accoda i colori a FZF_DEFAULT_OPTS.
+[[ -r "$HOME/.config/fzf/themes/noctalia.sh" ]] && source "$HOME/.config/fzf/themes/noctalia.sh"
 
 alias ..="cd .."
 alias ...="cd ../.."

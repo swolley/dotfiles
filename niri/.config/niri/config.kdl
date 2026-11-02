@@ -57,7 +57,10 @@ input {
     trackpoint {
     }
 
-    focus-follows-mouse
+    // Il fuoco segue il mouse solo su click: con focus-follows-mouse attivo
+    // uscire da una finestra (verso il vuoto o un altro monitor) sposta anche
+    // il fuoco della tastiera. Per riattivarlo: togli il commento.
+    // focus-follows-mouse max-scroll-amount="0%"
 }
 
 overview {
@@ -354,10 +357,28 @@ binds {
     Mod+KP_Add      { set-column-width "+10%"; }
     Mod+Ctrl+F  { expand-column-to-available-width; }
 
+    // Altezza: ha effetto solo quando la colonna contiene piu' finestre
+    // impilate, perche' una finestra sola occupa gia' tutta l'altezza.
+    Mod+Shift+Minus       { set-window-height "-10%"; }
+    Mod+Shift+plus        { set-window-height "+10%"; }
+    Mod+Shift+KP_Subtract { set-window-height "-10%"; }
+    Mod+Shift+KP_Add      { set-window-height "+10%"; }
+    Mod+Ctrl+R            { switch-preset-window-height; }
+    Mod+Ctrl+Shift+R      { reset-window-height; }
+
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }
     Mod+Up    { focus-window-up; }
     Mod+Right { focus-column-right; }
+
+    // Rotellina col Mod: scorre la striscia di colonne senza dover cliccare,
+    // ora che il fuoco non segue piu' il mouse. Ctrl+rotellina cambia workspace.
+    Mod+WheelScrollDown      cooldown-ms=100 { focus-column-right; }
+    Mod+WheelScrollUp        cooldown-ms=100 { focus-column-left; }
+    Mod+WheelScrollRight     cooldown-ms=100 { focus-column-right; }
+    Mod+WheelScrollLeft      cooldown-ms=100 { focus-column-left; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
 
     Mod+Ctrl+Left  { move-column-left; }
     Mod+Ctrl+Down  { move-window-down; }
@@ -396,14 +417,16 @@ binds {
     Mod+Shift+8 { move-column-to-workspace 8; }
     Mod+Shift+9 { move-column-to-workspace 9; }
 
-    // Screenshot di noctalia: salvano in ~/Immagini/Schermate e permettono
-    // di annotare. Ctrl+Print resta quello interno di niri, come riserva
-    // se la shell non sta girando.
-    Mod+Shift+S { spawn-sh "noctalia msg screenshot-region"; }
-    // Stamp: pannello screen-toolkit, con schermo intero, finestra e area.
-    Print       { spawn-sh "noctalia msg panel-toggle alexander/screen-toolkit:panel"; }
+    // Screenshot di noctalia, come su GNOME: salvano in ~/Immagini/Schermate.
+    // Stamp = schermo intero, Alt+Stamp = finestra attiva, Maiusc+Stamp = area.
+    Print       { spawn-sh "noctalia msg screenshot-fullscreen"; }
     Alt+Print   { spawn-sh "noctalia msg screenshot-window"; }
+    Shift+Print { spawn-sh "noctalia msg screenshot-region"; }
+    Mod+Shift+S { spawn-sh "noctalia msg screenshot-region"; }
     Mod+Shift+A { spawn-sh "noctalia msg screenshot-annotate"; }
+    // Pannello screen-toolkit: OCR, QR, palette, color picker, registrazione.
+    Mod+Print   { spawn-sh "noctalia msg panel-toggle alexander/screen-toolkit:panel"; }
+    // Riserva interna di niri, se la shell non sta girando.
     Ctrl+Print  { screenshot-screen; }
 
     Mod+Escape allow-inhibiting=false {

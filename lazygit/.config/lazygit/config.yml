@@ -1,0 +1,68 @@
+# ~/.config/lazygit/config.yml
+# lazygit 0.65.x
+
+gui:
+  theme:
+    activeBorderColor:
+      - "#8fbf98"
+      - bold
+    inactiveBorderColor:
+      - "#36363a"
+    searchingActiveBorderColor:
+      - "#ffffff"
+      - bold
+    optionsTextColor:
+      - "#c0bfbc"
+    selectedLineBgColor:
+      - "#38383d"
+    inactiveViewSelectedLineBgColor:
+      - bold
+    cherryPickedCommitFgColor:
+      - "#c0bfbc"
+    cherryPickedCommitBgColor:
+      - "#ffffff"
+    markedBaseCommitFgColor:
+      - "#ffffff"
+    markedBaseCommitBgColor:
+      - "#c01c28"
+    unstagedChangesColor:
+      - "#c01c28"
+    defaultFgColor:
+      - "#ffffff"
+  nerdFontsVersion: "3" # hai AdwaitaMono Nerd Font: icone attive
+  showFileTree: true # file ad albero invece che lista piatta (toggle: `
+  showRandomTip: false
+  showCommandLog: false # più spazio ai pannelli; riaprilo con @
+  showBottomLine: true
+  expandFocusedSidePanel: true # il pannello attivo si allarga da solo
+  mainPanelSplitMode: flexible
+  scrollHeight: 2
+  mouseEvents: true
+  skipDiscardChangeWarning: false
+  skipStashWarning: false
+os:
+  editPreset: "nvim" # `e` e i reword lunghi aprono nvim (non nano)
+git:
+  parseEmoji: true # rende :emoji: nei messaggi
+  autoFetch: true # fetch automatico in background
+  fetchAll: true
+  diffRenderers:
+    - colorArg: always
+      # DELTA non è installato. Dopo `sudo pacman -S git-delta` togli il commento
+      # alle due righe sotto per diff affiancati e syntax-highlight:
+      # pager: delta --dark --paging=never --line-numbers
+      # useConfig: false
+
+      type: rawGit
+# Comportamento generale
+disableStartupPopups: true # niente popup di versione all'avvio
+promptToReturnFromSubprocess: false # non chiede "premi invio" dopo ogni comando
+quitOnTopLevelReturn: false
+
+# Esempio: aggancia comandi tuoi a un tasto. Sblocca e adatta.
+# customCommands:
+#   - key: "<c-a>"
+#     context: "files"
+#     command: "git commit --amend --no-edit"
+#     description: "Amend rapido senza editor"
+#     loadingText: "amending..."
