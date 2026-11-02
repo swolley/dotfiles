@@ -177,6 +177,20 @@ configure_nautilus_terminal() {
   fi
 }
 
+configure_firefox_theme() {
+  if ! command -v noctalia >/dev/null 2>&1; then
+    warn "noctalia non installato, salto il tema di Firefox"
+    return
+  fi
+  # Firefox non legge i colori da GTK: con il tema di sistema usa l'accento del
+  # portale desktop, che accetta solo i preset di libadwaita. L'unico modo di
+  # avere l'accento di noctalia e' il percorso Pywalfox, di cui noctalia stesso
+  # fa da host nativo.
+  info "installo l'host nativo Pywalfox e applico i template"
+  run noctalia firefox-theme install
+  run noctalia msg templates-apply
+}
+
 setup_shell() {
   local zsh=/usr/bin/zsh
   [ -x "$zsh" ] || { warn "zsh non installato, salto"; return; }
@@ -296,6 +310,9 @@ configure_monitors
 section "Nautilus"
 configure_nautilus_terminal
 
+section "Tema di Firefox"
+configure_firefox_theme
+
 section "Fatto"
 cat <<'EOF'
     Restano da fare a mano, perche' dipendono da scelte o da segreti:
@@ -307,4 +324,6 @@ cat <<'EOF'
                             schermata di blocco, sfondi) stanno in
                             ~/.local/state/noctalia/settings.toml e non sono nel repo
       - chiavi SSH e GPG:   vanno ripristinate dal tuo backup
+      - Firefox:            installa l'estensione Pywalfox da addons.mozilla.org
+                            e premi una volta "Fetch pywal colors"
 EOF
