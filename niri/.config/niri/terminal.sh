@@ -5,6 +5,11 @@
 #   terminal.sh new        -> nuova sessione tmux, e focus alla finestra
 #   terminal.sh cwd [dir]  -> come new, ma nella cartella indicata (default: $PWD);
 #                             la usa Nautilus per "Apri nel terminale"
+#   terminal.sh run <cmd>  -> esegue il comando in una nuova sessione tmux
+#                             dentro la finestra esistente. Lo usano i
+#                             programmi che vogliono "aprire un terminale",
+#                             come il plugin arch-updater: accetta anche il
+#                             separatore -e che molti passano per abitudine.
 SESSION=main
 
 kitty_id() {
@@ -55,6 +60,22 @@ case "${1:-focus}" in
       open_kitty "$dir"
     fi
     ;;
+  run)
+    shift
+    [ "${1:-}" = "-e" ] && shift
+    [ $# -gt 0 ] || { echo "uso: $0 run [-e] <comando...>" >&2; exit 1; }
+    if [ -n "$id" ] && tmux has-session 2>/dev/null; then
+      name=$(tmux new-session -d -P -F '#{session_name}' "$@")
+      # il pannello resta visibile dopo la fine del comando: senza questo un
+      # errore sparirebbe prima che tu possa leggerlo
+      tmux set-option -t "$name" remain-on-exit on
+      client=$(last_client)
+      [ -n "$client" ] && tmux switch-client -c "$client" -t "$name"
+      niri msg action focus-window --id "$id"
+    else
+      setsid kitty -- tmux new-session "$@" >/dev/null 2>&1 &
+    fi
+    ;;
   *)
-    echo "uso: $0 {focus|new|cwd [dir]}" >&2; exit 1 ;;
+    echo "uso: $0 {focus|new|cwd [dir]|run <comando>}" >&2; exit 1 ;;
 esac

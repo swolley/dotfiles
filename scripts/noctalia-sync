@@ -92,6 +92,21 @@ def voci(blocco):
     return out
 
 
+def rientra(righe, da, a):
+    """Riallinea un blocco di righe dal rientro `da` a quello `a`.
+
+    Lo stato scrive le tabelle annidate senza rientro, il repo le tiene
+    indentate: senza questo ogni sincronizzazione appiattirebbe il file.
+    """
+    if da == a:
+        return righe
+    return [a + r[len(da):] if r.startswith(da) else r for r in righe]
+
+
+def spazi(riga):
+    return riga[: len(riga) - len(riga.lstrip())]
+
+
 def unisci(repo, stato):
     """Fonde un blocco del repo con l'omonimo dello stato.
 
@@ -103,7 +118,7 @@ def unisci(repo, stato):
     fuso, usate = [repo[0]], set()
     for k, righe in voci(repo):
         if k is not None and k in da_stato:
-            fuso += da_stato[k]
+            fuso += rientra(da_stato[k], spazi(da_stato[k][0]), spazi(righe[0]))
             usate.add(k)
         else:
             fuso += righe

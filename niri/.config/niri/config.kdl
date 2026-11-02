@@ -57,9 +57,9 @@ input {
     trackpoint {
     }
 
-    // Il fuoco segue il mouse solo su click: con focus-follows-mouse attivo
-    // uscire da una finestra (verso il vuoto o un altro monitor) sposta anche
-    // il fuoco della tastiera. Per riattivarlo: togli il commento.
+    // Il fuoco cambia solo su click: focus-follows-mouse, anche limitato con
+    // max-scroll-amount, fa comunque scorrere la striscia quando il puntatore
+    // attraversa un altro monitor. Per riprovarlo: togli il commento.
     // focus-follows-mouse max-scroll-amount="0%"
 }
 
