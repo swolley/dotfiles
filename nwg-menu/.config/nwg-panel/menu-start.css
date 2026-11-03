@@ -9,7 +9,10 @@ window {
 
 list {
     background: none;
-    border-radius: 12px
+    border-radius: 12px;
+    /* l'altezza della finestra la decide il contenuto, e con poche categorie
+       veniva un francobollo: la si allunga dando un minimo alle liste */
+    min-height: 620px
 }
 
 /* campo di ricerca */
@@ -55,15 +58,19 @@ button label {
     font-size: 10pt
 }
 
-/* Niente icone sulle categorie: sono bottoni, mentre le voci delle
-   applicazioni no, e questo e' l'unico modo per distinguerle. Ridurle con
-   -isl le spegnerebbe anche sulle app, dove invece servono. */
-button image {
-    opacity: 0;
-    min-width: 0;
-    min-height: 0;
-    margin: 0;
-    padding: 0
+/* Niente icone sulle categorie. nwg-menu non da' un nome css a niente e usa
+   righe di lista dappertutto, quindi l'unico appiglio e' la posizione: la
+   lista delle categorie e' l'ultima figlia della colonna di sinistra, mentre
+   le applicazioni stanno dentro uno scrolledwindow e le cartelle non sono
+   l'ultima figlia della colonna di destra. */
+list row image {
+    opacity: 0
+}
+
+/* la lista delle cartelle e' la prima figlia della colonna di destra:
+   li' le icone restano */
+box > list:first-child row image {
+    opacity: 1
 }
 
 /* Le app dentro i sottomenu: la cosa che si legge davvero. */
