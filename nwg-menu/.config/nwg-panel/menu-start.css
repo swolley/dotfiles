@@ -16,8 +16,10 @@ list {
 entry {
     background-color: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 6px 12px;
+    border-radius: 10px;
+    padding: 1px 8px;
+    min-height: 0;
+    font-size: 10pt;
     color: #d8ddd9
 }
 

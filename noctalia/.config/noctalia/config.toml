@@ -6,10 +6,11 @@
 ui_scale = 1.0
 
 [bar.default]
-# "custom-button" e' il menu applicazioni in stile mate (nwg-menu), accanto
-# alla lente: il pulsante del launcher non si puo' ripuntare altrove.
+# "custom-button" e' il menu applicazioni in stile mate (nwg-menu). La lente
+# del launcher di noctalia non sta piu' sulla barra: il menu fa la stessa cosa
+# meglio. Il launcher resta su Mod+Ctrl+D, che serve ancora per la ricerca
+# rapida, la calcolatrice e gli altri provider.
 start = [
-    "launcher",
     "custom-button",
     "wallpaper",
     "workspaces"
