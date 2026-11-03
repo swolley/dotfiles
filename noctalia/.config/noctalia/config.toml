@@ -85,16 +85,23 @@ lang = "it"
 niri_overview_close_on_launch_enabled = true
 niri_overview_type_to_launch_enabled = true
 
+    # Il launcher di noctalia fa da menu applicazioni: si apre attaccato al
+    # pulsante che lo chiama, stretto e in elenco. La griglia a tutto schermo
+    # in stile gnome e' nwg-drawer, bindata su Mod+D in niri.
     [shell.launcher]
-    app_grid = true
-    categories = true
+    app_grid = false
+    # niente categorie: a 560px le etichette si troncano e diventano
+    # illeggibili. Sfogliare per categoria si fa in nwg-drawer.
+    categories = false
+    compact = true
     default_view = "all"
     fetch_exchange_rates = false
+    layout = "simple"
     search_position = "top"
     show_icons = true
     sort_by_usage = false
     track_usage = false
-    width = 1100
+    width = 520
 
     [shell.screenshot]
     confirm_region = true
@@ -193,7 +200,10 @@ sidebar_section = "full"
 width = 800
 
 [shell.panel]
+launcher_placement = "attached"
+launcher_position = "auto"
 open_near_click_control_center = true
+open_near_click_launcher = true
 
 [widget.clock]
 format = "{:%a %d %b %Y  %H:%M}"

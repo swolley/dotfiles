@@ -13,6 +13,10 @@ prefer-no-csd
 
 spawn-at-startup "xwayland-satellite"
 
+// Griglia applicazioni in stile gnome: resta residente in memoria, cosi'
+// Mod+D la mostra subito invece di ricaricare l'elenco ogni volta.
+spawn-sh-at-startup "nwg-drawer -r -wm niri -c 6 -is 128 -spacing 32 -fm nautilus -term \"$HOME/.config/niri/terminal.sh run\" -ovl"
+
 // Shell UI (bar/dock/launcher/notifiche/lock).
 // Lo script avvia noctalia e, se muore, apre una kitty con le ultime righe
 // di log e scrive sul journal. NON usa notify-send: in v5 il demone di
@@ -61,6 +65,14 @@ input {
     // max-scroll-amount, fa comunque scorrere la striscia quando il puntatore
     // attraversa un altro monitor. Per riprovarlo: togli il commento.
     // focus-follows-mouse max-scroll-amount="0%"
+}
+
+gestures {
+    // Niente overview passando col mouse nell'angolo in alto a sinistra:
+    // ci si finiva senza volerlo. Resta su Mod+X e come secondo passo di Mod+D.
+    hot-corners {
+        off
+    }
 }
 
 overview {
@@ -223,8 +235,15 @@ binds {
         maximize-column;
     }
 
-    // Noctalia v5 IPC: https://docs.noctalia.dev/noctalia/ipc/
+    // Come su gnome: prima pressione la griglia applicazioni, seconda
+    // l'overview delle finestre, terza chiude. Il launcher di noctalia
+    // resta il menu attaccato al pulsante, su Mod+Ctrl+D.
     Mod+D {
+        spawn-sh "$HOME/.config/niri/launcher.sh";
+    }
+
+    // Noctalia v5 IPC: https://docs.noctalia.dev/noctalia/ipc/
+    Mod+Ctrl+D {
         spawn-sh "noctalia msg panel-toggle launcher";
     }
 
