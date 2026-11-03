@@ -148,6 +148,7 @@ noctalia in `~/.local/state/noctalia/settings.toml`.
 | `noctalia` | `~/.config/noctalia/config.toml`, `~/.config/noctalia/palettes/`, autostart |
 | `nvim` | `~/.config/nvim/` |
 | `nwg-drawer` | `~/.config/nwg-drawer/drawer.css` |
+| `nwg-menu` | `~/.config/nwg-panel/menu-start.css` |
 | `starship` | `~/.config/starship.toml` |
 | `tmux` | `~/.tmux.conf`, `~/.tmux/` |
 | `zshrc` | `~/.zshrc`, `~/.zshrc_customs.zsh` |
@@ -161,7 +162,7 @@ Nerd Font glyphs; Neovim loads it via `base16-nvim` as `noctalia-green`.
 La palette di noctalia e' la sorgente: i suoi template rigenerano GTK, Qt,
 niri, bat, fzf, lazygit e gli altri. Restano fuori i file scritti a mano, che
 i template sovrascriverebbero (kitty, tmux, gitmux, starship, nvim,
-nwg-drawer): li allinea `scripts/accent-sync`, che legge l'accento dalla
+nwg-drawer, nwg-menu): li allinea `scripts/accent-sync`, che legge l'accento dalla
 palette e sostituisce il vecchio esadecimale.
 
 ```bash
