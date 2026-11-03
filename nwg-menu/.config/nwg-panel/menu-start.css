@@ -12,7 +12,7 @@ list {
     border-radius: 12px;
     /* l'altezza della finestra la decide il contenuto, e con poche categorie
        veniva un francobollo: la si allunga dando un minimo alle liste */
-    min-height: 620px
+    min-height: 380px
 }
 
 /* campo di ricerca */
@@ -22,6 +22,7 @@ entry {
     border-radius: 10px;
     padding: 1px 8px;
     min-height: 0;
+    min-width: 720px;
     font-size: 10pt;
     color: #d8ddd9
 }
@@ -67,9 +68,11 @@ list row image {
     opacity: 0
 }
 
-/* la lista delle cartelle e' la prima figlia della colonna di destra:
-   li' le icone restano */
-box > list:first-child row image {
+/* la lista delle cartelle e' la prima figlia della colonna di destra, le
+   applicazioni stanno dentro uno scrolledwindow: in tutti e due i casi
+   l'icona serve a riconoscere la voce, quindi si riaccende */
+box > list:first-child row image,
+scrolledwindow row image {
     opacity: 1
 }
 
