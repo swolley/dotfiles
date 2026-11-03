@@ -24,9 +24,10 @@ spawn-sh-at-startup "nwg-drawer -r -wm niri -c 6 -is 128 -spacing 32 -fm nautilu
 // fallimento e ti ritroveresti col desktop vuoto senza spiegazione.
 spawn-sh-at-startup "$HOME/.config/niri/start-noctalia.sh"
 
-// Convenience: open a terminal on login (also Ctrl+Alt+T / Super+Return)
-// Non serve piu' come rete di sicurezza: se ne occupa start-noctalia.sh.
-spawn-sh-at-startup "$HOME/.config/niri/terminal.sh focus"
+// Niente terminale all'accesso: lo apri quando serve con Ctrl+Alt+T o
+// Super+Return. Come rete di sicurezza non serviva piu', se ne occupa
+// start-noctalia.sh.
+// spawn-sh-at-startup "$HOME/.config/niri/terminal.sh focus"
 
 environment {
     QT_QPA_PLATFORM "wayland"
