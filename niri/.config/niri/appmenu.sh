@@ -11,6 +11,11 @@
 # -d  si chiude anche uscendo col mouse
 # -va top  la barra di noctalia sta in alto
 #
+# Le icone: -isl vale per le categorie e per i risultati della ricerca, -iss
+# per le voci dentro i sottomenu. A 1 l'icona sparisce, ed e' quello che si
+# vuole nella colonna delle categorie, che fa solo da indice. Le dimensioni
+# dei nomi stanno nel css, perche' nwg-menu non ha flag per il testo.
+#
 # nwg-menu non conosce niri: il suo -wm sa solo sway, hyprland e river. Senza
 # quel flag lancia i programmi da se', che per l'avvio normale va bene; restano
 # figli del menu invece di essere avviati dal compositore.
@@ -24,7 +29,7 @@ exec nwg-menu \
   -t -k -d \
   -va top -ha left \
   -mt 4 -ml 4 \
-  -isl 32 -iss 16 \
+  -isl 1 -iss 16 \
   -padding 4 \
   -fm nautilus \
   -term "$HOME/.config/niri/terminal.sh run" \

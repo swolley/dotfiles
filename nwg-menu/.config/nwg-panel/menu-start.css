@@ -46,3 +46,23 @@ button:focus {
 separator {
     background-color: rgba(255, 255, 255, 0.08)
 }
+
+/* Le categorie a sinistra: nomi piu' piccoli delle voci delle app, perche'
+   sono solo l'indice. Le icone le spegne -iss nella riga di avvio. */
+button label {
+    font-size: 10pt
+}
+
+/* Le app dentro i sottomenu: la cosa che si legge davvero. */
+menuitem label {
+    font-size: 13pt
+}
+
+menu {
+    background-color: rgba(28, 28, 30, 0.98);
+    color: #d8ddd9
+}
+
+menuitem:hover {
+    background-color: rgba(143, 191, 152, 0.16)
+}
