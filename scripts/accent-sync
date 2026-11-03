@@ -33,7 +33,6 @@ FILES=(
   "starship/.config/starship.toml"
   "nvim/.config/nvim/lua/noctalia/palette.lua"
   "nwg-drawer/.config/nwg-drawer/drawer.css"
-  "nwg-menu/.config/nwg-panel/menu-start.css"
 )
 
 DRY_RUN=0
