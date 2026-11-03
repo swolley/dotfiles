@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# accent-sync — propaga il colore d'accento ai file scritti a mano.
+#
+# La sorgente dei colori e' la palette di noctalia: da li' i template
+# rigenerano da soli GTK, niri, Qt, bat, fzf, lazygit e gli altri. Restano
+# pero' cinque file con l'esadecimale scritto dentro, perche' sono
+# personalizzati e i template li sovrascriverebbero. Questo script li tiene
+# allineati.
+#
+# L'accento in uso si legge da kitty.conf (color2), che fa da ancora: ogni
+# occorrenza di quel valore nei cinque file viene sostituita.
+#
+# Uso:
+#   ./scripts/accent-sync                 # prende l'accento dalla palette
+#   ./scripts/accent-sync '#7fb069'       # usa il colore indicato
+#   ./scripts/accent-sync --dry-run       # mostra cosa cambierebbe
+#   ./scripts/accent-sync --check         # esce 1 se qualcosa e' disallineato
+
+set -euo pipefail
+
+RED="\033[1;31m"; GREEN="\033[1;32m"; YELLOW="\033[1;33m"
+BLUE="\033[1;34m"; CYAN="\033[1;36m"; DIM="\033[2m"; RESET="\033[0m"
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PALETTE="$REPO_DIR/noctalia/.config/noctalia/palettes/adwaita-starship.json"
+ANCORA="$REPO_DIR/kitty/.config/kitty/kitty.conf"
+
+# I file che i template non toccano e che quindi restano a carico nostro.
+FILES=(
+  "kitty/.config/kitty/kitty.conf"
+  "tmux/.tmux.conf"
+  "gitmux/.gitmux.conf"
+  "starship/.config/starship.toml"
+  "nvim/.config/nvim/lua/noctalia/palette.lua"
+  "nwg-drawer/.config/nwg-drawer/drawer.css"
+)
+
+DRY_RUN=0
+CHECK=0
+NUOVO=""
+
+section() { echo -e "\n${CYAN}==>${RESET} ${BLUE}$1${RESET}"; }
+info()    { echo -e "    $*"; }
+ok()      { echo -e "    ${GREEN}ok${RESET} $*"; }
+warn()    { echo -e "    ${YELLOW}attenzione${RESET} $*"; }
+die()     { echo -e "${RED}errore:${RESET} $*" >&2; exit 1; }
+
+usage() { sed -n '2,19p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0; }
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run|-n) DRY_RUN=1 ;;
+    --check)      CHECK=1; DRY_RUN=1 ;;
+    --help|-h)    usage ;;
+    -*)           die "opzione sconosciuta: $1" ;;
+    *)            NUOVO="$1" ;;
+  esac
+  shift
+done
+
+[ -f "$ANCORA" ] || die "manca $ANCORA"
+
+# Accento attualmente scritto nei file: color2 di kitty.
+VECCHIO="$(awk '/^color2[[:space:]]/ { print $2; exit }' "$ANCORA")"
+[ -n "$VECCHIO" ] || die "non trovo color2 in $ANCORA"
+
+# Accento di destinazione: l'argomento, altrimenti la palette di noctalia.
+if [ -z "$NUOVO" ]; then
+  [ -f "$PALETTE" ] || die "manca $PALETTE: passa il colore come argomento"
+  NUOVO="$(python3 -c '
+import json, sys
+d = json.load(open(sys.argv[1]))
+print((d.get("dark") or d)["mPrimary"])' "$PALETTE")"
+fi
+
+case "$NUOVO" in
+  '#'[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) ;;
+  *) die "colore non valido: $NUOVO (atteso #rrggbb)" ;;
+esac
+
+section "Accento"
+info "nei file:  $VECCHIO   (da $(basename "$ANCORA"), color2)"
+info "richiesto: $NUOVO"
+
+if [ "$VECCHIO" = "$NUOVO" ]; then
+  ok "gia' allineati, niente da fare"
+  exit 0
+fi
+
+section "File"
+TOCCATI=0
+for f in "${FILES[@]}"; do
+  percorso="$REPO_DIR/$f"
+  if [ ! -f "$percorso" ]; then
+    warn "$f non esiste, salto"
+    continue
+  fi
+  n="$(grep -c -i -- "$VECCHIO" "$percorso" || true)"
+  if [ "$n" -eq 0 ]; then
+    warn "$f non contiene l'accento"
+    continue
+  fi
+  TOCCATI=$((TOCCATI + n))
+  info "$f ${DIM}($n occorrenze)${RESET}"
+  [ "$DRY_RUN" -eq 1 ] && continue
+  # sed -i sostituirebbe il symlink con un file normale, scollegando il file
+  # dalla copia stowata: si riscrive il contenuto passando per il symlink.
+  tmp="$(mktemp)"
+  sed "s/$VECCHIO/$NUOVO/gI" "$percorso" >"$tmp"
+  cat "$tmp" >"$percorso"
+  rm -f "$tmp"
+done
+
+if [ "$CHECK" -eq 1 ]; then
+  [ "$TOCCATI" -eq 0 ] && { ok "tutto allineato"; exit 0; }
+  die "$TOCCATI occorrenze da aggiornare: lancia ./scripts/accent-sync"
+fi
+
+section "Fatto"
+if [ "$DRY_RUN" -eq 1 ]; then
+  info "nessuna modifica scritta (--dry-run)"
+else
+  ok "$TOCCATI occorrenze portate a $NUOVO"
+  info "i file rigenerati dai template seguono la palette di noctalia:"
+  info "${DIM}noctalia msg templates-apply${RESET}"
+fi
