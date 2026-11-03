@@ -206,10 +206,12 @@ sidebar_section = "full"
 width = 800
 
 [shell.panel]
-launcher_placement = "attached"
-launcher_position = "auto"
+# Il launcher si apre al centro dello schermo, non appeso alla barra: ci si
+# scrive dentro e conviene averlo sott'occhio invece che in un angolo.
+launcher_placement = "floating"
+launcher_position = "center"
 open_near_click_control_center = true
-open_near_click_launcher = true
+open_near_click_launcher = false
 
 [widget.clock]
 format = "{:%a %d %b %Y  %H:%M}"
