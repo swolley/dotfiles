@@ -50,9 +50,20 @@ separator {
 }
 
 /* Le categorie a sinistra: nomi piu' piccoli delle voci delle app, perche'
-   sono solo l'indice. Le icone le spegne -iss nella riga di avvio. */
+   sono solo l'indice. */
 button label {
     font-size: 10pt
+}
+
+/* Niente icone sulle categorie: sono bottoni, mentre le voci delle
+   applicazioni no, e questo e' l'unico modo per distinguerle. Ridurle con
+   -isl le spegnerebbe anche sulle app, dove invece servono. */
+button image {
+    opacity: 0;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0
 }
 
 /* Le app dentro i sottomenu: la cosa che si legge davvero. */
