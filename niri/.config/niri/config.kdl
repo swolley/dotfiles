@@ -188,18 +188,14 @@ window-rule {
 // vuoto; la striscia, che resta senza finestre, ne tiene uno solo appunto
 // perche' non ha nessun workspace nominato che la inchiodi a due.
 //
-// Un workspace con un nome non sparisce mai, e con open-on-output vive su un
-// monitor solo: qui serve a dare al browser un posto stabile sullo schermo
-// integrato. L'LG resta tutto dinamico, perche' e' dove si lavora.
-workspace "browser" {
-    open-on-output "eDP-1"
-}
+// Nessun workspace nominato: un nome compare al posto del numero nella barra,
+// e qui non aggiunge niente. Firefox si ancora al monitor, non al workspace.
 
-// Firefox nasce sullo schermo integrato grande, sul suo workspace fisso.
+// Firefox nasce sullo schermo integrato grande, sul suo primo workspace.
 // Spostarlo a mano resta possibile: la regola vale solo all'apertura.
 window-rule {
     match app-id=r#"^firefox$"#
-    open-on-workspace "browser"
+    open-on-output "eDP-1"
     open-maximized true
 }
 
