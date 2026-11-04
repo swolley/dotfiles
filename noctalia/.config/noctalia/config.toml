@@ -90,9 +90,10 @@ lang = "it"
 niri_overview_close_on_launch_enabled = true
 niri_overview_type_to_launch_enabled = true
 
-    # Il launcher di noctalia fa da menu applicazioni: si apre attaccato al
-    # pulsante che lo chiama, stretto e in elenco. La griglia a tutto schermo
-    # in stile gnome e' nwg-drawer, bindata su Mod+D in niri.
+    # Il launcher fa da menu applicazioni: stretto, in elenco, con le
+    # categorie come sole icone. Si apre al centro dello schermo, dalla lente
+    # sulla barra o con Mod+D, che alla seconda pressione passa all'overview
+    # delle finestre.
     [shell.launcher]
     app_grid = false
     # categorie come sole icone: a questa larghezza le etichette si
@@ -227,3 +228,8 @@ enabled = true
 
     [calendar.account.personal_google]
     type = "google"
+
+# Nella barra i workspace si leggono col loro numero: "name" mostrerebbe il
+# nome, che qui nessun workspace ha.
+[widget.workspaces]
+label_source = "id"
