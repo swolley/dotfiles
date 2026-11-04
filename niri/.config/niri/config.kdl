@@ -177,7 +177,7 @@ window-rule {
 // un monitor solo: e' il modo per dare ai monitor di servizio un posto fisso,
 // invece di ritrovarsi una fila che cresce a ogni finestra spostata li'.
 // L'LG resta tutto dinamico, perche' e' dove si lavora.
-workspace "portatile" {
+workspace "browser" {
     open-on-output "eDP-1"
 }
 
@@ -185,8 +185,11 @@ workspace "striscia" {
     open-on-output "DP-1"
 }
 
+// Firefox nasce sullo schermo integrato grande, sul suo workspace fisso.
+// Spostarlo a mano resta possibile: la regola vale solo all'apertura.
 window-rule {
-    match title="Firefox"
+    match app-id=r#"^firefox$"#
+    open-on-workspace "browser"
     open-maximized true
 }
 
