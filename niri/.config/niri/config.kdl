@@ -76,13 +76,14 @@ overview {
     // Fallback tint; Noctalia wallpaper sits in the backdrop via layer-rule below.
     backdrop-color "#1c1c1e"
 
-    // Un alone intorno a ogni workspace: senza, nell'overview i workspace
+    // Un contorno intorno a ogni workspace: senza, nell'overview i workspace
     // vuoti si confondono con lo sfondo e non si capisce quanti ce ne sono.
+    // softness a zero toglie la sfumatura e lascia un bordo netto.
     workspace-shadow {
-        softness 30
-        spread 5
+        softness 0
+        spread 3
         offset x=0 y=0
-        color "#8fbf9866"
+        color "#8fbf98cc"
     }
 }
 
