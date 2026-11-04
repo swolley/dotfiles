@@ -172,17 +172,16 @@ window-rule {
 }
 
 // I workspace di niri nascono e muoiono da soli: ne resta sempre uno vuoto in
-// coda a ogni monitor, e gli altri campano finche' contengono finestre. Un
-// workspace con un nome invece non sparisce mai, e con open-on-output vive su
-// un monitor solo: e' il modo per dare ai monitor di servizio un posto fisso,
-// invece di ritrovarsi una fila che cresce a ogni finestra spostata li'.
-// L'LG resta tutto dinamico, perche' e' dove si lavora.
+// coda a ogni monitor, e gli altri campano finche' contengono finestre. Il
+// vuoto in coda non si puo' togliere, quindi il minimo e' uno pieno piu' uno
+// vuoto; la striscia, che resta senza finestre, ne tiene uno solo appunto
+// perche' non ha nessun workspace nominato che la inchiodi a due.
+//
+// Un workspace con un nome non sparisce mai, e con open-on-output vive su un
+// monitor solo: qui serve a dare al browser un posto stabile sullo schermo
+// integrato. L'LG resta tutto dinamico, perche' e' dove si lavora.
 workspace "browser" {
     open-on-output "eDP-1"
-}
-
-workspace "striscia" {
-    open-on-output "DP-1"
 }
 
 // Firefox nasce sullo schermo integrato grande, sul suo workspace fisso.
