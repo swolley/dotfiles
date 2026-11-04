@@ -75,6 +75,15 @@ gestures {
 overview {
     // Fallback tint; Noctalia wallpaper sits in the backdrop via layer-rule below.
     backdrop-color "#1c1c1e"
+
+    // Un alone intorno a ogni workspace: senza, nell'overview i workspace
+    // vuoti si confondono con lo sfondo e non si capisce quanti ce ne sono.
+    workspace-shadow {
+        softness 30
+        spread 5
+        offset x=0 y=0
+        color "#8fbf9866"
+    }
 }
 
 // Stationary Noctalia wallpaper visible in overview (docs: compositor-settings/niri).
