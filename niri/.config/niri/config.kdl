@@ -78,10 +78,11 @@ overview {
 
     // Un contorno intorno a ogni workspace: senza, nell'overview i workspace
     // vuoti si confondono con lo sfondo e non si capisce quanti ce ne sono.
-    // softness a zero toglie la sfumatura e lascia un bordo netto.
+    // Poca softness: quel tanto che basta a smussare gli spigoli senza
+    // tornare al bagliore diffuso. Un raggio vero niri non lo espone.
     workspace-shadow {
-        softness 0
-        spread 3
+        softness 5
+        spread 2
         offset x=0 y=0
         color "#8fbf98cc"
     }
