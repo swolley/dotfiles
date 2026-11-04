@@ -171,18 +171,22 @@ window-rule {
     open-floating true
 }
 
-workspace "c" {
+// I workspace di niri nascono e muoiono da soli: ne resta sempre uno vuoto in
+// coda a ogni monitor, e gli altri campano finche' contengono finestre. Un
+// workspace con un nome invece non sparisce mai, e con open-on-output vive su
+// un monitor solo: e' il modo per dare ai monitor di servizio un posto fisso,
+// invece di ritrovarsi una fila che cresce a ogni finestra spostata li'.
+// L'LG resta tutto dinamico, perche' e' dove si lavora.
+workspace "portatile" {
+    open-on-output "eDP-1"
 }
 
-workspace "b" {
-}
-
-workspace "a" {
+workspace "striscia" {
+    open-on-output "DP-1"
 }
 
 window-rule {
     match title="Firefox"
-    open-on-workspace "c"
     open-maximized true
 }
 
