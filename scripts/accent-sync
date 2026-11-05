@@ -32,7 +32,6 @@ FILES=(
   "gitmux/.gitmux.conf"
   "starship/.config/starship.toml"
   "nvim/.config/nvim/lua/noctalia/palette.lua"
-  "nwg-drawer/.config/nwg-drawer/drawer.css"
 )
 
 DRY_RUN=0

@@ -4,12 +4,6 @@ noctalia
 xwayland-satellite
 xdg-desktop-portal-wlr
 nwg-displays
-# griglia applicazioni a tutto schermo in stile gnome, bindata su Mod+D:
-# resta residente in memoria, la avvia niri all'accesso
-nwg-drawer
-# menu con le categorie in verticale, in stile mate: ancora da configurare,
-# il suo -wm non conosce niri
-nwg-menu
 # gestore file e la sua voce "Apri nel terminale", configurabile:
 # quella di gnome-terminal e' cablata e aprirebbe una finestra nuova
 nautilus

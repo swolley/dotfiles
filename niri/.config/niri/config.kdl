@@ -13,10 +13,6 @@ prefer-no-csd
 
 spawn-at-startup "xwayland-satellite"
 
-// Griglia applicazioni in stile gnome: resta residente in memoria, cosi'
-// Mod+D la mostra subito invece di ricaricare l'elenco ogni volta.
-spawn-sh-at-startup "nwg-drawer -r -wm niri -c 6 -is 128 -spacing 32 -fm nautilus -term \"$HOME/.config/niri/terminal.sh run\" -ovl"
-
 // Shell UI (bar/dock/launcher/notifiche/lock).
 // Lo script avvia noctalia e, se muore, apre una kitty con le ultime righe
 // di log e scrive sul journal. NON usa notify-send: in v5 il demone di
@@ -24,9 +20,10 @@ spawn-sh-at-startup "nwg-drawer -r -wm niri -c 6 -is 128 -spacing 32 -fm nautilu
 // fallimento e ti ritroveresti col desktop vuoto senza spiegazione.
 spawn-sh-at-startup "$HOME/.config/niri/start-noctalia.sh"
 
-// Convenience: open a terminal on login (also Ctrl+Alt+T / Super+Return)
-// Non serve piu' come rete di sicurezza: se ne occupa start-noctalia.sh.
-spawn-sh-at-startup "$HOME/.config/niri/terminal.sh focus"
+// Niente terminale all'accesso: lo apri quando serve con Ctrl+Alt+T o
+// Super+Return. Come rete di sicurezza non serviva piu', se ne occupa
+// start-noctalia.sh.
+// spawn-sh-at-startup "$HOME/.config/niri/terminal.sh focus"
 
 environment {
     QT_QPA_PLATFORM "wayland"
@@ -78,6 +75,17 @@ gestures {
 overview {
     // Fallback tint; Noctalia wallpaper sits in the backdrop via layer-rule below.
     backdrop-color "#1c1c1e"
+
+    // Un contorno intorno a ogni workspace: senza, nell'overview i workspace
+    // vuoti si confondono con lo sfondo e non si capisce quanti ce ne sono.
+    // softness a zero: bordo pieno, niente sfumatura. Gli angoli restano
+    // vivi, un raggio niri non lo espone.
+    workspace-shadow {
+        softness 0
+        spread 3
+        offset x=0 y=0
+        color "#8fbf98cc"
+    }
 }
 
 // Stationary Noctalia wallpaper visible in overview (docs: compositor-settings/niri).
@@ -174,18 +182,20 @@ window-rule {
     open-floating true
 }
 
-workspace "c" {
-}
+// I workspace di niri nascono e muoiono da soli: ne resta sempre uno vuoto in
+// coda a ogni monitor, e gli altri campano finche' contengono finestre. Il
+// vuoto in coda non si puo' togliere, quindi il minimo e' uno pieno piu' uno
+// vuoto; la striscia, che resta senza finestre, ne tiene uno solo appunto
+// perche' non ha nessun workspace nominato che la inchiodi a due.
+//
+// Nessun workspace nominato: un nome compare al posto del numero nella barra,
+// e qui non aggiunge niente. Firefox si ancora al monitor, non al workspace.
 
-workspace "b" {
-}
-
-workspace "a" {
-}
-
+// Firefox nasce sullo schermo integrato grande, sul suo primo workspace.
+// Spostarlo a mano resta possibile: la regola vale solo all'apertura.
 window-rule {
-    match title="Firefox"
-    open-on-workspace "c"
+    match app-id=r#"^firefox$"#
+    open-on-output "eDP-1"
     open-maximized true
 }
 
@@ -196,7 +206,7 @@ window-rule {
 }
 
 window-rule {
-    geometry-corner-radius 16
+    geometry-corner-radius 6
     clip-to-geometry true
 }
 
@@ -235,16 +245,11 @@ binds {
         maximize-column;
     }
 
-    // Come su gnome: prima pressione la griglia applicazioni, seconda
-    // l'overview delle finestre, terza chiude. Il launcher di noctalia
-    // resta il menu attaccato al pulsante, su Mod+Ctrl+D.
+    // Come su gnome: prima pressione il launcher, seconda l'overview delle
+    // finestre, terza chiude.
+    // Noctalia v5 IPC: https://docs.noctalia.dev/noctalia/ipc/
     Mod+D {
         spawn-sh "$HOME/.config/niri/launcher.sh";
-    }
-
-    // Noctalia v5 IPC: https://docs.noctalia.dev/noctalia/ipc/
-    Mod+Ctrl+D {
-        spawn-sh "noctalia msg panel-toggle launcher";
     }
 
     Mod+L {
