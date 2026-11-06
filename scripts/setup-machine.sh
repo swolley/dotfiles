@@ -34,7 +34,8 @@ SERVICES_SYSTEM=(NetworkManager firewalld gdm avahi-daemon lm_sensors
 SERVICES_USER=()
 
 # Pacchetti stow da applicare (tutte le cartelle del repo che non sono scripts/).
-STOW_SKIP="scripts"
+# easyeffects: db/ e' stato macchina (casa vs ufficio); lo riprendiamo dopo.
+STOW_SKIP="scripts easyeffects"
 
 section() { echo -e "\n${CYAN}==>${RESET} ${BLUE}$1${RESET}"; }
 info()    { echo -e "    $*"; }
@@ -73,6 +74,26 @@ group_label() {
 
 packages_of() {
   grep -vE '^\s*#|^\s*$' "$1"
+}
+
+# Pacchetti della lista non ancora installati (verifica con pacman -Qq).
+missing_of() {
+  local pkg
+  while IFS= read -r pkg; do
+    pacman -Qq "$pkg" >/dev/null 2>&1 || printf '%s\n' "$pkg"
+  done < <(packages_of "$1")
+}
+
+# "3 da installare (12 gia' presenti)" oppure "tutti presenti (12)".
+pkg_summary() {
+  local total missing
+  total=$(packages_of "$1" | wc -l)
+  missing=$(missing_of "$1" | wc -l)
+  if [ "$missing" -eq 0 ]; then
+    printf 'tutti presenti (%s)' "$total"
+  else
+    printf '%s da installare (%s gia'\'' presenti)' "$missing" "$((total - missing))"
+  fi
 }
 
 ask() {  # ask "domanda" -> 0 se si'
@@ -217,7 +238,7 @@ while [ $# -gt 0 ]; do
     --list)
       for f in "$PKG_DIR"/*.txt; do
         g=$(group_name "$f")
-        printf '  %-16s %s (%s pacchetti)\n' "$g" "$(group_label "$g")" "$(packages_of "$f" | wc -l)"
+        printf '  %-16s %s — %s\n' "$g" "$(group_label "$g")" "$(pkg_summary "$f")"
       done
       exit 0 ;;
     --help|-h)    usage ;;
@@ -259,8 +280,7 @@ for f in "$PKG_DIR"/*.txt; do
     selected+=("$f")
     continue
   fi
-  n=$(packages_of "$f" | wc -l)
-  if ask "$(group_label "$g") — $n pacchetti. Installare?"; then
+  if ask "$(group_label "$g") — $(pkg_summary "$f"). Installare?"; then
     selected+=("$f")
   fi
 done
@@ -269,8 +289,12 @@ done
 
 for f in "${selected[@]}"; do
   g=$(group_name "$f")
-  mapfile -t pkgs < <(packages_of "$f")
-  info "${BLUE}$g${RESET}: ${#pkgs[@]} pacchetti"
+  mapfile -t pkgs < <(missing_of "$f")
+  if [ ${#pkgs[@]} -eq 0 ]; then
+    ok "$g: niente da installare ($(pkg_summary "$f"))"
+    continue
+  fi
+  info "${BLUE}$g${RESET}: ${#pkgs[@]} da installare"
   run "$HELPER" -S --needed --noconfirm "${pkgs[@]}"
 done
 
@@ -297,7 +321,16 @@ if [ "$DO_STOW" -eq 1 ]; then
     case " $STOW_SKIP " in *" $p "*) continue ;; esac
     [ -d "$p" ] || continue
     info "stow $p"
-    run stow --restow "$p"
+    # set -e interromperebbe tutto lo script: un conflitto su un pacchetto
+    # non deve annullare gli stow successivi ne' le sezioni dopo (shell, monitor…).
+    # "All operations aborted" di stow riguarda solo quel pacchetto, non i precedenti.
+    if [ "$DRY_RUN" -eq 1 ]; then
+      run stow --restow "$p"
+    elif stow --restow "$p"; then
+      :
+    else
+      warn "stow $p fallito (conflitti o file gia' presenti): continuo con gli altri"
+    fi
   done
 fi
 
