@@ -58,10 +58,12 @@ input {
     trackpoint {
     }
 
-    // Il fuoco cambia solo su click: focus-follows-mouse, anche limitato con
-    // max-scroll-amount, fa comunque scorrere la striscia quando il puntatore
-    // attraversa un altro monitor. Per riprovarlo: togli il commento.
-    // focus-follows-mouse max-scroll-amount="0%"
+    // Il fuoco segue il mouse e, toccando il bordo dello schermo, la striscia
+    // scorre fino a portare in vista la finestra parzialmente visibile. Effetto
+    // collaterale: scorre anche quando il puntatore attraversa un altro monitor.
+    // Per scorrere solo su click: `focus-follows-mouse max-scroll-amount="0%"`
+    // o togli la riga.
+    focus-follows-mouse
 }
 
 gestures {
