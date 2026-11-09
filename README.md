@@ -121,14 +121,21 @@ che installa sempre.
 
 ```bash
 ./scripts/setup-machine.sh            # interattivo
-./scripts/setup-machine.sh --list     # elenca i gruppi
+./scripts/setup-machine.sh --list     # elenca i gruppi e gli IDE
 ./scripts/setup-machine.sh --dry-run  # mostra i comandi senza eseguirli
 ./scripts/setup-machine.sh --yes --only base,niri-noctalia,dev-php
+./scripts/setup-machine.sh --yes --only dev-php --ide cursor
 ```
 
 Le liste stanno in `scripts/packages/*.txt`, una per gruppo, un pacchetto per
 riga. I linguaggi non hanno versioni fissate: i repo portano sempre l'ultima
 stabile. Per aggiungere software, modifica il file del gruppo giusto.
+
+L'IDE non e' in nessuna lista: se selezioni un gruppo `dev-*`, lo script chiede
+quale installare (nessuno, uno o piu' d'uno). `--ide code,cursor` salta la
+domanda, `--ide none` non installa nulla; con `--yes` senza `--ide` usa il
+primo. L'elenco e' l'array `IDES` in `scripts/setup-machine.sh`: per aggiungere
+un IDE basta una riga `chiave|etichetta|pacchetti`.
 
 Restano fuori, perche' dipendono dalla macchina o da segreti: shell di default,
 chiavi SSH e GPG, disposizione dei monitor, modalita' NVIDIA e gli override di

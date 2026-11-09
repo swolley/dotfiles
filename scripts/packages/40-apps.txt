@@ -2,7 +2,7 @@
 firefox
 google-chrome
 obsidian
-code
+# l'IDE (code, cursor) non e' qui: si sceglie con i gruppi dev-* in setup-machine.sh
 dbeaver
 inkscape
 krita

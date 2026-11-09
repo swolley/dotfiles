@@ -7,12 +7,17 @@
 # Le liste stanno in scripts/packages/*.txt, una per gruppo. I linguaggi non
 # hanno versioni fissate: i repo portano sempre l'ultima stabile.
 #
+# L'IDE non sta in nessuna lista: se selezioni un gruppo dev-*, lo script chiede
+# quale installare tra quelli dell'elenco IDES qui sotto.
+#
 # Uso:
 #   ./scripts/setup-machine.sh              # chiede gruppo per gruppo
 #   ./scripts/setup-machine.sh --yes        # installa tutto senza chiedere
 #   ./scripts/setup-machine.sh --only niri-noctalia,dev-php
+#   ./scripts/setup-machine.sh --ide cursor # IDE dei gruppi dev-* senza chiedere
+#                                           # (piu' d'uno separati da virgola, none = nessuno)
 #   ./scripts/setup-machine.sh --dry-run    # mostra cosa farebbe
-#   ./scripts/setup-machine.sh --list       # elenca i gruppi
+#   ./scripts/setup-machine.sh --list       # elenca i gruppi e gli IDE
 
 set -euo pipefail
 
@@ -27,6 +32,15 @@ DRY_RUN=0
 DO_STOW=1
 DO_SERVICES=1
 ONLY=""
+IDE_CHOICE=""   # da --ide: chiavi separate da virgola, oppure "none"
+IDE_PKGS=()
+
+# IDE tra cui scegliere quando si installa un gruppo dev-*: "chiave|etichetta|pacchetti".
+# Il primo e' quello usato con --yes. Per aggiungerne uno basta una riga.
+IDES=(
+  "code|Visual Studio Code (Code - OSS)|code"
+  "cursor|Cursor|cursor-bin"
+)
 
 # Servizi di sistema e utente da riabilitare.
 SERVICES_SYSTEM=(NetworkManager firewalld gdm avahi-daemon lm_sensors
@@ -96,24 +110,159 @@ pkg_summary() {
   fi
 }
 
-ask() {  # ask "domanda" -> 0 se si'
-  [ "$ASSUME_YES" -eq 1 ] && return 0
-  local reply
-  read -rp "    $1 [S/n] " reply </dev/tty || return 1
-  case "${reply,,}" in n|no) return 1 ;; *) return 0 ;; esac
+# True se c'e' un controller grafico NVIDIA (vendor 10de).
+has_nvidia_gpu() {
+  lspci -nn 2>/dev/null | grep -qiE 'NVIDIA.*(VGA|3D controller|Display controller)'
 }
 
-detect_monitors() {  # stampa "CONNETTORE<TAB>descrizione"
-  if command -v niri >/dev/null 2>&1 && niri msg --json outputs >/dev/null 2>&1; then
-    niri msg --json outputs | jq -r 'to_entries[] | "\(.key)\t\(.value.make) \(.value.model)"'
+ask() {  # ask "domanda" -> 0 se si' (default: no)
+  [ "$ASSUME_YES" -eq 1 ] && return 0
+  local reply
+  read -rp "    $1 [s/N] " reply </dev/tty || return 1
+  case "${reply,,}" in s|si|y|yes) return 0 ;; *) return 1 ;; esac
+}
+
+ide_field() {  # ide_field "riga" N -> campo N (1 chiave, 2 etichetta, 3 pacchetti)
+  printf '%s' "$1" | cut -d'|' -f"$2"
+}
+
+ide_by_key() {  # stampa la riga di IDES con quella chiave, altrimenti fallisce
+  local line
+  for line in "${IDES[@]}"; do
+    if [ "$(ide_field "$line" 1)" = "$1" ]; then
+      printf '%s' "$line"
+      return 0
+    fi
+  done
+  return 1
+}
+
+ide_installed() {  # true se tutti i pacchetti dell'IDE sono gia' presenti
+  local pkgs p
+  read -ra pkgs <<<"$(ide_field "$1" 3)"
+  for p in "${pkgs[@]}"; do
+    pacman -Qq "$p" >/dev/null 2>&1 || return 1
+  done
+}
+
+# Se tra i gruppi scelti c'e' un dev-*, decide quale IDE installare (uno, piu'
+# d'uno o nessuno) e mette i pacchetti in IDE_PKGS. Senza gruppi dev-* non fa
+# nulla e non chiede niente.
+select_ide() {
+  local f has_dev=0 line key tag reply n pkgs
+  local picked=() keys=() nums=()
+
+  for f in "${selected[@]}"; do
+    case "$(group_name "$f")" in dev-*) has_dev=1; break ;; esac
+  done
+  [ "$has_dev" -eq 1 ] || return 0
+
+  section "IDE"
+  if [ -n "$IDE_CHOICE" ]; then
+    if [ "$IDE_CHOICE" != none ]; then
+      IFS=, read -ra keys <<<"$IDE_CHOICE"
+      for key in "${keys[@]}"; do picked+=("$(ide_by_key "$key")"); done
+    fi
+  elif [ "$ASSUME_YES" -eq 1 ]; then
+    picked=("${IDES[0]}")
   else
-    for st in /sys/class/drm/card*-*/status; do
-      [ -r "$st" ] || continue
-      [ "$(cat "$st")" = connected ] || continue
-      n=$(basename "$(dirname "$st")")
-      printf '%s\t%s\n' "${n#card*-}" "rilevato da /sys"
+    info "Quale IDE installare? (numeri separati da virgola o spazio)"
+    n=1
+    for line in "${IDES[@]}"; do
+      tag=""
+      ide_installed "$line" && tag=" (gia' installato)"
+      printf '      %d) %-8s %s%s\n' "$n" "$(ide_field "$line" 1)" "$(ide_field "$line" 2)" "$tag"
+      n=$((n+1))
+    done
+    printf '      0) nessuno\n'
+    read -rp "    Scelta [invio = 0] " reply </dev/tty || reply=""
+    IFS=', ' read -ra nums <<<"$reply"
+    for n in "${nums[@]}"; do
+      case "$n" in
+        0) picked=(); break ;;
+        ''|*[!0-9]*) warn "scelta non valida: $n"; continue ;;
+      esac
+      if [ "$n" -ge 1 ] && [ "$n" -le "${#IDES[@]}" ]; then
+        picked+=("${IDES[$((n-1))]}")
+      else
+        warn "fuori intervallo: $n"
+      fi
     done
   fi
+
+  if [ ${#picked[@]} -eq 0 ]; then
+    info "nessun IDE da installare"
+    return 0
+  fi
+  for line in "${picked[@]}"; do
+    read -ra pkgs <<<"$(ide_field "$line" 3)"
+    IDE_PKGS+=("${pkgs[@]}")
+    ok "IDE: $(ide_field "$line" 2)"
+  done
+}
+
+# Marca + nome da EDID del connettore DRM (es. "ACR XB270HU").
+monitor_edid_label() {
+  local edid="$1/edid" out make name model
+  [ -r "$edid" ] || { printf 'sconosciuto'; return; }
+  [ "$(wc -c < "$edid" 2>/dev/null || echo 0)" -ge 128 ] || { printf 'sconosciuto'; return; }
+
+  if command -v edid-decode >/dev/null 2>&1; then
+    out=$(edid-decode "$edid" 2>/dev/null) || out=
+    make=$(printf '%s\n' "$out" | sed -n 's/^[[:space:]]*Manufacturer:[[:space:]]*//p' | head -1)
+    name=$(printf '%s\n' "$out" | sed -n "s/^[[:space:]]*Display Product Name:[[:space:]]*'\\(.*\\)'\$/\\1/p" | head -1)
+    name=$(printf '%s' "$name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    model=$(printf '%s\n' "$out" | sed -n 's/^[[:space:]]*Model:[[:space:]]*//p' | head -1)
+    if [ -n "$make" ] && [ -n "$name" ]; then
+      printf '%s %s' "$make" "$name"
+      return
+    fi
+    if [ -n "$make" ]; then
+      printf '%s (model %s)' "$make" "${model:-?}"
+      return
+    fi
+  fi
+
+  # Fallback senza edid-decode: manufacturer PNP + descriptor 0xFC.
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - "$edid" <<'PY' 2>/dev/null && return
+import sys
+b = open(sys.argv[1], "rb").read(128)
+if len(b) < 128:
+    print("sconosciuto"); raise SystemExit
+mid = (b[8] << 8) | b[9]
+make = "".join(
+    chr(((mid >> 10) & 0x1F) + 64)
+    + chr(((mid >> 5) & 0x1F) + 64)
+    + chr((mid & 0x1F) + 64)
+)
+name = ""
+for off in (54, 72, 90, 108):
+    if b[off] == 0 and b[off + 1] == 0 and b[off + 3] == 0xFC:
+        name = b[off + 5 : off + 18].split(b"\n", 1)[0].decode("ascii", "ignore").strip()
+        break
+model = (b[11] << 8) | b[10]
+print(f"{make} {name}" if name else f"{make} (model {model})")
+PY
+  fi
+  printf 'EDID presente'
+}
+
+detect_monitors() {  # stampa "CONNETTORE<TAB>marca nome"
+  local st dir conn desc
+  # Preferisci /sys+EDID: funziona anche fuori da niri e mostra marca/modello
+  # leggibili (ARZOPA, XB270HU…), non solo DP-1 / DP-6.
+  for st in /sys/class/drm/card*-*/status; do
+    [ -r "$st" ] || continue
+    [ "$(cat "$st")" = connected ] || continue
+    dir=$(dirname "$st")
+    conn=$(basename "$dir" | sed -E 's/^card[0-9]+-//')
+    desc=$(monitor_edid_label "$dir")
+    case "$conn" in
+      eDP-*) desc="$desc (pannello interno)" ;;
+    esac
+    printf '%s\t%s\n' "$conn" "$desc"
+  done
 }
 
 configure_monitors() {
@@ -127,7 +276,7 @@ configure_monitors() {
   info "Monitor rilevati:"
   local i=1
   for m in "${mons[@]}"; do
-    printf '      %d) %-10s %s\n' "$i" "${m%%$'\t'*}" "${m#*$'\t'}"
+    printf '      %d) %-12s %s\n' "$i" "${m%%$'\t'*}" "${m#*$'\t'}"
     i=$((i+1))
   done
 
@@ -224,7 +373,7 @@ setup_shell() {
 }
 
 usage() {
-  sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
   exit 0
 }
 
@@ -235,10 +384,15 @@ while [ $# -gt 0 ]; do
     --no-stow)    DO_STOW=0 ;;
     --no-services) DO_SERVICES=0 ;;
     --only)       ONLY="${2:-}"; shift ;;
+    --ide)        IDE_CHOICE="${2:-}"; shift ;;
     --list)
       for f in "$PKG_DIR"/*.txt; do
         g=$(group_name "$f")
         printf '  %-16s %s — %s\n' "$g" "$(group_label "$g")" "$(pkg_summary "$f")"
+      done
+      printf '\n  IDE (si scelgono con i gruppi dev-*, o con --ide):\n'
+      for line in "${IDES[@]}"; do
+        printf '  %-16s %s — %s\n' "$(ide_field "$line" 1)" "$(ide_field "$line" 2)" "$(ide_field "$line" 3)"
       done
       exit 0 ;;
     --help|-h)    usage ;;
@@ -250,6 +404,13 @@ done
 [ -d "$PKG_DIR" ] || die "cartella delle liste non trovata: $PKG_DIR"
 command -v pacman >/dev/null || die "questo script funziona su Arch / EndeavourOS"
 [ "$(id -u)" -ne 0 ] || die "non lanciarlo come root: usa il tuo utente, chiedera' sudo quando serve"
+
+if [ -n "$IDE_CHOICE" ] && [ "$IDE_CHOICE" != none ]; then
+  IFS=, read -ra _keys <<<"$IDE_CHOICE"
+  for _k in "${_keys[@]}"; do
+    ide_by_key "$_k" >/dev/null || die "IDE sconosciuto: '$_k' (disponibili: $(for _l in "${IDES[@]}"; do printf '%s ' "$(ide_field "$_l" 1)"; done)o none)"
+  done
+fi
 
 section "Helper AUR"
 if command -v paru >/dev/null; then
@@ -272,6 +433,11 @@ section "Pacchetti"
 selected=()
 for f in "$PKG_DIR"/*.txt; do
   g=$(group_name "$f")
+  # NVIDIA: chiedi/installa solo se c'e' la scheda (anche con --yes/--only).
+  if [ "$g" = nvidia ] && ! has_nvidia_gpu; then
+    ok "nvidia: nessuna GPU NVIDIA rilevata, salto"
+    continue
+  fi
   if [ -n "$ONLY" ]; then
     case ",$ONLY," in *",$g,"*) selected+=("$f") ;; esac
     continue
@@ -280,12 +446,18 @@ for f in "$PKG_DIR"/*.txt; do
     selected+=("$f")
     continue
   fi
+  if [ "$(missing_of "$f" | wc -l)" -eq 0 ]; then
+    ok "$(group_label "$g") — $(pkg_summary "$f")"
+    continue
+  fi
   if ask "$(group_label "$g") — $(pkg_summary "$f"). Installare?"; then
     selected+=("$f")
   fi
 done
 
 [ ${#selected[@]} -gt 0 ] || die "nessun gruppo selezionato"
+
+select_ide
 
 for f in "${selected[@]}"; do
   g=$(group_name "$f")
@@ -297,6 +469,11 @@ for f in "${selected[@]}"; do
   info "${BLUE}$g${RESET}: ${#pkgs[@]} da installare"
   run "$HELPER" -S --needed --noconfirm "${pkgs[@]}"
 done
+
+if [ ${#IDE_PKGS[@]} -gt 0 ]; then
+  info "${BLUE}ide${RESET}: ${#IDE_PKGS[@]} pacchetti (quelli gia' presenti vengono saltati)"
+  run "$HELPER" -S --needed --noconfirm "${IDE_PKGS[@]}"
+fi
 
 if [ "$DO_SERVICES" -eq 1 ]; then
   section "Servizi"
