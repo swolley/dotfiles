@@ -57,6 +57,17 @@ smart_auto_hide = true
 [lockscreen]
 fingerprint = false
 
+# Inattivita': blocco dopo 3 minuti, schermo spento a 4 (lo spegnimento deve
+# restare piu' alto del blocco, cosi' avviene a sessione gia' bloccata).
+# La sospensione resta spenta (idle.behavior.lock-and-suspend).
+[idle.behavior.lock]
+enabled = true
+timeout = 180
+
+[idle.behavior.screen-off]
+enabled = true
+timeout = 240
+
 [plugin_settings."ayagmar/headroom"]
 bar_accounts = "all"
 bar_style = "value"
