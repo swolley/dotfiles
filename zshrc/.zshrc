@@ -82,8 +82,12 @@ export PATH=$PATH:$JAVA_HOME/bin
 # Initialize Starship prompt
 eval "$(starship init zsh)"
 
-# Auto-start tmux if not already inside tmux and close it when exiting
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+# Auto-start tmux if not already inside tmux and close it when exiting.
+# Non nei terminali di VS Code / Cursor (TERM_PROGRAM=vscode, VSCODE_INJECTION):
+# ogni shell aperta da li' (anche quelle dell'agente) attaccherebbe la sessione
+# "default" e creerebbe o selezionerebbe finestre in quella del terminale vero.
+if command -v tmux &> /dev/null && [ -z "$TMUX" ] \
+   && [ "$TERM_PROGRAM" != "vscode" ] && [ -z "$VSCODE_INJECTION" ]; then
     # Verifica che la directory corrente esista, altrimenti usa la home
     if [ ! -d "$PWD" ]; then
         cd ~
