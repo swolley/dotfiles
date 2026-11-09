@@ -158,6 +158,16 @@ select_ide() {
   [ "$has_dev" -eq 1 ] || return 0
 
   section "IDE"
+  # Se ci sono gia' tutti, non c'e' niente da scegliere ne' da installare.
+  local all_installed=1
+  for line in "${IDES[@]}"; do
+    ide_installed "$line" || { all_installed=0; break; }
+  done
+  if [ "$all_installed" -eq 1 ]; then
+    ok "tutti gli IDE sono gia' installati"
+    return 0
+  fi
+
   if [ -n "$IDE_CHOICE" ]; then
     if [ "$IDE_CHOICE" != none ]; then
       IFS=, read -ra keys <<<"$IDE_CHOICE"
@@ -170,7 +180,7 @@ select_ide() {
     n=1
     for line in "${IDES[@]}"; do
       tag=""
-      ide_installed "$line" && tag=" (gia' installato)"
+      ide_installed "$line" && tag=" (installed)"
       printf '      %d) %-8s %s%s\n' "$n" "$(ide_field "$line" 1)" "$(ide_field "$line" 2)" "$tag"
       n=$((n+1))
     done
