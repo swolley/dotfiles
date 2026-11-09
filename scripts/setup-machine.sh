@@ -275,6 +275,51 @@ detect_monitors() {  # stampa "CONNETTORE<TAB>marca nome"
   done
 }
 
+# Primario gia' configurato: il connettore in [notification] del file che questo
+# script genera. Stampa niente se il file non c'e' o non lo contiene.
+current_primary() {  # current_primary FILE
+  [ -r "$1" ] || return 0
+  sed -n '/^\[notification\]/,/^\[/s/^monitors = \[ *"\([^"]*\)".*/\1/p' "$1" | head -1
+}
+
+# Area di uno schermo, per scegliere il piu' grande. "cm": area fisica da EDID
+# (byte 21 e 22, in cm); "px": area in pixel del modo preferito. 0 se ignota.
+monitor_area() {  # monitor_area cm|px CONNETTORE
+  local d dir="" w=0 h=0 mode
+  for d in /sys/class/drm/card*-"$2"; do
+    [ -e "$d" ] && dir=$d
+    break
+  done
+  [ -n "$dir" ] || { echo 0; return; }
+  if [ "$1" = cm ]; then
+    if [ -r "$dir/edid" ] && [ "$(wc -c < "$dir/edid")" -ge 128 ]; then
+      w=$(od -An -tu1 -j21 -N1 "$dir/edid" | tr -d ' ')
+      h=$(od -An -tu1 -j22 -N1 "$dir/edid" | tr -d ' ')
+    fi
+  else
+    mode=$(head -1 "$dir/modes" 2>/dev/null || true)
+    case "$mode" in
+      *x*) w=${mode%%x*}; h=${mode#*x}; h=${h%%[!0-9]*} ;;
+    esac
+  fi
+  echo $(( ${w:-0} * ${h:-0} ))
+}
+
+# Indice (da 1) del monitor piu' grande in mons: per area fisica se tutti la
+# riportano nell'EDID, altrimenti per pixel. A parita' vince il primo.
+largest_monitor() {
+  local kind=cm m a i=1 best=1 best_area=-1
+  for m in "${mons[@]}"; do
+    [ "$(monitor_area cm "${m%%$'\t'*}")" -gt 0 ] || kind=px
+  done
+  for m in "${mons[@]}"; do
+    a=$(monitor_area "$kind" "${m%%$'\t'*}")
+    if [ "$a" -gt "$best_area" ]; then best=$i; best_area=$a; fi
+    i=$((i+1))
+  done
+  echo "$best"
+}
+
 configure_monitors() {
   local target="$HOME/.config/noctalia/90-monitors.local.toml"
   mapfile -t mons < <(detect_monitors)
@@ -283,22 +328,43 @@ configure_monitors() {
     return
   fi
 
+  # Default all'invio: il primario gia' configurato, se e' ancora collegato;
+  # altrimenti il monitor piu' grande.
+  local attuale default=0 da_attuale=0 i=1 nota
+  attuale=$(current_primary "$target")
+  if [ -n "$attuale" ]; then
+    for m in "${mons[@]}"; do
+      [ "${m%%$'\t'*}" = "$attuale" ] && default=$i
+      i=$((i+1))
+    done
+    if [ "$default" -gt 0 ]; then
+      da_attuale=1
+    else
+      warn "il primario salvato ($attuale) non e' collegato"
+    fi
+  fi
+  [ "$default" -gt 0 ] || default=$(largest_monitor)
+
   info "Monitor rilevati:"
-  local i=1
+  i=1
   for m in "${mons[@]}"; do
-    printf '      %d) %-12s %s\n' "$i" "${m%%$'\t'*}" "${m#*$'\t'}"
+    nota=""
+    if [ "$i" -eq "$default" ]; then
+      if [ "$da_attuale" -eq 1 ]; then nota=" (primario attuale)"; else nota=" (il piu' grande)"; fi
+    fi
+    printf '      %d) %-12s %s%s\n' "$i" "${m%%$'\t'*}" "${m#*$'\t'}" "$nota"
     i=$((i+1))
   done
 
-  local scelta=1
+  local scelta=$default
   if [ "$ASSUME_YES" -eq 0 ]; then
-    read -rp "    Quale e' il monitor principale? [1-${#mons[@]}, invio = 1] " scelta </dev/tty || scelta=1
-    [ -n "$scelta" ] || scelta=1
+    read -rp "    Quale e' il monitor principale? [1-${#mons[@]}, invio = $default] " scelta </dev/tty || scelta=$default
+    [ -n "$scelta" ] || scelta=$default
   fi
   case "$scelta" in
-    ''|*[!0-9]*) warn "scelta non valida, uso il primo"; scelta=1 ;;
+    ''|*[!0-9]*) warn "scelta non valida, uso il $default"; scelta=$default ;;
   esac
-  [ "$scelta" -ge 1 ] && [ "$scelta" -le ${#mons[@]} ] || { warn "fuori intervallo, uso il primo"; scelta=1; }
+  [ "$scelta" -ge 1 ] && [ "$scelta" -le ${#mons[@]} ] || { warn "fuori intervallo, uso il $default"; scelta=$default; }
 
   local primario
   primario="${mons[$((scelta-1))]%%$'\t'*}"
@@ -325,6 +391,13 @@ configure_monitors() {
     for m in "${mons[@]}"; do
       local conn="${m%%$'\t'*}"
       [ "$conn" = "$primario" ] && continue
+      echo
+      # Dock sugli altri schermi: nascosta finche' non porti il puntatore sul
+      # bordo (niente "intelligente", che la mostrerebbe su ogni schermo vuoto).
+      echo "[dock.monitor.$conn]"
+      echo "enabled = true"
+      echo "auto_hide = true"
+      echo "smart_auto_hide = false"
       echo
       echo "[bar.default.monitor.$(echo "$conn" | tr -cd '[:alnum:]' | tr 'A-Z' 'a-z')]"
       echo "match = \"$conn\""
