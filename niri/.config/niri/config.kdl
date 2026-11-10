@@ -32,6 +32,10 @@ environment {
     XDG_SESSION_TYPE "wayland"
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
 
+    // OpenSSH user agent (systemd --user ssh-agent.socket).
+    // Needed by DBeaver/GUI apps: Niri does not inherit this from GNOME.
+    SSH_AUTH_SOCK "/run/user/1000/ssh-agent.socket"
+
     // Do NOT force Intel iris here — this config is shared across machines.
     // On Intel-only boxes you may optionally set:
     // MESA_LOADER_DRIVER_OVERRIDE "iris"
