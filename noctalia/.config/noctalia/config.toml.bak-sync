@@ -86,9 +86,11 @@ terminal = "/home/swolley/.config/niri/terminal.sh run"
 auto_check_hours = 1
 check_arch_news = false
 flatpak_enabled = false
-show_activity_graph = true
+show_activity_graph = false
 show_changelog_after_update = false
 show_download_size = false
+
+config_review = false
 
 [plugins]
 enabled = [ "ayagmar/headroom", "alexander/screen-toolkit", "yuuto/arch-updater" ]

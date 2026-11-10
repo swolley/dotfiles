@@ -399,8 +399,9 @@ configure_monitors() {
       echo "auto_hide = true"
       echo "smart_auto_hide = false"
       echo
-      echo "[bar.default.monitor.$(echo "$conn" | tr -cd '[:alnum:]' | tr 'A-Z' 'a-z')]"
-      echo "match = \"$conn\""
+      # Chiave = nome del connettore, come fa la UI di noctalia: con una chiave
+      # diversa + match, le impostazioni mostrano ogni monitor due volte.
+      echo "[bar.default.monitor.$conn]"
       echo "auto_hide = true"
       echo "reserve_space = false"
     done

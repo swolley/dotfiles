@@ -220,6 +220,23 @@ window-rule {
     default-window-height { fixed 920; }
 }
 
+// Finestra di login delle VPN OpenConnect di NetworkManager (password, codice
+// 2FA, SSO): un popup al centro invece di una colonna a tutta altezza.
+window-rule {
+    match app-id="^nm-openconnect-auth-dialog$"
+    open-floating true
+    default-column-width { fixed 560; }
+    default-window-height { fixed 680; }
+}
+
+// Editor delle connessioni di rete (modifica delle VPN, wifi, ecc.).
+window-rule {
+    match app-id="^nm-connection-editor$"
+    open-floating true
+    default-column-width { fixed 640; }
+    default-window-height { fixed 720; }
+}
+
 debug {
     // Allows notification actions and window activation from Noctalia.
     honor-xdg-activation-with-invalid-serial

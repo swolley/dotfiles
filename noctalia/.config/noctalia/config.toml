@@ -16,9 +16,9 @@ end = [
     "usage",
     "yuuto/arch-updater:widget",
     "tray",
-    "notifications",
     "clipboard",
     "network",
+    "bar",
     "bluetooth",
     "volume",
     "brightness",
@@ -29,6 +29,8 @@ end = [
 font_scale = 0.84999998845160007
 font_weight = 400
 thickness = 26
+
+center = [ "clock", "notifications" ]
 
 [brightness]
 # luminosita' dei monitor esterni via DDC/CI (richiede ddcutil)
@@ -49,7 +51,7 @@ widget_order = []
 
 [dock]
 enabled = false
-pinned = [ "firefox", "cursor", "io.dbeaver.DBeaver", "com.anthropic.Claude", "tabby", "obsidian", "org.gnome.Nautilus" ]
+pinned = [ "firefox", "cursor", "io.dbeaver.DBeaver", "tabby", "org.gnome.Nautilus" ]
 reserve_space = false
 show_dots = true
 smart_auto_hide = true
@@ -93,7 +95,7 @@ show_download_size = false
 config_review = false
 
 [plugins]
-enabled = [ "ayagmar/headroom", "alexander/screen-toolkit", "yuuto/arch-updater" ]
+enabled = [ "ayagmar/headroom", "alexander/screen-toolkit", "yuuto/arch-updater", "andrewdems/vpn-manager" ]
 
 [shell]
 avatar_path = "/home/swolley/Documenti/swolley.jpg"
@@ -109,6 +111,8 @@ niri_overview_type_to_launch_enabled = true
     # categorie come sole icone. Si apre al centro dello schermo, dalla lente
     # sulla barra o con Mod+D, che alla seconda pressione passa all'overview
     # delle finestre.
+
+external_ip_enabled = true
 
     [shell.launcher]
     app_grid = false
@@ -156,7 +160,7 @@ enabled = false
     recursive = false
 
     [wallpaper.default]
-    path = "/home/swolley/Immagini/logo_collab_app.png"
+    path = "/home/swolley/Immagini/swolley.jpg"
 
 [widget.battery]
 display_mode = "none"
@@ -175,6 +179,8 @@ hide_when_no_media = true
 
 [widget.network]
 enabled = false
+
+show_vpn_label = true
 
 [widget.usage]
 type = "ayagmar/headroom:usage"
@@ -197,10 +203,10 @@ enable_screenshot_sounds = false
 type = "wifi"
 
 [[control_center.shortcuts]]
-type = "bluetooth"
+type = "andrewdems/vpn-manager:toggle"
 
 [[control_center.shortcuts]]
-type = "caffeine"
+type = "bluetooth"
 
 [[control_center.shortcuts]]
 type = "power_profile"
@@ -255,3 +261,9 @@ label_source = "id"
 
 [battery.device."/org/freedesktop/UPower/devices/battery_hidpp_battery_0"]
 warning_threshold = 10
+
+[widget.bar]
+type = "andrewdems/vpn-manager:bar"
+
+[widget.notifications]
+hide_when_no_unread = true
