@@ -422,6 +422,12 @@ binds {
     Mod+WheelScrollLeft      cooldown-ms=100 { focus-column-left; }
     Mod+Ctrl+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+    // Stessa azione da tastiera. Mod+Ctrl+Su/Giu' sono gia' di move-window-*,
+    // quindi si usano Pag Su/Giu', come nella config di default di niri.
+    Mod+Page_Down      { focus-workspace-down; }
+    Mod+Page_Up        { focus-workspace-up; }
+    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+    Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
 
     Mod+Ctrl+Left  { move-column-left; }
     Mod+Ctrl+Down  { move-window-down; }
