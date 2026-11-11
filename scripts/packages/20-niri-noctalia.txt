@@ -31,3 +31,5 @@ libsecret
 # sfogliare i file del telefono
 kdeconnect
 sshfs
+# agente polkit: serve alle richieste di password di pkexec (es. FortiClient)
+polkit-gnome
