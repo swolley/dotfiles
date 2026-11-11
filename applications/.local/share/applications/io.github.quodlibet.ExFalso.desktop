@@ -1,0 +1,10 @@
+[Desktop Entry]
+# Ex Falso e' l'editor di tag che viene insieme a Quod Libet: stesso pacchetto,
+# non si disinstalla da solo. I tag si sistemano con picard, quindi la voce
+# sparisce dal launcher mentre il player resta. NoDisplay nasconde l'icona ma
+# tiene l'associazione ai tipi di file, cosi' resta apribile da nautilus.
+Type=Application
+Name=Ex Falso
+Exec=exfalso %F
+Icon=io.github.quodlibet.ExFalso
+NoDisplay=true

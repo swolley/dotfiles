@@ -146,6 +146,7 @@ noctalia in `~/.local/state/noctalia/settings.toml`.
 
 | Package | Linked paths |
 | --- | --- |
+| `applications` | `~/.local/share/applications/` (voci di menu nascoste o corrette) |
 | `bat` | `~/.config/bat/config` (tema generato da noctalia) |
 | `gitmux` | `~/.gitmux.conf` |
 | `code` | `~/.config/code-flags.conf` (portachiavi sotto niri) |
