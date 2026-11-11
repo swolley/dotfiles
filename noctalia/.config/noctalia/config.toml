@@ -306,3 +306,9 @@ enable_charging_animation = false
 [notification.filter.tutte]
 match_content = ".*"
 override_duration = 3000
+
+# Manda sfondo, palette e disposizione dei monitor a noctalia-greeter a ogni
+# cambio di tema, cosi' la schermata di accesso non resta indietro. Serve
+# un'autorizzazione: scrive in /var/lib/noctalia-greeter.
+[shell.greeter_sync]
+auto_sync = true
