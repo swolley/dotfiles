@@ -1,11 +1,11 @@
-# Sessione GNOME completa, con le estensioni e le app che usi.
+# GNOME di riserva: la sessione di tutti i giorni e' niri + noctalia, questa
+# serve solo per accedere a un desktop funzionante se quella si rompe. Niente
+# estensioni, niente strumenti per gestirle: dentro niri non girano, e per il
+# ruolo di riserva non servono.
 gnome-shell
-gnome-shell-extensions
 gdm
 gnome-control-center
 gnome-tweaks
-extension-manager
-gnome-browser-connector
 dconf-editor
 nautilus
 sushi
@@ -40,7 +40,3 @@ networkmanager
 # wireguard-tools serve per wg e wg-quick da riga di comando
 networkmanager-openvpn
 wireguard-tools
-# estensioni GNOME da AUR
-gnome-shell-extension-arch-update
-gnome-shell-extension-dash-to-dock
-gnome-shell-extension-gsconnect
