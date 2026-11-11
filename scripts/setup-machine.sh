@@ -437,6 +437,28 @@ configure_nautilus_terminal() {
   fi
 }
 
+configure_wifi_powersave() {
+  if ! command -v NetworkManager >/dev/null 2>&1; then
+    info "NetworkManager non installato, salto"
+    return
+  fi
+  # Il risparmio energetico del wifi fa dormire la radio tra un pacchetto e
+  # l'altro: latenza che balla, ssh che si pianta, chiamate che gracchiano.
+  # Su un portatile sempre alla presa non serve. 2 = disabilitato (0 e' il
+  # default del driver, 3 lo accende).
+  info "disattivo il risparmio energetico del wifi"
+  run sudo mkdir -p /etc/NetworkManager/conf.d
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo -e "    ${DIM}\$ scrivo /etc/NetworkManager/conf.d/wifi-powersave.conf${RESET}"
+  else
+    sudo tee /etc/NetworkManager/conf.d/wifi-powersave.conf >/dev/null <<'NMCONF'
+[connection]
+wifi.powersave = 2
+NMCONF
+  fi
+  run sudo systemctl reload NetworkManager
+}
+
 configure_gdm_accent() {
   if ! command -v gdm >/dev/null 2>&1; then
     info "gdm non installato, salto"
@@ -647,6 +669,9 @@ configure_monitors
 
 section "Nautilus"
 configure_nautilus_terminal
+
+section "Wifi"
+configure_wifi_powersave
 
 section "Schermata di accesso"
 configure_gdm_accent
