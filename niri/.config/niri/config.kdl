@@ -62,12 +62,11 @@ input {
     trackpoint {
     }
 
-    // Il fuoco segue il mouse e, toccando il bordo dello schermo, la striscia
-    // scorre fino a portare in vista la finestra parzialmente visibile. Effetto
-    // collaterale: scorre anche quando il puntatore attraversa un altro monitor.
-    // Per scorrere solo su click: `focus-follows-mouse max-scroll-amount="0%"`
-    // o togli la riga.
-    focus-follows-mouse
+    // Il fuoco cambia solo su click. Con focus-follows-mouse la striscia scorre
+    // da sola quando il puntatore tocca il bordo o attraversa un altro monitor,
+    // e dopo un po' stanca. Niri non ha un ritardo, solo max-scroll-amount.
+    // Per riprovarlo: togli il commento.
+    // focus-follows-mouse max-scroll-amount="0%"
 }
 
 gestures {
@@ -239,6 +238,15 @@ window-rule {
     open-floating true
     default-column-width { fixed 640; }
     default-window-height { fixed 720; }
+}
+
+// Finestre "Apri file" / "Apri cartella" / "Salva con nome": le apre il portale
+// GTK per conto di qualsiasi app. Popup al centro invece di una colonna intera.
+window-rule {
+    match app-id="^xdg-desktop-portal-gtk$"
+    open-floating true
+    default-column-width { fixed 900; }
+    default-window-height { fixed 640; }
 }
 
 debug {
