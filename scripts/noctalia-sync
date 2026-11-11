@@ -136,8 +136,8 @@ def main():
     for f in (STATE, SHARED):
         if not f.exists():
             sys.exit(f"manca {f}")
-    if not SHARED.is_symlink():
-        print(f"nota: {SHARED} non e' un symlink ai dotfiles", file=sys.stderr)
+    if ".dotfiles" not in SHARED.resolve().parts:
+        print(f"nota: {SHARED} non risolve nei dotfiles", file=sys.stderr)
 
     pre_state, st_blocks = blocks(STATE.read_text())
     pre_shared, sh_blocks = blocks(SHARED.read_text())

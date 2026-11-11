@@ -18,6 +18,7 @@ end = [
     "tray",
     "clipboard",
     "network",
+    "phone",
     "bluetooth",
     "volume",
     "brightness",
@@ -283,3 +284,6 @@ connection_notifications = true
 enabled = false
 hide_when_adapter_off = true
 hide_when_no_connected_device = true
+
+[widget.phone]
+type = "icefish/phone-connect:bar"
