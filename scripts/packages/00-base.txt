@@ -28,6 +28,8 @@ glances
 nmap
 bind
 inetutils
+# wifi da riga di comando: canali, potenza del segnale, scansione
+iw
 openssh
 unzip
 unrar
