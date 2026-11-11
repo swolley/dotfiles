@@ -18,7 +18,6 @@ end = [
     "tray",
     "clipboard",
     "network",
-    "bar",
     "bluetooth",
     "volume",
     "brightness",
@@ -55,6 +54,8 @@ pinned = [ "firefox", "cursor", "io.dbeaver.DBeaver", "tabby", "org.gnome.Nautil
 reserve_space = false
 show_dots = true
 smart_auto_hide = true
+
+show_instance_count = false
 
 [lockscreen]
 fingerprint = false
