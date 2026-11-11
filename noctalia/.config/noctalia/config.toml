@@ -18,7 +18,6 @@ end = [
     "tray",
     "clipboard",
     "network",
-    "phone",
     "bluetooth",
     "volume",
     "brightness",
@@ -287,3 +286,8 @@ hide_when_no_connected_device = true
 
 [widget.phone]
 type = "icefish/phone-connect:bar"
+
+enabled = false
+
+[plugin_settings."icefish/phone-connect"]
+enable_charging_animation = false

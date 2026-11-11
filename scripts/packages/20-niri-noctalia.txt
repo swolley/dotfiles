@@ -27,3 +27,7 @@ ddcutil
 # (in GNOME lo avvia la shell; sotto niri parte dal socket systemd utente)
 gnome-keyring
 libsecret
+# KDE Connect per il plugin phone-connect di noctalia; sshfs serve solo a
+# sfogliare i file del telefono
+kdeconnect
+sshfs

@@ -18,6 +18,7 @@ end = [
     "tray",
     "clipboard",
     "network",
+    "phone",
     "bluetooth",
     "volume",
     "brightness",
@@ -96,7 +97,13 @@ show_download_size = false
 config_review = false
 
 [plugins]
-enabled = [ "ayagmar/headroom", "alexander/screen-toolkit", "yuuto/arch-updater", "andrewdems/vpn-manager" ]
+enabled = [
+    "ayagmar/headroom",
+    "alexander/screen-toolkit",
+    "yuuto/arch-updater",
+    "andrewdems/vpn-manager",
+    "icefish/phone-connect"
+]
 
 [shell]
 avatar_path = "/home/swolley/Documenti/swolley.jpg"
@@ -207,7 +214,7 @@ type = "wifi"
 type = "andrewdems/vpn-manager:toggle"
 
 [[control_center.shortcuts]]
-type = "bluetooth"
+type = "icefish/phone-connect:tile"
 
 [[control_center.shortcuts]]
 type = "power_profile"
@@ -268,3 +275,15 @@ type = "andrewdems/vpn-manager:bar"
 
 [widget.notifications]
 hide_when_no_unread = true
+
+[bluetooth]
+connect_when_enabled = true
+connection_notifications = true
+
+[widget.bluetooth]
+enabled = false
+hide_when_adapter_off = true
+hide_when_no_connected_device = true
+
+[widget.phone]
+type = "icefish/phone-connect:bar"
