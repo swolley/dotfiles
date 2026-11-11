@@ -1,0 +1,7 @@
+[Desktop Entry]
+# il telefono si governa dal widget di noctalia
+Type=Application
+Name=KDE Connect
+Exec=kdeconnect-app
+Icon=kdeconnect
+NoDisplay=true

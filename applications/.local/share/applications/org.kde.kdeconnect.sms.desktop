@@ -1,0 +1,7 @@
+[Desktop Entry]
+# gli sms si mandano dal pannello di phone-connect
+Type=Application
+Name=KDE Connect SMS
+Exec=kdeconnect-sms
+Icon=kdeconnect
+NoDisplay=true

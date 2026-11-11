@@ -1,0 +1,7 @@
+[Desktop Entry]
+# indicatore per desktop senza plasma: lo fa gia' la barra
+Type=Application
+Name=KDE Connect Indicator
+Exec=kdeconnect-indicator
+Icon=kdeconnect
+NoDisplay=true
