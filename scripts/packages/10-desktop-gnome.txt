@@ -10,8 +10,6 @@ dconf-editor
 nautilus
 sushi
 gnome-text-editor
-gnome-console
-gnome-terminal
 gnome-calculator
 gnome-clocks
 gnome-disk-utility

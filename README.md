@@ -11,7 +11,7 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 ├── gitmux/          → ~/.gitmux.conf
 ├── code/            → ~/.config/code-flags.conf
 ├── easyeffects/     → ~/.config/easyeffects/db/, ~/.local/share/easyeffects/
-├── kitty/           → ~/.config/kitty/
+├── kitty/           → ~/.config/kitty/, ~/.config/xdg-terminals.list
 ├── niri/            → ~/.config/niri/, ~/.config/xdg-desktop-portal/
 ├── noctalia/        → ~/.config/noctalia/
 ├── nvim/            → ~/.config/nvim/
@@ -150,7 +150,7 @@ noctalia in `~/.local/state/noctalia/settings.toml`.
 | `gitmux` | `~/.gitmux.conf` |
 | `code` | `~/.config/code-flags.conf` (portachiavi sotto niri) |
 | `easyeffects` | `~/.config/easyeffects/db/`, `~/.local/share/easyeffects/` (preset, impulsi, autoload), autostart |
-| `kitty` | `~/.config/kitty/` |
+| `kitty` | `~/.config/kitty/`, `~/.config/xdg-terminals.list` |
 | `lazygit` | `~/.config/lazygit/config.yml` |
 | `niri` | `~/.config/niri/`, `~/.config/xdg-desktop-portal/niri-portals.conf` |
 | `noctalia` | `~/.config/noctalia/config.toml`, `~/.config/noctalia/palettes/`, autostart |
