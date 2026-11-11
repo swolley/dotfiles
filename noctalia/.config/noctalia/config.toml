@@ -49,13 +49,16 @@ widget_order = []
     [desktop_widgets.widget]
 
 [dock]
+# le icone appuntate stanno nello stato locale: dipendono da cosa e'
+# installato su questa macchina
 enabled = false
-pinned = [ "firefox", "cursor", "io.dbeaver.DBeaver", "tabby", "org.gnome.Nautilus" ]
 reserve_space = false
 show_dots = true
 smart_auto_hide = true
 
 show_instance_count = false
+
+icon_size = 42
 
 [lockscreen]
 fingerprint = false
@@ -100,8 +103,8 @@ enabled = [
     "ayagmar/headroom",
     "alexander/screen-toolkit",
     "yuuto/arch-updater",
-    "andrewdems/vpn-manager",
-    "icefish/phone-connect"
+    "icefish/phone-connect",
+    "andrewdems/vpn-manager"
 ]
 
 [shell]

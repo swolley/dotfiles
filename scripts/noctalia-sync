@@ -30,6 +30,12 @@ LOCAL = [
     re.compile(r"^\s*\[osd\]"),
     re.compile(r"^\s*\[wallpaper\.(last|monitors)"),
 ]
+# Chiavi che restano locali pur stando in un blocco portabile: la fila di
+# icone appuntate sulla dock dipende da cosa e' installato su questa macchina,
+# mentre il resto di [dock] (dimensioni, comportamento) si condivide.
+LOCAL_KEYS = {
+    "[dock]": {"pinned"},
+}
 HEADER = re.compile(r"^\s*\[")
 
 
@@ -128,6 +134,22 @@ def unisci(repo, stato):
     return fuso
 
 
+def separa(header, blocco):
+    """Divide un blocco in (da spostare, da lasciare nello stato).
+
+    Serve ai blocchi che si condividono per quasi tutto tranne qualche chiave:
+    quelle elencate in LOCAL_KEYS restano dove la shell le ha scritte.
+    """
+    locali = LOCAL_KEYS.get(header)
+    if not locali:
+        return blocco, None
+    tieni, sposta = [blocco[0]], [blocco[0]]
+    for k, righe in voci(blocco):
+        (tieni if k in locali else sposta).extend(righe)
+    return (sposta if len(sposta) > 1 else None,
+            tieni if len(tieni) > 1 else None)
+
+
 def main():
     args = sys.argv[1:]
     dry = "--dry-run" in args or "-n" in args
@@ -142,7 +164,15 @@ def main():
     pre_state, st_blocks = blocks(STATE.read_text())
     pre_shared, sh_blocks = blocks(SHARED.read_text())
 
-    movable = [(h, b) for h, b in st_blocks if not any(p.match(h) for p in LOCAL)]
+    movable, trattenuti = [], []
+    for h, b in st_blocks:
+        if any(p.match(h) for p in LOCAL):
+            continue
+        sposta, tieni = separa(h, b)
+        if sposta:
+            movable.append((h, sposta))
+        if tieni:
+            trattenuti.append((h, tieni))
     if not movable:
         print("niente da spostare: lo stato contiene solo impostazioni di questa macchina")
         return
@@ -181,7 +211,8 @@ def main():
             risultato += [(h, x) for x in bs]
             visti.add(h)
 
-    restano = [(h, b) for h, b in st_blocks if any(p.match(h) for p in LOCAL)]
+    restano = [(h, b) for h, b in st_blocks
+               if any(p.match(h) for p in LOCAL)] + trattenuti
 
     prima = subprocess.run(["noctalia", "config", "export", "full"],
                            capture_output=True, text=True).stdout
