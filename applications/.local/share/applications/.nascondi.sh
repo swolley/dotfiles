@@ -48,8 +48,8 @@ nascondi gcm-import             "importa profili colore"
 nascondi vim                    "l'editor e' neovim; vim resta per il comando vi degli script"
 
 # KDE Connect: l'interfaccia e' il plugin phone-connect sulla barra di
-# noctalia. L'accoppiamento di un telefono nuovo si fa con kdeconnect-app o
-# kdeconnect-cli --pair dal terminale.
+# noctalia, accoppiamento compreso (il pannello mostra Accoppia accanto ai
+# dispositivi visti in rete). kdeconnect-app resta solo come riserva.
 nascondi org.kde.kdeconnect.app       "il telefono si governa dal widget di noctalia"
 nascondi org.kde.kdeconnect.nonplasma "indicatore per desktop senza plasma: lo fa gia' la barra"
 nascondi org.kde.kdeconnect.sms       "gli sms si mandano dal pannello di phone-connect"
