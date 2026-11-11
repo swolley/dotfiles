@@ -43,9 +43,15 @@ IDES=(
 )
 
 # Servizi di sistema e utente da riabilitare.
+# Quelli che non esistono su questa macchina (pacchetto non installato) si
+# saltano: si verifica prima l'unita' e solo dopo la si abilita.
+# forticlient: senza il suo servizio la GUI di FortiClient non mostra la finestra.
 SERVICES_SYSTEM=(NetworkManager firewalld gdm avahi-daemon lm_sensors
-                 power-profiles-daemon fstrim.timer paccache.timer)
-SERVICES_USER=()
+                 power-profiles-daemon fstrim.timer paccache.timer
+                 forticlient)
+# ssh-agent.socket: l'agente SSH di systemd; SSH_AUTH_SOCK lo imposta il pacchetto
+# stow ssh (~/.config/environment.d/ssh-agent.conf).
+SERVICES_USER=(ssh-agent.socket)
 
 # Pacchetti stow da applicare (tutte le cartelle del repo che non sono scripts/).
 # easyeffects: db/ e' stato macchina (casa vs ufficio); lo riprendiamo dopo.
@@ -562,14 +568,22 @@ fi
 if [ "$DO_SERVICES" -eq 1 ]; then
   section "Servizi"
   for s in "${SERVICES_SYSTEM[@]}"; do
-    if systemctl list-unit-files "$s"* >/dev/null 2>&1; then
-      run sudo systemctl enable "$s"
-    else
+    if ! systemctl cat "$s" >/dev/null 2>&1; then
       warn "$s non installato, salto"
+    elif systemctl is-enabled --quiet "$s" 2>/dev/null; then
+      info "$s gia' abilitato"
+    else
+      run sudo systemctl enable "$s"
     fi
   done
   for s in "${SERVICES_USER[@]}"; do
-    run systemctl --user enable "$s"
+    if ! systemctl --user cat "$s" >/dev/null 2>&1; then
+      warn "$s (utente) non installato, salto"
+    elif systemctl --user is-enabled --quiet "$s" 2>/dev/null; then
+      info "$s (utente) gia' abilitato"
+    else
+      run systemctl --user enable "$s"
+    fi
   done
 fi
 

@@ -15,6 +15,7 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 ├── niri/            → ~/.config/niri/, ~/.config/xdg-desktop-portal/
 ├── noctalia/        → ~/.config/noctalia/
 ├── nvim/            → ~/.config/nvim/
+├── ssh/             → ~/.config/environment.d/ssh-agent.conf
 ├── starship/        → ~/.config/starship.toml
 ├── tmux/            → ~/.tmux.conf, ~/.tmux/
 ├── zshrc/           → ~/.zshrc, ~/.zshrc_customs.zsh
@@ -154,6 +155,7 @@ noctalia in `~/.local/state/noctalia/settings.toml`.
 | `niri` | `~/.config/niri/`, `~/.config/xdg-desktop-portal/niri-portals.conf` |
 | `noctalia` | `~/.config/noctalia/config.toml`, `~/.config/noctalia/palettes/`, autostart |
 | `nvim` | `~/.config/nvim/` |
+| `ssh` | `~/.config/environment.d/ssh-agent.conf` (`SSH_AUTH_SOCK` per l'agente systemd) |
 | `starship` | `~/.config/starship.toml` |
 | `tmux` | `~/.tmux.conf`, `~/.tmux/` |
 | `zshrc` | `~/.zshrc`, `~/.zshrc_customs.zsh` |
