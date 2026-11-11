@@ -116,6 +116,10 @@ font_family = "Adwaita Sans"
 lang = "it"
 niri_overview_close_on_launch_enabled = true
 niri_overview_type_to_launch_enabled = true
+# Agente polkit: risponde alle richieste di password di pkexec (FortiClient,
+# gparted...). Prima lo faceva polkit-gnome, disinstallato con la pulizia:
+# senza nessuno dei due quelle finestre non compaiono piu'.
+polkit_agent = true
 
     # Il launcher fa da menu applicazioni: stretto, in elenco, con le
     # categorie come sole icone. Si apre al centro dello schermo, dalla lente

@@ -6,7 +6,6 @@ gnome-shell
 gdm
 gnome-control-center
 gnome-tweaks
-dconf-editor
 nautilus
 sushi
 gnome-text-editor
@@ -16,7 +15,8 @@ gnome-keyring
 seahorse
 file-roller
 loupe
-evince
+# papers e' il visualizzatore documenti di gnome, erede di evince
+papers
 totem
 gvfs
 gvfs-afc

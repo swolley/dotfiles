@@ -42,7 +42,6 @@ lazydocker
 github-cli
 git-cliff
 git-filter-repo
-meld
 gitmux-bin
 # pacman: manutenzione
 pacman-contrib
