@@ -294,3 +294,11 @@ enabled = false
 
 [plugin_settings."icefish/phone-connect"]
 enable_charging_animation = false
+
+# Durata dei toast. noctalia non ha un'impostazione globale: la durata la
+# decide chi manda la notifica, e l'unico modo per scavalcarla e' un filtro.
+# match_content e' una regex sul testo, e ".*" prende tutto; con match = ""
+# invece non si aggancia niente. I cinque secondi di prima erano troppi.
+[notification.filter.tutte]
+match_content = ".*"
+override_duration = 3000

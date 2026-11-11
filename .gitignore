@@ -1,3 +1,10 @@
 # File generati da scripts/setup-machine.sh: dipendono dai monitor di ogni
 # macchina, quindi non vanno nel repo condiviso.
 noctalia/.config/noctalia/90-monitors.local.toml
+
+# Stato dell'interfaccia di easyeffects: dispositivo di ingresso e uscita
+# correnti e contatori d'uso dei preset, riscritti a ogni avvio. I preset veri
+# stanno in .local/share/easyeffects/, e il preset giusto per il DAC lo applica
+# autoload/. Il file resta nel repo perche' stow lo linki, ma smette di
+# sporcare i diff.
+easyeffects/.config/easyeffects/db/easyeffectsrc
