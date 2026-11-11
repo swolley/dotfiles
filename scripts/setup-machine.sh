@@ -437,6 +437,36 @@ configure_nautilus_terminal() {
   fi
 }
 
+configure_gdm_accent() {
+  if ! command -v gdm >/dev/null 2>&1; then
+    info "gdm non installato, salto"
+    return
+  fi
+  # EndeavourOS forza il proprio viola nella schermata di accesso con degli
+  # override di sistema (eos-settings-gnome): accent-color='purple', sfondo
+  # #46226e e logo EndeavourOS. Si tolgono disinstallando quel pacchetto.
+  if pacman -Qq eos-settings-gnome >/dev/null 2>&1; then
+    info "rimuovo eos-settings-gnome: forza il viola nella schermata di accesso"
+    run sudo pacman -Rns --noconfirm eos-settings-gnome
+  fi
+  # L'accento della schermata di accesso lo legge l'utente gdm dalle proprie
+  # impostazioni, non dalle tue: va messo nel suo database dconf. Lo disegna
+  # gnome-shell, quindi accetta solo i preset di libadwaita e il verde e' il
+  # suo (#3a944a), non quello di noctalia.
+  info "metto il verde nella schermata di accesso"
+  run sudo mkdir -p /etc/dconf/db/gdm.d
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo -e "    ${DIM}\$ scrivo /etc/dconf/db/gdm.d/10-accent${RESET}"
+  else
+    sudo tee /etc/dconf/db/gdm.d/10-accent >/dev/null <<'DCONF'
+[org/gnome/desktop/interface]
+accent-color='green'
+color-scheme='prefer-dark'
+DCONF
+  fi
+  run sudo dconf update
+}
+
 configure_firefox_theme() {
   if ! command -v noctalia >/dev/null 2>&1; then
     warn "noctalia non installato, salto il tema di Firefox"
@@ -617,6 +647,9 @@ configure_monitors
 
 section "Nautilus"
 configure_nautilus_terminal
+
+section "Schermata di accesso"
+configure_gdm_accent
 
 section "Tema di Firefox"
 configure_firefox_theme

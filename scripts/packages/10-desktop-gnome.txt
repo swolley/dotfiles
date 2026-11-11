@@ -4,8 +4,8 @@
 # ruolo di riserva non servono.
 gnome-shell
 gdm
-gnome-control-center
-gnome-tweaks
+# niente gnome-control-center ne' gnome-tweaks: le impostazioni di gnome si
+# toccano con gsettings, e sotto niri le governa noctalia
 nautilus
 sushi
 gnome-text-editor
