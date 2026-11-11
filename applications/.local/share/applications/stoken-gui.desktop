@@ -1,0 +1,7 @@
+[Desktop Entry]
+# token rsa securid, non in uso
+Type=Application
+Name=Software Token
+Exec=stoken-gui
+Icon=stoken-gui
+NoDisplay=true

@@ -1,0 +1,48 @@
+#!/bin/sh
+# Rigenera gli override che nascondono dal launcher le voci di sistema inutili.
+# Un file con lo stesso nome in ~/.local/share/applications ha la precedenza su
+# quello in /usr/share: NoDisplay=true toglie l'icona ma lascia intatte le
+# associazioni ai tipi di file, cosi' quei programmi restano apribili dai file
+# che gestiscono. Serve ripassarlo se un aggiornamento aggiunge voci nuove.
+set -eu
+cd "$(dirname "$0")"
+
+nascondi() {
+  nome="$1"
+  motivo="$2"
+  origine="/usr/share/applications/$nome.desktop"
+  [ -f "$origine" ] || return 0
+  {
+    echo "[Desktop Entry]"
+    echo "# $motivo"
+    echo "Type=Application"
+    echo "Name=$(grep -m1 '^Name=' "$origine" | cut -d= -f2-)"
+    echo "Exec=$(grep -m1 '^Exec=' "$origine" | cut -d= -f2-)"
+    icona=$(grep -m1 '^Icon=' "$origine" | cut -d= -f2- || true)
+    [ -n "$icona" ] && echo "Icon=$icona"
+    echo "NoDisplay=true"
+  } > "$nome.desktop"
+}
+
+nascondi yad-settings           "yad disegna le finestre degli script eos, non si usa a mano"
+nascondi yad-icon-browser       "sfoglia-icone di yad, strumento per chi scrive script"
+nascondi cmake-gui              "cmake si usa da riga di comando"
+nascondi electron34             "runtime, non un programma da aprire"
+nascondi electron37             "runtime, non un programma da aprire"
+nascondi java-java-openjdk      "runtime java, lanciato dai programmi"
+nascondi jconsole-java-openjdk  "console di diagnostica della jvm"
+nascondi jshell-java-openjdk    "shell java interattiva, si usa dal terminale"
+nascondi org.freedesktop.IBus.Setup "metodo di input non usato"
+nascondi assistant              "manuale delle api qt, per chi sviluppa in qt"
+nascondi designer               "editor di interfacce qt"
+nascondi linguist               "strumento di traduzione qt"
+nascondi qdbusviewer            "ispettore dbus di qt"
+nascondi qv4l2                  "test delle webcam, strumento di v4l-utils"
+nascondi qvidcap                "cattura video di v4l-utils"
+nascondi stoken-gui             "token rsa securid, non in uso"
+nascondi stoken-gui-small       "token rsa securid, non in uso"
+nascondi gnome-display-panel    "impostazioni schermo di gnome: sotto niri si usa nwg-displays"
+nascondi org.gnome.ColorProfileViewer "profili colore: nessuno e' configurato"
+nascondi gcm-picker             "prelievo colore di gnome-color-manager"
+nascondi gcm-import             "importa profili colore"
+nascondi vim                    "l'editor e' neovim; vim resta per il comando vi degli script"

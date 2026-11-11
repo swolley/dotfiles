@@ -1,0 +1,7 @@
+[Desktop Entry]
+# profili colore: nessuno e' configurato
+Type=Application
+Name=Color Profile Viewer
+Exec=gcm-viewer
+Icon=gnome-color-manager
+NoDisplay=true

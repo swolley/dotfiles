@@ -1,0 +1,7 @@
+[Desktop Entry]
+# shell java interattiva, si usa dal terminale
+Type=Application
+Name=OpenJDK Java 27 Shell
+Exec=/usr/lib/jvm/java-27-openjdk/bin/jshell
+Icon=java27-openjdk
+NoDisplay=true

@@ -1,0 +1,7 @@
+[Desktop Entry]
+# l'editor e' neovim; vim resta per il comando vi degli script
+Type=Application
+Name=Vim
+Exec=vim %F
+Icon=gvim
+NoDisplay=true

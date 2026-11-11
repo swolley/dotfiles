@@ -1,0 +1,7 @@
+[Desktop Entry]
+# importa profili colore
+Type=Application
+Name=ICC Profile Installer
+Exec=/usr/bin/gcm-import %F
+Icon=application-vnd.iccprofile
+NoDisplay=true

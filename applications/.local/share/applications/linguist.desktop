@@ -1,0 +1,7 @@
+[Desktop Entry]
+# strumento di traduzione qt
+Type=Application
+Name=Qt Linguist
+Exec=linguist6 %F
+Icon=linguist
+NoDisplay=true

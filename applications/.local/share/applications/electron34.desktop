@@ -1,0 +1,7 @@
+[Desktop Entry]
+# runtime, non un programma da aprire
+Type=Application
+Name=Electron 34
+Exec=electron34 %u
+Icon=electron34
+NoDisplay=true

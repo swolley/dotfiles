@@ -1,0 +1,7 @@
+[Desktop Entry]
+# runtime java, lanciato dai programmi
+Type=Application
+Name=OpenJDK Java 27 Runtime
+Exec=/usr/lib/jvm/java-27-openjdk/bin/java -jar
+Icon=java27-openjdk
+NoDisplay=true

@@ -1,0 +1,7 @@
+[Desktop Entry]
+# manuale delle api qt, per chi sviluppa in qt
+Type=Application
+Name=Qt Assistant
+Exec=assistant6
+Icon=assistant
+NoDisplay=true

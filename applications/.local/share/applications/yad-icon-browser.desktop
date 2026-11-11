@@ -1,0 +1,7 @@
+[Desktop Entry]
+# sfoglia-icone di yad, strumento per chi scrive script
+Type=Application
+Name=Icon Browser
+Exec=yad-icon-browser
+Icon=yad
+NoDisplay=true

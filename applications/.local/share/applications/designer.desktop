@@ -1,0 +1,7 @@
+[Desktop Entry]
+# editor di interfacce qt
+Type=Application
+Name=Qt Widgets Designer
+Exec=designer6 %F
+Icon=designer
+NoDisplay=true

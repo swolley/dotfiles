@@ -1,0 +1,7 @@
+[Desktop Entry]
+# cmake si usa da riga di comando
+Type=Application
+Name=CMake
+Exec=cmake-gui %f
+Icon=CMakeSetup
+NoDisplay=true

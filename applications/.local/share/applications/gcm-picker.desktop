@@ -1,0 +1,7 @@
+[Desktop Entry]
+# prelievo colore di gnome-color-manager
+Type=Application
+Name=Color Picker
+Exec=gcm-picker
+Icon=gnome-color-manager
+NoDisplay=true
