@@ -1,0 +1,7 @@
+[Desktop Entry]
+# aggiornamento di endeavouros: lo lancio dal terminale
+Type=Application
+Name=eos-update
+Exec=bash -c "echo '==> eos-update --aur'; eos-update --aur; eos-sleep-counter 60"
+Icon=endeavouros-icon
+NoDisplay=true

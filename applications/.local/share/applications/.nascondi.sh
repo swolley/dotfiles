@@ -73,6 +73,10 @@ nascondi nvtop "monitor gpu da terminale: la finestra e' mission-center"
 # su uno zip. Resta il programma predefinito per gli archivi.
 nascondi org.gnome.FileRoller "gestore archivi: si apre dal file, non dal menu'"
 
+# eos-update: apre un terminale per fare quello che faccio a mano quando mi
+# va, con un conto alla rovescia di 60 secondi alla fine.
+nascondi eos-update "aggiornamento di endeavouros: lo lancio dal terminale"
+
 # GParted: stessa precedenza, ma qui non si nasconde, si sostituisce il
 # comando. Il percorso del lanciatore va scritto per esteso, perche' nei file
 # .desktop non esistono ne' ~ ne' le variabili d'ambiente.
