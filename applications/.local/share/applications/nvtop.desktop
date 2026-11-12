@@ -1,0 +1,7 @@
+[Desktop Entry]
+# monitor gpu da terminale: la finestra e' mission-center
+Type=Application
+Name=nvtop
+Exec=nvtop
+Icon=nvtop
+NoDisplay=true

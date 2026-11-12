@@ -53,3 +53,22 @@ nascondi vim                    "l'editor e' neovim; vim resta per il comando vi
 nascondi org.kde.kdeconnect.app       "il telefono si governa dal widget di noctalia"
 nascondi org.kde.kdeconnect.nonplasma "indicatore per desktop senza plasma: lo fa gia' la barra"
 nascondi org.kde.kdeconnect.sms       "gli sms si mandano dal pannello di phone-connect"
+
+# Visualizzatori: restano i programmi predefiniti per immagini e PDF, quindi
+# si aprono con un doppio clic da nautilus. Nel menu' non servono: non e' da
+# li' che si parte, si parte sempre dal file.
+nascondi org.gnome.Loupe  "visualizzatore immagini: si apre dal file, non dal menu'"
+nascondi org.gnome.Papers "visualizzatore pdf: si apre dal file, non dal menu'"
+
+# hwloc: disegna la topologia di cpu e memoria. Arriva come dipendenza (lo usa
+# pipewire), non e' un programma che si apre dal menu'; da riga di comando
+# resta `lstopo`.
+nascondi lstopo "mappa della topologia hardware, strumento da riga di comando"
+
+# nvtop: il `top` della gpu, arriva come dipendenza di mission-center, che e'
+# l'interfaccia che uso davvero. Resta il comando `nvtop` nel terminale.
+nascondi nvtop "monitor gpu da terminale: la finestra e' mission-center"
+
+# gestore archivi: si apre sempre da nautilus, con "Estrai qui" o doppio clic
+# su uno zip. Resta il programma predefinito per gli archivi.
+nascondi org.gnome.FileRoller "gestore archivi: si apre dal file, non dal menu'"

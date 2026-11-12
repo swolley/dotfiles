@@ -61,6 +61,12 @@ btrfs-assistant
 # polkit-gnome: l'agente lo fa noctalia (shell.polkit_agent)
 polkit-gnome
 
+# --- GNOME: la sessione ora e' solo niri, l'accesso lo fa greetd con
+# noctalia-greeter. Le app GNOME che uso (nautilus, loupe, papers, ...)
+# restano: dipendono dalle librerie, non dalla shell.
+gnome-shell
+gdm
+
 # NOTA: i pacchetti NVIDIA e cuda NON stanno qui di proposito. Su questo
 # portatile la scheda non e' visibile e sono 6 GB sprecati, ma su una macchina
 # che la monta davvero servono: li installa il gruppo nvidia, che

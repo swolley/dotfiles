@@ -1,0 +1,7 @@
+[Desktop Entry]
+# visualizzatore pdf: si apre dal file, non dal menu'
+Type=Application
+Name=Document Viewer
+Exec=papers %U
+Icon=org.gnome.Papers
+NoDisplay=true

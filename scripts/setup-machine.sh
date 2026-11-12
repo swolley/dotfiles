@@ -79,7 +79,7 @@ group_name() {  # 20-niri-noctalia.txt -> niri-noctalia
 group_label() {
   case "$1" in
     base)           echo "Base: shell, CLI, git, manutenzione pacman" ;;
-    desktop-gnome)  echo "Desktop GNOME con estensioni e app di sistema" ;;
+    desktop-gtk)    echo "Applicazioni GTK: file, documenti, immagini, dischi, rete" ;;
     niri-noctalia)  echo "Sessione niri con shell noctalia" ;;
     nvidia)         echo "Driver NVIDIA precompilati e PRIME" ;;
     apps)           echo "Applicazioni grafiche" ;;

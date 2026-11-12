@@ -12,8 +12,13 @@ tidal-hifi
 transmission-gtk
 nicotine+
 easyeffects
-# catena di plugin audio usata da easyeffects
-lsp-plugins
+# catena di plugin audio usata da easyeffects. Solo il formato LV2: e' quello
+# che easyeffects carica (tramite lilv), e l'host virtuale lv2-host lo fornisce
+# gia' pipewire-audio. Il metapacchetto lsp-plugins tirerebbe dentro anche
+# clap/vst/vst3, e con loro qtractor come unico host di quei formati: una DAW
+# intera installata per sbaglio. Se un giorno arriva reaper, dichiara lui
+# vst3-host e allora lsp-plugins-vst3 si aggiunge senza strascichi.
+lsp-plugins-lv2
 # mixer audio: profili e instradamento per applicazione
 pavucontrol
 # tastiere meccaniche programmabili

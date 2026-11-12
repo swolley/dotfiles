@@ -1,0 +1,48 @@
+# Le applicazioni GTK che uso ogni giorno. La sessione e' solo niri: gnome-shell
+# e gdm non ci sono piu' (stanno in rimuovi.txt), l'accesso lo fa greetd con
+# noctalia-greeter. Questi programmi pero' non dipendono dalla shell, solo dalle
+# librerie, e continuano a funzionare identici.
+#
+# Niente gnome-control-center ne' gnome-tweaks: le impostazioni le governa
+# noctalia, e quel che resta si tocca con gsettings.
+nautilus
+sushi
+gnome-text-editor
+gnome-calculator
+# gnome-disk-utility: salute SMART, benchmark, scrittura di immagini su
+# chiavetta, opzioni di mount. Lavora a caldo, tramite udisks.
+gnome-disk-utility
+# gparted: l'altra meta' del lavoro, quella che Disks non fa. Sposta e
+# ridimensiona partizioni mettendo in coda le operazioni. Il suo lanciatore si
+# eleva con pkexec e, sotto wayland, deve autorizzare root sul display di
+# xwayland: senza xorg-xhost non si apre dal menu'.
+gparted
+xorg-xhost
+gnome-keyring
+seahorse
+file-roller
+loupe
+# papers e' il visualizzatore documenti di gnome, erede di evince
+papers
+totem
+gvfs
+gvfs-afc
+gvfs-gphoto2
+gvfs-mtp
+gvfs-nfs
+gvfs-smb
+xdg-desktop-portal
+xdg-desktop-portal-gnome
+xdg-user-dirs
+xdg-user-dirs-gtk
+xdg-utils
+adwaita-icon-theme
+gnome-themes-extra
+cantarell-fonts
+power-profiles-daemon
+network-manager-applet
+networkmanager
+# VPN: OpenVPN per il lavoro; WireGuard e' nativo in NetworkManager,
+# wireguard-tools serve per wg e wg-quick da riga di comando
+networkmanager-openvpn
+wireguard-tools

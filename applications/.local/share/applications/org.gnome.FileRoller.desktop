@@ -1,0 +1,7 @@
+[Desktop Entry]
+# gestore archivi: si apre dal file, non dal menu'
+Type=Application
+Name=File Roller
+Exec=file-roller %U
+Icon=org.gnome.FileRoller
+NoDisplay=true

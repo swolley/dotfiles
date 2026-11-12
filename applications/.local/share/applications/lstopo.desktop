@@ -1,0 +1,7 @@
+[Desktop Entry]
+# mappa della topologia hardware, strumento da riga di comando
+Type=Application
+Name=Hardware Locality lstopo
+Exec=lstopo
+Icon=hwloc
+NoDisplay=true

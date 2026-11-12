@@ -1,0 +1,7 @@
+[Desktop Entry]
+# visualizzatore immagini: si apre dal file, non dal menu'
+Type=Application
+Name=Image Viewer
+Exec=loupe %U
+Icon=org.gnome.Loupe
+NoDisplay=true
