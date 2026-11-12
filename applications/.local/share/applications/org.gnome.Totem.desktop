@@ -1,0 +1,7 @@
+[Desktop Entry]
+# lettore video: si apre dal file, non dal menu'
+Type=Application
+Name=Videos
+Exec=totem %U
+Icon=org.gnome.Totem
+NoDisplay=true
