@@ -13,11 +13,13 @@ gnome-calculator
 # chiavetta, opzioni di mount. Lavora a caldo, tramite udisks.
 gnome-disk-utility
 # gparted: l'altra meta' del lavoro, quella che Disks non fa. Sposta e
-# ridimensiona partizioni mettendo in coda le operazioni. Il suo lanciatore si
-# eleva con pkexec e, sotto wayland, deve autorizzare root sul display di
-# xwayland: senza xorg-xhost non si apre dal menu'.
+# ridimensiona partizioni mettendo in coda le operazioni.
+#
+# Il suo lanciatore di serie si eleva con pkexec e finisce su xwayland, dove
+# i menu' si accorciano e il tema torna chiaro. Lo sostituisce il lanciatore
+# in applications/.local/share/applications/gparted-wayland, che passa a root
+# il socket wayland. Niente xorg-xhost, quindi: serviva solo alla via vecchia.
 gparted
-xorg-xhost
 gnome-keyring
 seahorse
 file-roller

@@ -1,0 +1,20 @@
+#!/bin/sh
+# Apre GParted come root restando su wayland.
+#
+# Il lanciatore di sistema si eleva con pkexec, che ripulisce l'ambiente e
+# lascia passare solo DISPLAY: root finisce quindi su xwayland. Li' nessun
+# window manager pubblica _NET_WORKAREA, GTK non sa quanto spazio ha e
+# accorcia i menu' mettendoci le frecce di scorrimento.
+#
+# Passando a mano il socket wayland, GParted ci parla diretto: scala giusta e
+# menu' interi. Il tema scuro non si impone qui: lo prende da
+# /root/.config/gtk-3.0/settings.ini, che scrive setup-machine.sh.
+#
+# Si invoca /usr/bin/gparted e non il binario: quello script, quando gira
+# gia' da root, maschera le unita' di mount per impedire l'automount durante
+# le operazioni. Saltarlo sarebbe pericoloso.
+exec pkexec env \
+  WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}" \
+  XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" \
+  GDK_BACKEND=wayland \
+  /usr/bin/gparted "$@"

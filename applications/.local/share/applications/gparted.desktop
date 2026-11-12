@@ -1,0 +1,11 @@
+[Desktop Entry]
+# lanciato tramite gparted-wayland: vedi i commenti in quello script
+Type=Application
+Name=GParted
+Comment=Create, reorganize, and delete partitions
+Exec=/home/swolley/.local/share/applications/gparted-wayland %f
+Icon=gparted
+Categories=System;Filesystem;
+Keywords=Partition;Partizioni;Disco;
+Terminal=false
+StartupNotify=true

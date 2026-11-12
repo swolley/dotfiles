@@ -72,3 +72,20 @@ nascondi nvtop "monitor gpu da terminale: la finestra e' mission-center"
 # gestore archivi: si apre sempre da nautilus, con "Estrai qui" o doppio clic
 # su uno zip. Resta il programma predefinito per gli archivi.
 nascondi org.gnome.FileRoller "gestore archivi: si apre dal file, non dal menu'"
+
+# GParted: stessa precedenza, ma qui non si nasconde, si sostituisce il
+# comando. Il percorso del lanciatore va scritto per esteso, perche' nei file
+# .desktop non esistono ne' ~ ne' le variabili d'ambiente.
+cat > gparted.desktop <<FINE
+[Desktop Entry]
+# lanciato tramite gparted-wayland: vedi i commenti in quello script
+Type=Application
+Name=$(grep -m1 '^Name=' /usr/share/applications/gparted.desktop | cut -d= -f2-)
+Comment=$(grep -m1 '^Comment=' /usr/share/applications/gparted.desktop | cut -d= -f2-)
+Exec=$HOME/.local/share/applications/gparted-wayland %f
+Icon=$(grep -m1 '^Icon=' /usr/share/applications/gparted.desktop | cut -d= -f2-)
+Categories=System;Filesystem;
+Keywords=Partition;Partizioni;Disco;
+Terminal=false
+StartupNotify=true
+FINE

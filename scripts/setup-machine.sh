@@ -485,34 +485,21 @@ NMCONF
   run sudo systemctl reload NetworkManager
 }
 
-configure_gdm_accent() {
-  if ! command -v gdm >/dev/null 2>&1; then
-    info "gdm non installato, salto"
-    return
-  fi
-  # EndeavourOS forza il proprio viola nella schermata di accesso con degli
-  # override di sistema (eos-settings-gnome): accent-color='purple', sfondo
-  # #46226e e logo EndeavourOS. Si tolgono disinstallando quel pacchetto.
-  if pacman -Qq eos-settings-gnome >/dev/null 2>&1; then
-    info "rimuovo eos-settings-gnome: forza il viola nella schermata di accesso"
-    run sudo pacman -Rns --noconfirm eos-settings-gnome
-  fi
-  # L'accento della schermata di accesso lo legge l'utente gdm dalle proprie
-  # impostazioni, non dalle tue: va messo nel suo database dconf. Lo disegna
-  # gnome-shell, quindi accetta solo i preset di libadwaita e il verde e' il
-  # suo (#3a944a), non quello di noctalia.
-  info "metto il verde nella schermata di accesso"
-  run sudo mkdir -p /etc/dconf/db/gdm.d
+configure_root_theme() {
+  # I programmi grafici che si elevano a root leggono le preferenze di /root,
+  # non le tue: senza niente li' dentro GTK ripiega sul chiaro di fabbrica.
+  # Due righe bastano a dare a root un tema scuro suo.
+  info "tema scuro per i programmi lanciati come root"
+  run sudo mkdir -p /root/.config/gtk-3.0
   if [ "$DRY_RUN" -eq 1 ]; then
-    echo -e "    ${DIM}\$ scrivo /etc/dconf/db/gdm.d/10-accent${RESET}"
+    echo -e "    ${DIM}\$ scrivo /root/.config/gtk-3.0/settings.ini${RESET}"
   else
-    sudo tee /etc/dconf/db/gdm.d/10-accent >/dev/null <<'DCONF'
-[org/gnome/desktop/interface]
-accent-color='green'
-color-scheme='prefer-dark'
-DCONF
+    sudo tee /root/.config/gtk-3.0/settings.ini >/dev/null <<'GTK'
+[Settings]
+gtk-theme-name=Adwaita
+gtk-application-prefer-dark-theme=1
+GTK
   fi
-  run sudo dconf update
 }
 
 configure_firefox_theme() {
@@ -713,8 +700,8 @@ remove_packages
 section "Wifi"
 configure_wifi_powersave
 
-section "Schermata di accesso"
-configure_gdm_accent
+section "Tema di root"
+configure_root_theme
 
 section "Tema di Firefox"
 configure_firefox_theme
