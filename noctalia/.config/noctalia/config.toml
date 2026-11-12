@@ -57,8 +57,9 @@ show_dots = true
 smart_auto_hide = true
 
 show_instance_count = false
+icon_size = 44
 
-icon_size = 42
+cross_axis_padding = 6
 
 [lockscreen]
 fingerprint = false
@@ -82,6 +83,10 @@ timeout = 240
 # mostrare cose diverse. Si trovano sotto [widget.usage].
 provider_antigravity = "off"
 
+notify = false
+notify_reset_credits = false
+warn_percent = 75
+
 [plugin_settings."yuuto/arch-updater"]
 # aur_check_cmd e update_cmd restano vuoti di proposito: il primo vale solo con
 # aur_helper = "custom", il secondo scavalcherebbe ignore_packages e romperebbe
@@ -101,15 +106,15 @@ config_review = false
 
 [plugins]
 enabled = [
-    "ayagmar/headroom",
     "alexander/screen-toolkit",
     "yuuto/arch-updater",
     "icefish/phone-connect",
-    "andrewdems/vpn-manager"
+    "andrewdems/vpn-manager",
+    "ayagmar/headroom"
 ]
 
 [shell]
-avatar_path = "/home/swolley/Documenti/swolley.jpg"
+avatar_path = "/home/swolley/Scaricati/grafiche/swolley/DALL·E 2024-12-13 23.38.18 - A refined illustration of a microprocessor component with a black plastic casing and metallic pins surrounding it, placed on a sleek digital backgroun.webp"
 button_borders = false
 card_borders = false
 date_format = "%A %d %B %Y"
@@ -178,7 +183,9 @@ enabled = false
     path = "/home/swolley/Immagini/swolley.jpg"
 
 [widget.battery]
-display_mode = "none"
+display_mode = "glyph"
+
+hide_when_plugged = true
 
 [widget.brightness]
 enabled = false
@@ -264,6 +271,8 @@ type = "clock"
 glyph = "rocket"
 type = "yuuto/arch-updater:widget"
 
+hide_on_empty = true
+
 [calendar]
 dedupe_events = true
 enabled = true
@@ -307,6 +316,7 @@ enable_charging_animation = false
 # decide chi manda la notifica, e l'unico modo per scavalcarla e' un filtro.
 # match_content e' una regex sul testo, e ".*" prende tutto; con match = ""
 # invece non si aggancia niente. I cinque secondi di prima erano troppi.
+
 [notification.filter.tutte]
 match_content = ".*"
 override_duration = 3000
@@ -315,6 +325,7 @@ override_duration = 3000
 # cronologia. La regex e' sul testo della notifica e racchiusa in ".*" cosi'
 # funziona sia come ricerca sia come corrispondenza intera. Il filtro ripete
 # la durata di "tutte" perche' non e' detto che i due si sommino.
+
 [notification.filter.senza-cronologia]
 match_content = ".*([Cc]laude|[Ll]aravel [Mm]ix).*"
 save_history = false
@@ -323,5 +334,9 @@ override_duration = 3000
 # Manda sfondo, palette e disposizione dei monitor a noctalia-greeter a ogni
 # cambio di tema, cosi' la schermata di accesso non resta indietro. Serve
 # un'autorizzazione: scrive in /var/lib/noctalia-greeter.
+
 [shell.greeter_sync]
 auto_sync = true
+
+[widget.tray]
+match_adjacent_spacing = true
