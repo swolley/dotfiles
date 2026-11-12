@@ -19,7 +19,7 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 ├── starship/        → ~/.config/starship.toml
 ├── tmux/            → ~/.tmux.conf, ~/.tmux/
 ├── zshrc/           → ~/.zshrc, ~/.zshrc_customs.zsh
-└── scripts/         → setup-machine.sh, install-niri.sh, pkg, aur-wrap
+└── scripts/         → setup-machine.sh, install-niri.sh, pkg, aur-wrap, dotfiles-updates
 ```
 
 ## Prerequisites

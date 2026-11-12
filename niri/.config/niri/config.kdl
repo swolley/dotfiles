@@ -25,6 +25,9 @@ spawn-at-startup "xwayland-satellite"
 // fallimento e ti ritroveresti col desktop vuoto senza spiegazione.
 spawn-sh-at-startup "$HOME/.config/niri/start-noctalia.sh"
 
+// Notifica se nel repo dei dotfiles ci sono commit da scaricare (solo fetch).
+spawn-sh-at-startup "$HOME/.dotfiles/scripts/dotfiles-updates"
+
 // Niente terminale all'accesso: lo apri quando serve con Ctrl+Alt+T o
 // Super+Return. Come rete di sicurezza non serviva piu', se ne occupa
 // start-noctalia.sh.
