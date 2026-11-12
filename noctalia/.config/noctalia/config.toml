@@ -307,6 +307,15 @@ enable_charging_animation = false
 match_content = ".*"
 override_duration = 3000
 
+# Le notifiche di Claude e di Laravel Mix compaiono ma non finiscono nella
+# cronologia. La regex e' sul testo della notifica e racchiusa in ".*" cosi'
+# funziona sia come ricerca sia come corrispondenza intera. Il filtro ripete
+# la durata di "tutte" perche' non e' detto che i due si sommino.
+[notification.filter.senza-cronologia]
+match_content = ".*([Cc]laude|[Ll]aravel [Mm]ix).*"
+save_history = false
+override_duration = 3000
+
 # Manda sfondo, palette e disposizione dei monitor a noctalia-greeter a ogni
 # cambio di tema, cosi' la schermata di accesso non resta indietro. Serve
 # un'autorizzazione: scrive in /var/lib/noctalia-greeter.
