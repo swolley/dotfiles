@@ -26,6 +26,7 @@ BLUE="\033[1;34m"; CYAN="\033[1;36m"; DIM="\033[2m"; RESET="\033[0m"
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKG_DIR="$REPO_DIR/scripts/packages"
+RIMUOVI="$REPO_DIR/scripts/rimuovi.txt"
 
 ASSUME_YES=0
 DRY_RUN=0
@@ -437,6 +438,31 @@ configure_nautilus_terminal() {
   fi
 }
 
+# Pacchetti preinstallati da EndeavourOS che sotto niri non servono. Elencati
+# in scripts/rimuovi.txt, qui si tolgono solo quelli davvero presenti.
+remove_packages() {
+  [ -f "$RIMUOVI" ] || { info "nessuna lista di rimozione"; return; }
+  local da_togliere=()
+  local pkg
+  while IFS= read -r pkg; do
+    pacman -Qq "$pkg" >/dev/null 2>&1 && da_togliere+=("$pkg")
+  done < <(packages_of "$RIMUOVI")
+
+  if [ ${#da_togliere[@]} -eq 0 ]; then
+    ok "niente da rimuovere"
+    return
+  fi
+
+  info "da rimuovere: ${da_togliere[*]}"
+  if ! ask "Rimuoverli?"; then
+    warn "salto la rimozione"
+    return
+  fi
+  # -Rns porta via anche le dipendenze rimaste orfane. --noconfirm solo
+  # perche' la domanda l'abbiamo gia' fatta noi qui sopra.
+  run sudo pacman -Rns --noconfirm "${da_togliere[@]}"
+}
+
 configure_wifi_powersave() {
   if ! command -v NetworkManager >/dev/null 2>&1; then
     info "NetworkManager non installato, salto"
@@ -659,6 +685,17 @@ if [ "$DO_STOW" -eq 1 ]; then
       warn "stow $p fallito (conflitti o file gia' presenti): continuo con gli altri"
     fi
   done
+
+  # Voci di menu da nascondere: runtime, strumenti qt, pannelli di gnome che
+  # sotto niri non governano niente. Lo stow mette solo i file che lo script
+  # ha gia' generato; rilanciarlo serve a coprire le voci comparse nel
+  # frattempo e quelle che su questa macchina hanno un nome diverso.
+  nascondi="$HOME/.local/share/applications/.nascondi.sh"
+  if [ -x "$nascondi" ]; then
+    info "nascondo le voci di menu inutili"
+    run "$nascondi"
+    run update-desktop-database "$HOME/.local/share/applications"
+  fi
 fi
 
 section "Shell"
@@ -669,6 +706,9 @@ configure_monitors
 
 section "Nautilus"
 configure_nautilus_terminal
+
+section "Pulizia"
+remove_packages
 
 section "Wifi"
 configure_wifi_powersave

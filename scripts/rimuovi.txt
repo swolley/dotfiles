@@ -1,0 +1,67 @@
+# Pacchetti da TOGLIERE, non da installare: lo legge la fase
+# "Pulizia" di setup-machine.sh, che rimuove con pacman -Rns quelli presenti.
+#
+# EndeavourOS installa di suo una sessione GNOME completa e una manciata di
+# strumenti propri. Sotto niri + noctalia non servono, ma arrivano comunque
+# con l'immagine di installazione: senza questa lista una macchina nuova se
+# li ritroverebbe tutti.
+#
+# Le dipendenze tirate dentro da questi pacchetti non vanno elencate: -Rns le
+# porta via da sole se non le usa nessun altro.
+
+# --- GNOME: resta la sessione minima di riserva (gnome-shell, gdm e le app
+# che usi davvero), via il contorno
+alacarte
+dconf-editor
+epiphany
+evince
+extension-manager
+gnome-browser-connector
+gnome-clocks
+gnome-console
+gnome-control-center
+gnome-menus
+gnome-nettool
+gnome-power-manager
+gnome-screenshot
+gnome-tweaks
+# le estensioni vivono solo dentro gnome-shell: sotto niri non girano
+gnome-shell-extensions
+gnome-shell-extension-arch-update
+gnome-shell-extension-dash-to-dock
+gnome-shell-extension-gsconnect
+
+# --- EndeavourOS: benvenuto, guide e strumenti per chi ha appena installato
+welcome
+eos-quickstart
+eos-apps-info
+eos-packagelist
+eos-log-tool
+reflector-simple
+# forza il viola nella schermata di accesso e nel desktop GNOME
+eos-settings-gnome
+# tema GTK non usato: i colori li generano i template di noctalia
+arc-gtk-theme-eos
+
+# --- Xorg: la sessione e' Wayland. Le app X11 girano con xorg-xwayland, che
+# e' un altro pacchetto e resta installato
+xorg-server
+xorg-xinit
+xorg-xdpyinfo
+xorg-xinput
+xorg-xkill
+
+# --- doppioni e cose sostituite
+# il terminale e' kitty
+xterm
+# il confronto file si fa con git difftool e lazygit
+meld
+# le istantanee btrfs si gestiscono con snapper da riga di comando
+btrfs-assistant
+# polkit-gnome: l'agente lo fa noctalia (shell.polkit_agent)
+polkit-gnome
+
+# NOTA: i pacchetti NVIDIA e cuda NON stanno qui di proposito. Su questo
+# portatile la scheda non e' visibile e sono 6 GB sprecati, ma su una macchina
+# che la monta davvero servono: li installa il gruppo nvidia, che
+# setup-machine.sh propone solo quando rileva la GPU.

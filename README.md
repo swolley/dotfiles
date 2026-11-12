@@ -132,6 +132,11 @@ Le liste stanno in `scripts/packages/*.txt`, una per gruppo, un pacchetto per
 riga. I linguaggi non hanno versioni fissate: i repo portano sempre l'ultima
 stabile. Per aggiungere software, modifica il file del gruppo giusto.
 
+C'e' anche il contrario: `scripts/rimuovi.txt` elenca quello che EndeavourOS
+preinstalla e che qui non serve (la sessione GNOME oltre il minimo di riserva,
+i suoi strumenti di benvenuto, Xorg). La fase "Pulizia" lo legge e toglie con
+`pacman -Rns` solo i pacchetti davvero presenti, chiedendo prima conferma.
+
 L'IDE non e' in nessuna lista: se selezioni un gruppo `dev-*`, lo script chiede
 quale installare (nessuno, uno o piu' d'uno). `--ide code,cursor` salta la
 domanda, `--ide none` non installa nulla; con `--yes` senza `--ide` usa il
