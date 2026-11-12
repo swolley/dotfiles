@@ -77,13 +77,9 @@ enabled = true
 timeout = 240
 
 [plugin_settings."ayagmar/headroom"]
-# L'anello accanto alla percentuale non si toglie, per ora. bar.luau legge
-# ancora bar_style e con "value" mostrerebbe solo logo e numero, ma la 0.3 ha
-# smesso di dichiarare quella voce in plugin.toml, e noctalia scarta le
-# impostazioni non dichiarate: metterla qui fa solo un avviso nei log.
-# Dichiararla a mano nel plugin materializzato fa sparire il widget, e
-# comunque si perderebbe al primo aggiornamento. E' una regressione da
-# segnalare a monte.
+# bar_style e bar_accounts stavano qui fino alla 0.2; dalla 0.3 sono
+# impostazioni del widget, cosi' due capsule sulla stessa barra possono
+# mostrare cose diverse. Si trovano sotto [widget.usage].
 provider_antigravity = "off"
 
 [plugin_settings."yuuto/arch-updater"]
@@ -203,6 +199,9 @@ show_vpn_label = true
 
 [widget.usage]
 type = "ayagmar/headroom:usage"
+# "full" (il valore di fabbrica) mette anche un anello di avanzamento accanto
+# a ogni percentuale; "value" lascia solo logo e numero.
+bar_style = "value"
 
 [widget.volume]
 enabled = false
