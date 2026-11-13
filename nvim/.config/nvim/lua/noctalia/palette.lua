@@ -1,5 +1,8 @@
 -- Soft noctalia green palette shared with kitty / starship / tmux.
-return {
+-- The values below are the fallback: noctalia generates the same table from the
+-- shared palette in ~/.cache/noctalia/nvim-palette.lua (template in the dotfiles:
+-- noctalia/.config/noctalia/templates/nvim-palette.lua) and it takes precedence.
+local defaults = {
   base = "#1c1c1e",
   surface = "#2a2b2e",
   surface2 = "#3a3b3e",
@@ -14,3 +17,10 @@ return {
   urgent = "#ffb4ab",
   rose = "#c4a7a0",
 }
+
+local cache = (vim.env.XDG_CACHE_HOME or (vim.env.HOME .. "/.cache")) .. "/noctalia/nvim-palette.lua"
+local ok, generated = pcall(dofile, cache)
+if ok and type(generated) == "table" then
+  return vim.tbl_extend("force", defaults, generated)
+end
+return defaults

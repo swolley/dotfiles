@@ -182,6 +182,8 @@ wallpaper_scheme = "m3-content"
     soft_urgent = { color = "#ffb4ab", blend = false }
     soft_yellow = { color = "#c6a26e", blend = false }
     soft_teal = { color = "#7eb8b0", blend = false }
+    soft_accent_dim = { color = "#6b8070", blend = false }
+    soft_rose = { color = "#c4a7a0", blend = false }
 
     # ANSI colors of the terminal (kitty). Normal 1-6 stay dark enough to carry
     # white text: programs use them as backgrounds (Symfony, Laravel badges).
@@ -209,6 +211,12 @@ wallpaper_scheme = "m3-content"
     input_path = "$XDG_CONFIG_HOME/noctalia/templates/kitty-colors.conf"
     output_path = "$XDG_CONFIG_HOME/kitty/noctalia-colors.conf"
     post_hook = "pkill -USR1 -x kitty || true"
+
+    # Neovim: the palette module loads the generated file from the cache and
+    # falls back to its own values (nvim/.config/nvim/lua/noctalia/palette.lua).
+    [theme.templates.user.nvim]
+    input_path = "$XDG_CONFIG_HOME/noctalia/templates/nvim-palette.lua"
+    output_path = "$XDG_CACHE_HOME/noctalia/nvim-palette.lua"
 
     # gitmux has no include: noctalia writes the whole config to the cache and
     # tmux.conf prefers it over ~/.gitmux.conf (the fallback in the dotfiles).

@@ -175,11 +175,10 @@ Nerd Font glyphs; Neovim loads it via `base16-nvim` as `noctalia-green`.
 La palette di noctalia e' la sorgente: i suoi template rigenerano GTK, Qt,
 niri, bat, fzf, lazygit e gli altri. Per i file scritti a mano ci sono template
 utente nel repo (`noctalia/.config/noctalia/templates/`): **tmux**, **gitmux**,
-**starship** e **kitty** prendono i colori dalla palette (i toni morbidi stanno in
+**starship**, **kitty** e **Neovim** prendono i colori dalla palette (i toni morbidi stanno in
 `[theme.templates.custom_colors]` del `config.toml`: chi riusa i dotfiles li
-cambia li'). I file kitty.conf, .tmux.conf, .gitmux.conf e palette-default.toml tengono gli
+cambia li'). I file kitty.conf, .tmux.conf, .gitmux.conf, palette.lua (nvim) e palette-default.toml tengono gli
 stessi valori come ripiego, e li allinea `scripts/accent-sync` (accento).
-Neovim e' ancora scritto a mano.
 
 ```bash
 accent-sync --check     # esce 1 se qualcosa e' disallineato
