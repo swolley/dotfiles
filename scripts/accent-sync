@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-# accent-sync — propaga il colore d'accento ai file scritti a mano.
+# accent-sync — propagate the accent color to the hand-written files.
 #
-# La sorgente dei colori e' la palette di noctalia: da li' i template
-# rigenerano da soli GTK, niri, Qt, bat, fzf, lazygit e gli altri. Restano
-# pero' cinque file con l'esadecimale scritto dentro, perche' sono
-# personalizzati e i template li sovrascriverebbero. Questo script li tiene
-# allineati.
+# The color source is the noctalia palette: from there the templates
+# regenerate GTK, niri, Qt, bat, fzf, lazygit and the rest on their own.
+# Five files remain, however, with the hex value written inside, because
+# they are customized and the templates would overwrite them. This script
+# keeps them in sync.
 #
-# L'accento in uso si legge da kitty.conf (color2), che fa da ancora: ogni
-# occorrenza di quel valore nei cinque file viene sostituita.
+# The accent in use is read from kitty.conf (color2), which acts as the
+# anchor: every occurrence of that value in the five files is replaced.
 #
-# Uso:
-#   ./scripts/accent-sync                 # prende l'accento dalla palette
-#   ./scripts/accent-sync '#7fb069'       # usa il colore indicato
-#   ./scripts/accent-sync --dry-run       # mostra cosa cambierebbe
-#   ./scripts/accent-sync --check         # esce 1 se qualcosa e' disallineato
+# Usage:
+#   ./scripts/accent-sync                 # take the accent from the palette
+#   ./scripts/accent-sync '#7fb069'       # use the given color
+#   ./scripts/accent-sync --dry-run       # show what would change
+#   ./scripts/accent-sync --check         # exit 1 if anything is out of sync
 
 set -euo pipefail
 
@@ -25,7 +25,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PALETTE="$REPO_DIR/noctalia/.config/noctalia/palettes/adwaita-starship.json"
 ANCORA="$REPO_DIR/kitty/.config/kitty/kitty.conf"
 
-# I file che i template non toccano e che quindi restano a carico nostro.
+# Files the templates don't touch, which therefore stay our responsibility.
 FILES=(
   "kitty/.config/kitty/kitty.conf"
   "tmux/.tmux.conf"
@@ -41,8 +41,8 @@ NUOVO=""
 section() { echo -e "\n${CYAN}==>${RESET} ${BLUE}$1${RESET}"; }
 info()    { echo -e "    $*"; }
 ok()      { echo -e "    ${GREEN}ok${RESET} $*"; }
-warn()    { echo -e "    ${YELLOW}attenzione${RESET} $*"; }
-die()     { echo -e "${RED}errore:${RESET} $*" >&2; exit 1; }
+warn()    { echo -e "    ${YELLOW}warning${RESET} $*"; }
+die()     { echo -e "${RED}error:${RESET} $*" >&2; exit 1; }
 
 usage() { sed -n '2,19p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0; }
 
@@ -51,21 +51,21 @@ while [ $# -gt 0 ]; do
     --dry-run|-n) DRY_RUN=1 ;;
     --check)      CHECK=1; DRY_RUN=1 ;;
     --help|-h)    usage ;;
-    -*)           die "opzione sconosciuta: $1" ;;
+    -*)           die "unknown option: $1" ;;
     *)            NUOVO="$1" ;;
   esac
   shift
 done
 
-[ -f "$ANCORA" ] || die "manca $ANCORA"
+[ -f "$ANCORA" ] || die "missing $ANCORA"
 
-# Accento attualmente scritto nei file: color2 di kitty.
+# Accent currently written in the files: kitty's color2.
 VECCHIO="$(awk '/^color2[[:space:]]/ { print $2; exit }' "$ANCORA")"
-[ -n "$VECCHIO" ] || die "non trovo color2 in $ANCORA"
+[ -n "$VECCHIO" ] || die "color2 not found in $ANCORA"
 
-# Accento di destinazione: l'argomento, altrimenti la palette di noctalia.
+# Target accent: the argument, otherwise the noctalia palette.
 if [ -z "$NUOVO" ]; then
-  [ -f "$PALETTE" ] || die "manca $PALETTE: passa il colore come argomento"
+  [ -f "$PALETTE" ] || die "missing $PALETTE: pass the color as an argument"
   NUOVO="$(python3 -c '
 import json, sys
 d = json.load(open(sys.argv[1]))
@@ -74,36 +74,36 @@ fi
 
 case "$NUOVO" in
   '#'[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) ;;
-  *) die "colore non valido: $NUOVO (atteso #rrggbb)" ;;
+  *) die "invalid color: $NUOVO (expected #rrggbb)" ;;
 esac
 
-section "Accento"
-info "nei file:  $VECCHIO   (da $(basename "$ANCORA"), color2)"
-info "richiesto: $NUOVO"
+section "Accent"
+info "in files:   $VECCHIO   (from $(basename "$ANCORA"), color2)"
+info "requested:  $NUOVO"
 
 if [ "$VECCHIO" = "$NUOVO" ]; then
-  ok "gia' allineati, niente da fare"
+  ok "already in sync, nothing to do"
   exit 0
 fi
 
-section "File"
+section "Files"
 TOCCATI=0
 for f in "${FILES[@]}"; do
   percorso="$REPO_DIR/$f"
   if [ ! -f "$percorso" ]; then
-    warn "$f non esiste, salto"
+    warn "$f does not exist, skipping"
     continue
   fi
   n="$(grep -c -i -- "$VECCHIO" "$percorso" || true)"
   if [ "$n" -eq 0 ]; then
-    warn "$f non contiene l'accento"
+    warn "$f does not contain the accent"
     continue
   fi
   TOCCATI=$((TOCCATI + n))
-  info "$f ${DIM}($n occorrenze)${RESET}"
+  info "$f ${DIM}($n occurrences)${RESET}"
   [ "$DRY_RUN" -eq 1 ] && continue
-  # sed -i sostituirebbe il symlink con un file normale, scollegando il file
-  # dalla copia stowata: si riscrive il contenuto passando per il symlink.
+  # sed -i would replace the symlink with a regular file, detaching it from
+  # the stowed copy: rewrite the contents through the symlink instead.
   tmp="$(mktemp)"
   sed "s/$VECCHIO/$NUOVO/gI" "$percorso" >"$tmp"
   cat "$tmp" >"$percorso"
@@ -111,15 +111,15 @@ for f in "${FILES[@]}"; do
 done
 
 if [ "$CHECK" -eq 1 ]; then
-  [ "$TOCCATI" -eq 0 ] && { ok "tutto allineato"; exit 0; }
-  die "$TOCCATI occorrenze da aggiornare: lancia ./scripts/accent-sync"
+  [ "$TOCCATI" -eq 0 ] && { ok "everything in sync"; exit 0; }
+  die "$TOCCATI occurrences to update: run ./scripts/accent-sync"
 fi
 
-section "Fatto"
+section "Done"
 if [ "$DRY_RUN" -eq 1 ]; then
-  info "nessuna modifica scritta (--dry-run)"
+  info "no changes written (--dry-run)"
 else
-  ok "$TOCCATI occorrenze portate a $NUOVO"
-  info "i file rigenerati dai template seguono la palette di noctalia:"
+  ok "$TOCCATI occurrences changed to $NUOVO"
+  info "files regenerated from templates follow the noctalia palette:"
   info "${DIM}noctalia msg templates-apply${RESET}"
 fi

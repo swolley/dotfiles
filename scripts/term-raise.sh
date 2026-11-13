@@ -10,7 +10,7 @@ elif [[ "$XDG_CURRENT_DESKTOP" == *GNOME* ]];  then WM=gnome
 elif [ -n "$DISPLAY" ];                        then WM=x11
 else WM=unknown; fi
 
-# --- 2. terminale: preferenze per desktop, primo installato vince ----------
+# --- 2. terminal: per-desktop preferences, first one installed wins --------
 case $WM in
     gnome) prefs="gnome-terminal kgx kitty foot alacritty wezterm ghostty xterm" ;;
     *)     prefs="kitty foot alacritty wezterm ghostty gnome-terminal kgx xterm" ;;
@@ -19,9 +19,9 @@ TERMINAL=${TERM_RAISE_TERMINAL:-}
 if [ -z "$TERMINAL" ]; then
     for t in $prefs; do command -v "$t" >/dev/null && { TERMINAL=$t; break; }; done
 fi
-[ -z "$TERMINAL" ] && { echo "term-raise: nessun terminale trovato" >&2; exit 1; }
+[ -z "$TERMINAL" ] && { echo "term-raise: no terminal found" >&2; exit 1; }
 
-# --- 3. app_id / WM_CLASS e comando di avvio per terminale -----------------
+# --- 3. app_id / WM_CLASS and launch command per terminal ------------------
 case $TERMINAL in
     kitty)          APP=kitty;                  launch() { kitty tmux "$@"; } ;;
     foot)           APP=foot;                   launch() { foot tmux "$@"; } ;;
@@ -50,7 +50,7 @@ raise() {
     esac || true
 }
 
-# --- 5. logica principale --------------------------------------------------
+# --- 5. main logic ---------------------------------------------------------
 if tmux list-clients -t "$S" 2>/dev/null | grep -q .; then
     tmux new-window -t "$S"
     raise

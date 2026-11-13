@@ -67,7 +67,7 @@ warn() {
 }
 
 need_cmd() {
-  command -v "$1" >/dev/null 2>&1 || die "comando richiesto non trovato: $1"
+  command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"
 }
 
 resolve_helper() {
@@ -78,14 +78,14 @@ resolve_helper() {
     elif command -v yay >/dev/null 2>&1; then
       cand=yay
     else
-      die 'né paru né yay trovati in PATH'
+      die 'neither paru nor yay found in PATH'
     fi
   fi
   if [[ -x /usr/bin/$cand ]]; then
     printf '%s' "/usr/bin/$cand"
     return 0
   fi
-  type -P "$cand" 2>/dev/null || die "helper non eseguibile: $cand"
+  type -P "$cand" 2>/dev/null || die "helper not executable: $cand"
 }
 
 resolve_cache() {
@@ -141,25 +141,25 @@ sync_pkg() {
   local dest="$AUR_CACHE_DIR/$pkg"
 
   if [[ $NO_SYNC -eq 1 ]]; then
-    [[ -f $dest/PKGBUILD ]] || die "PKGBUILD assente (usa sync): $dest"
+    [[ -f $dest/PKGBUILD ]] || die "PKGBUILD missing (run a sync): $dest"
     return 0
   fi
 
   mkdir -p "$AUR_CACHE_DIR"
   log "Sync PKGBUILD: $pkg"
   if [[ -d $dest/.git ]]; then
-    git -C "$dest" pull --ff-only || warn "git pull fallito per $pkg, uso cache locale"
+    git -C "$dest" pull --ff-only || warn "git pull failed for $pkg, using local cache"
   elif [[ -f $dest/PKGBUILD ]]; then
     local tmp
     tmp=$(mktemp -d)
-    (cd "$tmp" && "$HELPER" -G "$pkg") || die "$HELPER -G fallito per $pkg"
+    (cd "$tmp" && "$HELPER" -G "$pkg") || die "$HELPER -G failed for $pkg"
     rsync -a --delete "$tmp/$pkg/" "$dest/"
     rm -rf "$tmp"
   else
-    (cd "$AUR_CACHE_DIR" && "$HELPER" -G "$pkg") || die "$HELPER -G fallito per $pkg"
+    (cd "$AUR_CACHE_DIR" && "$HELPER" -G "$pkg") || die "$HELPER -G failed for $pkg"
   fi
 
-  [[ -f $dest/PKGBUILD ]] || die "PKGBUILD mancante dopo sync: $dest"
+  [[ -f $dest/PKGBUILD ]] || die "PKGBUILD missing after sync: $dest"
 }
 
 build_pkg() {
@@ -171,7 +171,7 @@ build_pkg() {
   ver=$(pkgbuild_version "$dir")
 
   if archive=$(find_built_archive "$dir" "$name" "$ver"); then
-    log "Già buildato: $(basename "$archive")"
+    log "Already built: $(basename "$archive")"
     printf '%s' "$archive"
     return 0
   fi
@@ -183,10 +183,10 @@ build_pkg() {
     return 0
   fi
 
-  (cd "$dir" && makepkg -fd) || die "makepkg fallito: $pkg"
+  (cd "$dir" && makepkg -fd) || die "makepkg failed: $pkg"
 
   archive=$(find_built_archive "$dir" "$name" "$ver") \
-    || die "archivio non trovato dopo build: $name-$ver in $dir"
+    || die "archive not found after build: $name-$ver in $dir"
 
   printf '%s' "$archive"
 }
@@ -195,7 +195,7 @@ confirm_install() {
   local archives=("$@")
   local a
 
-  printf '\nPacchetti da installare insieme:\n'
+  printf '\nPackages to install together:\n'
   for a in "${archives[@]}"; do
     printf '  - %s\n' "$(basename "$a")"
   done
@@ -206,8 +206,8 @@ confirm_install() {
   fi
 
   local reply
-  read -r -p 'Procedere con pacman -U? [y/N] ' reply
-  [[ $reply == [yY] || $reply == [yY][eE][sS] ]] || die 'annullato'
+  read -r -p 'Proceed with pacman -U? [y/N] ' reply
+  [[ $reply == [yY] || $reply == [yY][eE][sS] ]] || die 'cancelled'
 }
 
 normalize_token() {
@@ -251,11 +251,11 @@ expand_packages() {
 
   if [[ ${#expanded[@]} -lt 2 ]]; then
     usage
-    die "servono almeno due pacchetti (o un alias come 'instantclient'); ricevuti: ${expanded[*]:-nessuno}"
+    die "at least two packages are required (or an alias such as 'instantclient'); got: ${expanded[*]:-none}"
   fi
 
   if [[ ${#RAW_ARGS[@]} -eq 1 ]] || [[ ${expanded[*]} != "${RAW_ARGS[*]}" ]]; then
-    log "Espansione: ${RAW_ARGS[*]} → ${expanded[*]}"
+    log "Expanding: ${RAW_ARGS[*]} → ${expanded[*]}"
   fi
 
   PACKAGES=("${expanded[@]}")
@@ -286,7 +286,7 @@ while [[ $# -gt 0 ]]; do
       break
       ;;
     -*)
-      die "opzione sconosciuta: $1"
+      die "unknown option: $1"
       ;;
     *)
       RAW_ARGS+=("$1")
@@ -297,7 +297,7 @@ done
 
 [[ ${#RAW_ARGS[@]} -ge 1 ]] || {
   usage
-  die 'specifica almeno un pacchetto o alias'
+  die 'specify at least one package or alias'
 }
 
 expand_packages
@@ -315,7 +315,7 @@ fi
 
 log "Helper: $HELPER"
 log "Cache: $AUR_CACHE_DIR"
-log "Pacchetti: ${PACKAGES[*]}"
+log "Packages: ${PACKAGES[*]}"
 
 ARCHIVES=()
 for pkg in "${PACKAGES[@]}"; do
@@ -328,7 +328,7 @@ for pkg in "${PACKAGES[@]}"; do
 done
 
 if [[ $DRY_RUN -eq 1 ]]; then
-  printf '\n[dry-run] pacchetti:\n' >&2
+  printf '\n[dry-run] packages:\n' >&2
   for a in "${ARCHIVES[@]}"; do
     printf '  - %s\n' "$(basename "$a")" >&2
   done
@@ -338,7 +338,7 @@ fi
 
 confirm_install "${ARCHIVES[@]}"
 
-log "Installazione in una sola transazione..."
+log "Installing in a single transaction..."
 pacman_opts=(-U)
 if [[ $ASSUME_YES -eq 1 ]]; then
   pacman_opts+=(--noconfirm)
@@ -350,5 +350,5 @@ else
   sudo pacman "${pacman_opts[@]}" "${ARCHIVES[@]}"
 fi
 
-log "Fatto."
+log "Done."
 pacman -Q "${PACKAGES[@]}" 2>/dev/null || true

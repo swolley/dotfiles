@@ -1,5 +1,5 @@
-# GPU NVIDIA su portatile Optimus. nvidia-open e' il modulo precompilato:
-# niente DKMS, niente ricompilazione a ogni aggiornamento del kernel.
+# NVIDIA GPU on an Optimus laptop. nvidia-open is the precompiled module:
+# no DKMS, no rebuild on every kernel update.
 nvidia-open
 nvidia-utils
 nvidia-settings

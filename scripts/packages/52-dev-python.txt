@@ -1,4 +1,4 @@
-# Python con uv per ambienti e dipendenze.
+# Python with uv for environments and dependencies.
 python
 python-pip
 uv

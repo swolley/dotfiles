@@ -11,11 +11,6 @@ prefer-no-csd
 // screen: niente helper esterni (erano polkit-gnome, swaybg, swayidle).
 // Per riattivarli: config.kdl.bak-v4-quickshell.
 
-// Eccezione: l'agente polkit integrato non risulta attivo (pkexec rispondeva
-// "No authentication agent"), e senza agente non compare la richiesta di
-// password dei programmi che usano pkexec, come "Chiudi" di FortiClient.
-spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-
 spawn-at-startup "xwayland-satellite"
 
 // Shell UI (bar/dock/launcher/notifiche/lock).

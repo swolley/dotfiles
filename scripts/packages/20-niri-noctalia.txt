@@ -1,34 +1,38 @@
-# Sessione niri con la shell noctalia.
+# niri session with the noctalia shell.
 niri
 noctalia
 xwayland-satellite
 xdg-desktop-portal-wlr
 nwg-displays
-# gestore file e la sua voce "Apri nel terminale", configurabile:
-# quella di gnome-terminal e' cablata e aprirebbe una finestra nuova
+# file manager and its "Open in Terminal" entry, which is configurable:
+# the gnome-terminal one is hardcoded and would open a new window
 nautilus
 nautilus-open-any-terminal
 brightnessctl
 grim
 slurp
-# font usati dalla shell e dal terminale
+# fonts used by the shell and the terminal
 ttf-adwaitamono-nerd
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
 noto-fonts-extra
 
-# strumenti usati dai plugin della shell (screen-toolkit: selettore colore)
+# tools used by the shell plugins (screen-toolkit: color picker)
 hyprpicker
-# luminosita' dei monitor esterni via DDC/CI (va poi attivata in noctalia)
+# external monitor brightness via DDC/CI (then enable it in noctalia)
 ddcutil
 
-# portachiavi: senza, VS Code e gli altri Electron non salvano le credenziali
-# (in GNOME lo avvia la shell; sotto niri parte dal socket systemd utente)
+# keyring: without it, VS Code and other Electron apps do not save credentials
+# (under GNOME the shell starts it; under niri it starts from the systemd user socket)
 gnome-keyring
 libsecret
-# KDE Connect per il plugin phone-connect di noctalia; sshfs serve solo a
-# sfogliare i file del telefono
+# KDE Connect for noctalia's phone-connect plugin; sshfs is only needed to
+# browse the phone's files
 kdeconnect
 sshfs
-# l'agente polkit lo fa noctalia: shell.polkit_agent nel suo config.toml
+# the polkit agent is provided by noctalia: shell.polkit_agent in its config.toml
+# login: greetd with the noctalia greeter replaces gdm (see
+# configure_login_manager in setup-machine.sh)
+greetd
+noctalia-greeter

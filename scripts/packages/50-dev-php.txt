@@ -1,4 +1,4 @@
-# PHP e Laravel. I repo portano sempre l'ultima stabile: niente versione fissata.
+# PHP and Laravel. The repos always carry the latest stable: no pinned version.
 php
 php-gd
 php-imagick

@@ -1,5 +1,5 @@
-# Base: shell, strumenti da riga di comando, gestione pacchetti.
-# Installato sempre, senza chiedere.
+# Base: shell, command-line tools, package management.
+# Always installed, without asking.
 base-devel
 git
 stow
@@ -28,7 +28,7 @@ glances
 nmap
 bind
 inetutils
-# wifi da riga di comando: canali, potenza del segnale, scansione
+# command-line wifi: channels, signal strength, scanning
 iw
 openssh
 unzip
@@ -38,26 +38,26 @@ nano
 nano-syntax-highlighting
 wl-clipboard
 xclip
-# git: strumenti accessori
+# git: extra tools
 lazygit
 lazydocker
 github-cli
 git-cliff
 git-filter-repo
 gitmux-bin
-# pacman: manutenzione
+# pacman: maintenance
 pacman-contrib
 reflector
 downgrade
 rebuild-detector
-# shell: analisi statica e test degli script di questo repo
+# shell: static analysis and tests for this repo's scripts
 shellcheck
 bats
 bats-support
 bats-assert
-# correttore ortografico usato dalle app GTK
+# spell checker used by GTK apps
 aspell
 aspell-it
 aspell-en
-# proxy che riduce i token nelle sessioni con Claude (vedi CLAUDE.md)
+# proxy that cuts token usage in Claude sessions (see CLAUDE.md)
 rtk-bin

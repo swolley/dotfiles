@@ -1,14 +1,14 @@
 #!/bin/sh
-# Avvisa con una notifica se nel repo dei dotfiles ci sono commit da scaricare.
-# Parte all'accesso (spawn-at-startup in niri), aspetta la rete e fa un fetch.
-# Non modifica nulla: niente pull. Se il fetch non riesce (rete assente, chiave
-# ssh non sbloccata) esce senza notifiche.
+# Sends a notification if the dotfiles repo has commits to pull.
+# Runs at login (spawn-at-startup in niri), waits for the network and fetches.
+# Changes nothing: no pull. If the fetch fails (no network, ssh key not
+# unlocked) it exits without notifying.
 REPO="${DOTFILES:-$HOME/.dotfiles}"
 export GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10"
 
 cd "$REPO" || exit 0
 
-# la rete puo' arrivare dopo l'accesso: riprova per circa 2 minuti
+# the network may come up after login: retry for about 2 minutes
 ok=0
 for _ in 1 2 3 4 5 6 7 8; do
   if git fetch --quiet 2>/dev/null; then ok=1; break; fi
@@ -24,20 +24,20 @@ behind=$(git rev-list --count "HEAD..$upstream")
 ahead=$(git rev-list --count "$upstream..HEAD")
 body=$(git log --format='%s' -5 "HEAD..$upstream")
 [ "$ahead" -gt 0 ] && body="$body
-(hai anche $ahead commit locali non pushati: serve un rebase)"
+(you also have $ahead local unpushed commits: a rebase is needed)"
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   body="$body
-(modifiche locali non committate)"
+(uncommitted local changes)"
 fi
 
-# il demone di notifica e' noctalia, che parte in parallelo a questo script:
-# senza di lui la notifica andrebbe persa. Aspetta fino a 60 secondi.
+# the notification daemon is noctalia, which starts in parallel with this
+# script: without it the notification would be lost. Wait up to 60 seconds.
 for _ in $(seq 60); do
   busctl --user status org.freedesktop.Notifications >/dev/null 2>&1 && break
   sleep 1
 done
 
 notify-send -a dotfiles -i software-update-available \
-  "Dotfiles: $behind commit da scaricare" "$body
+  "Dotfiles: $behind commits to pull" "$body
 
 cd ~/.dotfiles && git pull --rebase"

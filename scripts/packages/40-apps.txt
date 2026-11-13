@@ -1,8 +1,8 @@
-# Applicazioni grafiche.
+# Graphical applications.
 firefox
 google-chrome
 obsidian
-# l'IDE (code, cursor) non e' qui: si sceglie con i gruppi dev-* in setup-machine.sh
+# the IDE (code, cursor) is not here: it is chosen via the dev-* groups in setup-machine.sh
 dbeaver
 inkscape
 krita
@@ -12,16 +12,16 @@ tidal-hifi
 transmission-gtk
 nicotine+
 easyeffects
-# catena di plugin audio usata da easyeffects. Solo il formato LV2: e' quello
-# che easyeffects carica (tramite lilv), e l'host virtuale lv2-host lo fornisce
-# gia' pipewire-audio. Il metapacchetto lsp-plugins tirerebbe dentro anche
-# clap/vst/vst3, e con loro qtractor come unico host di quei formati: una DAW
-# intera installata per sbaglio. Se un giorno arriva reaper, dichiara lui
-# vst3-host e allora lsp-plugins-vst3 si aggiunge senza strascichi.
+# audio plugin chain used by easyeffects. LV2 format only: it is the one
+# easyeffects loads (through lilv), and the virtual host lv2-host is already
+# provided by pipewire-audio. The lsp-plugins metapackage would also pull in
+# clap/vst/vst3, and with them qtractor as the only host for those formats: a
+# whole DAW installed by accident. If reaper ever arrives, it declares
+# vst3-host itself and then lsp-plugins-vst3 can be added without side effects.
 lsp-plugins-lv2
-# mixer audio: profili e instradamento per applicazione
+# audio mixer: per-application profiles and routing
 pavucontrol
-# tastiere meccaniche programmabili
+# programmable mechanical keyboards
 qmk
 vial-appimage
 bottles

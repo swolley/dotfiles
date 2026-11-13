@@ -1,30 +1,30 @@
-# Le applicazioni GTK che uso ogni giorno. La sessione e' solo niri: gnome-shell
-# e gdm non ci sono piu' (stanno in rimuovi.txt), l'accesso lo fa greetd con
-# noctalia-greeter. Questi programmi pero' non dipendono dalla shell, solo dalle
-# librerie, e continuano a funzionare identici.
+# The GTK applications I use every day. The session is niri only: gnome-shell
+# and gdm are gone (they are in rimuovi.txt), login is handled by greetd with
+# noctalia-greeter. These programs do not depend on the shell, only on the
+# libraries, and keep working exactly the same.
 #
-# Niente gnome-control-center ne' gnome-tweaks: le impostazioni le governa
-# noctalia, e quel che resta si tocca con gsettings.
+# No gnome-control-center or gnome-tweaks: settings are managed by
+# noctalia, and whatever is left can be changed with gsettings.
 nautilus
 sushi
 gnome-text-editor
 gnome-calculator
-# gnome-disk-utility: salute SMART, benchmark, scrittura di immagini su
-# chiavetta, opzioni di mount. Lavora a caldo, tramite udisks.
+# gnome-disk-utility: SMART health, benchmarks, writing images to USB
+# sticks, mount options. Works on live systems, through udisks.
 gnome-disk-utility
-# gparted: l'altra meta' del lavoro, quella che Disks non fa. Sposta e
-# ridimensiona partizioni mettendo in coda le operazioni.
+# gparted: the other half of the job, the one Disks does not do. Moves and
+# resizes partitions, queuing the operations.
 #
-# Il suo lanciatore di serie si eleva con pkexec e finisce su xwayland, dove
-# i menu' si accorciano e il tema torna chiaro. Lo sostituisce il lanciatore
-# in applications/.local/share/applications/gparted-wayland, che passa a root
-# il socket wayland. Niente xorg-xhost, quindi: serviva solo alla via vecchia.
+# Its stock launcher elevates with pkexec and ends up on xwayland, where
+# menus get truncated and the theme goes back to light. It is replaced by the
+# launcher in applications/.local/share/applications/gparted-wayland, which
+# passes the wayland socket to root. So no xorg-xhost: only the old way needed it.
 gparted
 gnome-keyring
 seahorse
 file-roller
 loupe
-# papers e' il visualizzatore documenti di gnome, erede di evince
+# papers is the GNOME document viewer, successor to evince
 papers
 totem
 gvfs
@@ -44,7 +44,7 @@ cantarell-fonts
 power-profiles-daemon
 network-manager-applet
 networkmanager
-# VPN: OpenVPN per il lavoro; WireGuard e' nativo in NetworkManager,
-# wireguard-tools serve per wg e wg-quick da riga di comando
+# VPN: OpenVPN for work; WireGuard is native in NetworkManager,
+# wireguard-tools provides wg and wg-quick on the command line
 networkmanager-openvpn
 wireguard-tools

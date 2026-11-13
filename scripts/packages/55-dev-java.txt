@@ -1,2 +1,2 @@
-# OpenJDK: il pacchetto jdk-openjdk segue sempre l'ultima stabile.
+# OpenJDK: the jdk-openjdk package always follows the latest stable.
 jdk-openjdk

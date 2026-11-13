@@ -1,4 +1,4 @@
-# Node, npm e pnpm dall'ultima stabile nei repo.
+# Node, npm and pnpm from the latest stable in the repos.
 nodejs
 npm
 pnpm

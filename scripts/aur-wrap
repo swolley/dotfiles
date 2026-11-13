@@ -40,17 +40,17 @@ resolve_helper() {
   elif command -v yay >/dev/null 2>&1; then
     cand=yay
   else
-    die 'né paru né yay trovati in PATH'
+    die 'neither paru nor yay found in PATH'
   fi
 
   if [[ -x /usr/bin/$cand ]]; then
     printf '%s' "/usr/bin/$cand"
     return 0
   fi
-  type -P "$cand" 2>/dev/null || die "helper non eseguibile: $cand"
+  type -P "$cand" 2>/dev/null || die "helper not executable: $cand"
 }
 
-# pacman/paru/yay messages (IT + EN) for Instant Client pin break
+# pacman/paru/yay messages (localized: IT + EN) for Instant Client pin break
 is_oracle_pin_failure() {
   local logf=$1
   grep -Eq 'oracle-instantclient-basic' "$logf" || return 1
@@ -75,11 +75,11 @@ prompt_recover() {
     return 0
   fi
   if [[ ! -t 0 ]]; then
-    log 'TTY assente: salto recovery (rilancia con -y o da terminale)'
+    log 'no TTY: skipping recovery (rerun with -y or from a terminal)'
     return 1
   fi
   local reply
-  read -r -p 'aur-wrap: errore pin Oracle Instant Client. Eseguo aur-coinstall instantclient? [Y/n] ' reply
+  read -r -p 'aur-wrap: Oracle Instant Client pin error. Run aur-coinstall instantclient? [Y/n] ' reply
   [[ -z $reply || $reply == [yY] || $reply == [yY][eE][sS] ]]
 }
 
@@ -91,7 +91,7 @@ prompt_rerun() {
     return 1
   fi
   local reply
-  read -r -p 'aur-wrap: rilancio il comando originale? [Y/n] ' reply
+  read -r -p 'aur-wrap: rerun the original command? [Y/n] ' reply
   [[ -z $reply || $reply == [yY] || $reply == [yY][eE][sS] ]]
 }
 
@@ -114,7 +114,7 @@ if [[ -t 1 ]] && ! args_have_color "$@"; then
 fi
 helper_argv+=("$@")
 
-[[ -x $COINSTALL ]] || die "aur-coinstall non trovato/eseguibile: $COINSTALL"
+[[ -x $COINSTALL ]] || die "aur-coinstall not found or not executable: $COINSTALL"
 
 HELPER=$(resolve_helper)
 log "helper: $HELPER"
@@ -135,7 +135,7 @@ if ! is_oracle_pin_failure "$TMP"; then
   exit "$EC"
 fi
 
-log 'rilevato fallimento dipendenze oracle-instantclient (basic/sdk)'
+log 'detected oracle-instantclient (basic/sdk) dependency failure'
 
 if ! prompt_recover "$@"; then
   exit "$EC"
@@ -149,11 +149,11 @@ fi
 "$COINSTALL" "${co_opts[@]}" instantclient
 CO_EC=$?
 if [[ $CO_EC -ne 0 ]]; then
-  die "aur-coinstall fallito (exit $CO_EC)"
+  die "aur-coinstall failed (exit $CO_EC)"
 fi
 
 if prompt_rerun "$@"; then
-  log "rilancio: $HELPER ${helper_argv[*]}"
+  log "rerunning: $HELPER ${helper_argv[*]}"
   exec "$HELPER" "${helper_argv[@]}"
 fi
 

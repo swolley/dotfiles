@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Sposta nei dotfiles le impostazioni di noctalia fatte dall'interfaccia.
+"""Move noctalia settings made through the UI into the dotfiles.
 
-La shell scrive sempre in ~/.local/state/noctalia/settings.toml, che ha la
-precedenza sul config.toml condiviso. Questo script sposta nel repo i blocchi
-portabili e lascia nello stato solo quelli legati a questa macchina.
+The shell always writes to ~/.local/state/noctalia/settings.toml, which takes
+precedence over the shared config.toml. This script moves the portable blocks
+into the repo and leaves only the machine-specific ones in the state file.
 
-Uso:
-  noctalia-sync            mostra cosa sposterebbe e chiede conferma
-  noctalia-sync --dry-run  mostra e basta
-  noctalia-sync --yes      sposta senza chiedere
+Usage:
+  noctalia-sync            show what it would move and ask for confirmation
+  noctalia-sync --dry-run  show only
+  noctalia-sync --yes      move without asking
 """
 import re
 import shutil
@@ -20,8 +20,8 @@ from pathlib import Path
 STATE = Path.home() / ".local/state/noctalia/settings.toml"
 SHARED = Path.home() / ".config/noctalia/config.toml"
 
-# Blocchi che restano locali: nomi dei monitor, geometrie calcolate sulla
-# risoluzione, sfondi correnti, impostazioni per singolo plugin con percorsi.
+# Blocks that stay local: monitor names, geometries computed from the
+# resolution, current wallpapers, per-plugin settings containing paths.
 LOCAL = [
     re.compile(r"^\s*\[bar\.[a-z_]+\.monitor\."),
     re.compile(r"^\s*\[dock\.monitor\."),
@@ -30,9 +30,9 @@ LOCAL = [
     re.compile(r"^\s*\[osd\]"),
     re.compile(r"^\s*\[wallpaper\.(last|monitors)"),
 ]
-# Chiavi che restano locali pur stando in un blocco portabile: la fila di
-# icone appuntate sulla dock dipende da cosa e' installato su questa macchina,
-# mentre il resto di [dock] (dimensioni, comportamento) si condivide.
+# Keys that stay local even inside a portable block: the row of icons pinned
+# to the dock depends on what is installed on this machine, while the rest of
+# [dock] (size, behavior) is shared.
 LOCAL_KEYS = {
     "[dock]": {"pinned"},
 }
@@ -40,7 +40,7 @@ HEADER = re.compile(r"^\s*\[")
 
 
 def blocks(text):
-    """Spezza un TOML in (preambolo, [(intestazione, righe), ...])."""
+    """Split a TOML into (preamble, [(header, lines), ...])."""
     pre, out, cur = [], [], None
     for line in text.split("\n"):
         if HEADER.match(line):
@@ -70,11 +70,11 @@ KEY = re.compile(r"^\s*([A-Za-z0-9_.\"'-]+)\s*=")
 
 
 def voci(blocco):
-    """Spezza il corpo di un blocco in voci (chiave, righe).
+    """Split the body of a block into entries (key, lines).
 
-    Commenti e righe vuote si attaccano alla chiave che precedono, cosi' una
-    chiave sostituita si porta dietro il proprio commento. Le chiavi col valore
-    su piu' righe (array) si riconoscono contando le parentesi ancora aperte.
+    Comments and blank lines attach to the key that follows them, so a
+    replaced key brings its own comment along. Keys whose value spans several
+    lines (arrays) are recognized by counting the brackets still open.
     """
     out, buf, sospese, chiave, aperte = [], [], [], None, 0
     for riga in blocco[1:]:
@@ -99,10 +99,10 @@ def voci(blocco):
 
 
 def rientra(righe, da, a):
-    """Riallinea un blocco di righe dal rientro `da` a quello `a`.
+    """Re-indent a block of lines from indentation `da` to `a`.
 
-    Lo stato scrive le tabelle annidate senza rientro, il repo le tiene
-    indentate: senza questo ogni sincronizzazione appiattirebbe il file.
+    The state file writes nested tables without indentation, while the repo
+    keeps them indented: without this every sync would flatten the file.
     """
     if da == a:
         return righe
@@ -114,11 +114,11 @@ def spazi(riga):
 
 
 def unisci(repo, stato):
-    """Fonde un blocco del repo con l'omonimo dello stato.
+    """Merge a repo block with its namesake from the state file.
 
-    Lo stato vince sulle chiavi che definisce, ma le chiavi presenti solo nel
-    repo vanno conservate: sostituire il blocco intero le perderebbe, e la
-    configurazione effettiva cambierebbe.
+    The state wins on the keys it defines, but keys present only in the repo
+    must be preserved: replacing the whole block would lose them and the
+    effective configuration would change.
     """
     da_stato = {k: righe for k, righe in voci(stato) if k is not None}
     fuso, usate = [repo[0]], set()
@@ -135,10 +135,10 @@ def unisci(repo, stato):
 
 
 def separa(header, blocco):
-    """Divide un blocco in (da spostare, da lasciare nello stato).
+    """Split a block into (to move, to leave in the state file).
 
-    Serve ai blocchi che si condividono per quasi tutto tranne qualche chiave:
-    quelle elencate in LOCAL_KEYS restano dove la shell le ha scritte.
+    Needed for blocks that are shared for almost everything except a few keys:
+    those listed in LOCAL_KEYS stay where the shell wrote them.
     """
     locali = LOCAL_KEYS.get(header)
     if not locali:
@@ -157,9 +157,9 @@ def main():
 
     for f in (STATE, SHARED):
         if not f.exists():
-            sys.exit(f"manca {f}")
+            sys.exit(f"missing {f}")
     if ".dotfiles" not in SHARED.resolve().parts:
-        print(f"nota: {SHARED} non risolve nei dotfiles", file=sys.stderr)
+        print(f"note: {SHARED} does not resolve into the dotfiles", file=sys.stderr)
 
     pre_state, st_blocks = blocks(STATE.read_text())
     pre_shared, sh_blocks = blocks(SHARED.read_text())
@@ -174,20 +174,20 @@ def main():
         if tieni:
             trattenuti.append((h, tieni))
     if not movable:
-        print("niente da spostare: lo stato contiene solo impostazioni di questa macchina")
+        print("nothing to move: the state file only contains settings specific to this machine")
         return
 
-    print("Da spostare nei dotfiles:")
+    print("To move into the dotfiles:")
     for h, _ in movable:
         print("   ", h)
     if dry:
         return
     if not assume_yes:
-        if input("Procedo? [S/n] ").strip().lower() in ("n", "no"):
+        if input("Proceed? [Y/n] ").strip().lower() in ("n", "no"):
             return
 
-    # Nel repo: sostituisce i blocchi omonimi, aggiunge i nuovi in coda.
-    # Le tabelle di array ([[x]]) possono ripetersi: si spostano come gruppo.
+    # In the repo: replace namesake blocks, append new ones at the end.
+    # Array tables ([[x]]) can repeat: they are moved as a group.
     gruppi = {}
     for h, b in movable:
         gruppi.setdefault(h, []).append(b)
@@ -196,9 +196,9 @@ def main():
     for h, b in sh_blocks:
         if h in gruppi:
             if h not in visti:
-                # Una tabella normale si fonde chiave per chiave; le tabelle di
-                # array ([[x]]) si ripetono e non hanno chiavi confrontabili,
-                # quindi si sostituisce il gruppo per intero.
+                # A regular table is merged key by key; array tables ([[x]])
+                # repeat and have no comparable keys, so the whole group is
+                # replaced.
                 if h.startswith("[[") or len(gruppi[h]) > 1:
                     risultato += [(h, x) for x in gruppi[h]]
                 else:
@@ -228,14 +228,14 @@ def main():
     dopo = subprocess.run(["noctalia", "config", "export", "full"],
                           capture_output=True, text=True).stdout
     if prima and prima != dopo:
-        print("ATTENZIONE: la configurazione effettiva e' cambiata. Ripristino i backup.",
+        print("WARNING: the effective configuration changed. Restoring backups.",
               file=sys.stderr)
         shutil.copy2(str(STATE) + ".bak-sync", STATE)
         shutil.copy2(str(SHARED) + ".bak-sync", SHARED)
         sys.exit(1)
 
-    print(f"spostati {len(movable)} blocchi; configurazione effettiva invariata")
-    print("ricordati di committare i dotfiles")
+    print(f"moved {len(movable)} blocks; effective configuration unchanged")
+    print("remember to commit the dotfiles")
 
 
 if __name__ == "__main__":
