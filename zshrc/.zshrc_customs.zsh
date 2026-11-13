@@ -83,32 +83,37 @@ eos-search() {
 	aur search "$@"
 }
 
-html() {
-	local base_path="/srv/http"
-
-	if ! [ -d "$base_path" ]; then
-		base_path="/usr/share/nginx/html"
-		if ! [ -d "$base_path" ]; then
-			base_path="/var/www/html"
-			if ! [ -d "$base_path" ]; then
-				echo "❌ Not a valid directory found."
-				return 1
-			fi
+# Web root of the projects: $HOME-independent, first existing directory among
+# $HTML_BASE_PATH (if set), /srv/http, /usr/share/nginx/html, /var/www/html.
+_html_base() {
+	local dir
+	for dir in "$HTML_BASE_PATH" /srv/http /usr/share/nginx/html /var/www/html; do
+		if [ -n "$dir" ] && [ -d "$dir" ]; then
+			printf '%s' "$dir"
+			return 0
 		fi
-	fi
+	done
+	return 1
+}
 
-    if [ -n "$1" ] && [ -d "$base_path/$1" ]; then
-    		cd "$base_path/$1"
-    else
-        cd /srv/http
-    fi
+html() {
+	local base_path
+	base_path=$(_html_base) || {
+		echo "❌ Not a valid directory found."
+		return 1
+	}
+
+	if [ -n "$1" ] && [ -d "$base_path/$1" ]; then
+		cd "$base_path/$1"
+	else
+		cd "$base_path"
+	fi
 }
 
 # Tab completion for html: the project folders under the web root.
 _html() {
-	local base=/srv/http
-	[ -d "$base" ] || base=/usr/share/nginx/html
-	[ -d "$base" ] || base=/var/www/html
+	local base
+	base=$(_html_base) || return 1
 	_files -W "$base" -/
 }
 compdef _html html
