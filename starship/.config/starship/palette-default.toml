@@ -1,0 +1,12 @@
+# Fallback palette, used when noctalia has not generated one. The colors in
+# use come from the noctalia template (see starship-palette.toml there).
+[palettes.noctalia_soft]
+accent = "#8fbf98"
+text = "#d8ddd9"
+muted = "#7a827c"
+urgent = "#ffb4ab"
+red = "#ffb4ab"
+yellow = "#c6a26e"
+base = "#1c1c1e"
+surface = "#2a2b2e"
+surface2 = "#3a3b3e"

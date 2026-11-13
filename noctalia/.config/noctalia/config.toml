@@ -188,6 +188,13 @@ wallpaper_scheme = "m3-content"
     input_path = "$XDG_CONFIG_HOME/noctalia/templates/tmux-colors.conf"
     output_path = "$XDG_CONFIG_HOME/tmux/noctalia-colors.conf"
 
+    # starship reads a single file: noctalia generates the palette and the
+    # script joins it with the prompt structure into ~/.config/starship.toml.
+    [theme.templates.user.starship]
+    input_path = "$XDG_CONFIG_HOME/noctalia/templates/starship-palette.toml"
+    output_path = "$XDG_CACHE_HOME/noctalia/starship-palette.toml"
+    post_hook = "sh '{{ config_dir }}/templates/starship-build.sh'"
+
 [wallpaper]
 fill_color = "#000000"
 

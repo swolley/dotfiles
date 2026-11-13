@@ -1,3 +1,5 @@
+# Structure of the prompt (no palette block). ~/.config/starship.toml is built
+# from this file plus a palette by noctalia/.config/noctalia/templates/starship-build.sh.
 "$schema" = 'https://starship.rs/config-schema.json'
 
 # Noctalia green powerline — screenshot layout:
@@ -22,17 +24,6 @@ $time\
 [ ](fg:surface2)"""
 
 palette = 'noctalia_soft'
-
-[palettes.noctalia_soft]
-accent = "#8fbf98"
-text = "#d8ddd9"
-muted = "#7a827c"
-urgent = "#ffb4ab"
-red = "#ffb4ab"
-yellow = "#c6a26e"
-base = "#1c1c1e"
-surface = "#2a2b2e"
-surface2 = "#3a3b3e"
 
 [os]
 disabled = true

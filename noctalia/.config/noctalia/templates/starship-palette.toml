@@ -1,0 +1,10 @@
+[palettes.noctalia_soft]
+accent = "{{ colors.primary.default.hex }}"
+text = "{{ colors.soft_fg_source.default.hex }}"
+muted = "{{ colors.soft_muted_source.default.hex }}"
+urgent = "{{ colors.soft_urgent_source.default.hex }}"
+red = "{{ colors.soft_urgent_source.default.hex }}"
+yellow = "{{ colors.soft_yellow_source.default.hex }}"
+base = "{{ colors.soft_bg_source.default.hex }}"
+surface = "{{ colors.soft_surface_source.default.hex }}"
+surface2 = "{{ colors.soft_surface2_source.default.hex }}"

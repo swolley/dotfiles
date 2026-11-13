@@ -30,7 +30,7 @@ FILES=(
   "kitty/.config/kitty/kitty.conf"
   "tmux/.tmux.conf"
   "gitmux/.gitmux.conf"
-  "starship/.config/starship.toml"
+  "starship/.config/starship/palette-default.toml"
   "nvim/.config/nvim/lua/noctalia/palette.lua"
 )
 
