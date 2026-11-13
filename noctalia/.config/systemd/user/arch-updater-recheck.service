@@ -1,0 +1,8 @@
+[Unit]
+Description=Ask the noctalia arch-updater widget to re-check updates
+
+[Service]
+Type=oneshot
+# Wait until pacman has finished (db.lck gone) and the changes settled, then
+# ask the plugin to check again.
+ExecStart=/bin/sh -c 'sleep 5; while [ -e /var/lib/pacman/db.lck ]; do sleep 2; done; sleep 3; exec noctalia msg plugin yuuto/arch-updater:service all check'

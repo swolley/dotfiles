@@ -1,0 +1,13 @@
+[Unit]
+Description=Re-check updates in the noctalia arch-updater widget when pacman changes packages
+
+[Path]
+# The local package database changes whenever pacman/paru installs, upgrades
+# or removes something, from any terminal.
+PathChanged=/var/lib/pacman/local
+# Rate limit: one re-check at a time, however many files pacman touches.
+TriggerLimitIntervalSec=30
+TriggerLimitBurst=1
+
+[Install]
+WantedBy=default.target
