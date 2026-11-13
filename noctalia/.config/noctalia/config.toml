@@ -183,10 +183,32 @@ wallpaper_scheme = "m3-content"
     soft_yellow = { color = "#c6a26e", blend = false }
     soft_teal = { color = "#7eb8b0", blend = false }
 
+    # ANSI colors of the terminal (kitty). Normal 1-6 stay dark enough to carry
+    # white text: programs use them as backgrounds (Symfony, Laravel badges).
+    ansi_red = { color = "#c01c28", blend = false }
+    ansi_red_bright = { color = "#ff7b63", blend = false }
+    ansi_green_bright = { color = "#a8d0b0", blend = false }
+    ansi_yellow = { color = "#a9762f", blend = false }
+    ansi_yellow_bright = { color = "#e0bb8a", blend = false }
+    ansi_blue = { color = "#2b5ea7", blend = false }
+    ansi_blue_bright = { color = "#62a0ea", blend = false }
+    ansi_magenta = { color = "#7d4b94", blend = false }
+    ansi_magenta_bright = { color = "#c061cb", blend = false }
+    ansi_cyan = { color = "#1d7f91", blend = false }
+    ansi_cyan_bright = { color = "#4dbdd4", blend = false }
+    ansi_white_bright = { color = "#ffffff", blend = false }
+
     # tmux reads the generated file with source-file (see .tmux.conf).
     [theme.templates.user.tmux]
     input_path = "$XDG_CONFIG_HOME/noctalia/templates/tmux-colors.conf"
     output_path = "$XDG_CONFIG_HOME/tmux/noctalia-colors.conf"
+
+    # kitty includes the generated file (see kitty.conf); SIGUSR1 reloads the
+    # open windows.
+    [theme.templates.user.kitty]
+    input_path = "$XDG_CONFIG_HOME/noctalia/templates/kitty-colors.conf"
+    output_path = "$XDG_CONFIG_HOME/kitty/noctalia-colors.conf"
+    post_hook = "pkill -USR1 -x kitty || true"
 
     # starship reads a single file: noctalia generates the palette and the
     # script joins it with the prompt structure into ~/.config/starship.toml.
