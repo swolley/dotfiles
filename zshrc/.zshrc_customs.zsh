@@ -92,7 +92,7 @@ html() {
 			base_path="/var/www/html"
 			if ! [ -d "$base_path" ]; then
 				echo "❌ Not a valid directory found."
-				exit 1
+				return 1
 			fi
 		fi
 	fi
@@ -104,7 +104,17 @@ html() {
     fi
 }
 
+# Tab completion for html: the project folders under the web root.
+_html() {
+	local base=/srv/http
+	[ -d "$base" ] || base=/usr/share/nginx/html
+	[ -d "$base" ] || base=/var/www/html
+	_files -W "$base" -/
+}
+compdef _html html
+
 # Porta nei dotfiles le impostazioni di noctalia cambiate dall'interfaccia:
 # la shell scrive in ~/.local/state/noctalia/settings.toml, che non e' nel repo.
 alias noctalia-sync="$DOTFILES_SCRIPTS/noctalia-sync"
 alias accent-sync="$DOTFILES_SCRIPTS/accent-sync"
+alias pa="php artisan"
