@@ -170,6 +170,24 @@ wallpaper_scheme = "m3-content"
     builtin_ids = [ "gtk3", "gtk4", "niri", "qt" ]
     community_ids = [ "bat", "claude-code", "codex", "fzf", "inkscape", "lazygit", "obsidian", "pywalfox", "vscode" ]
 
+    # Extra palette colors (the soft tones used by tmux, starship, kitty, nvim).
+    # blend = false keeps the exact hue; templates read them as
+    # colors.<name>_source.<mode>.hex. Other users: change them here.
+    [theme.templates.custom_colors]
+    soft_bg = { color = "#1c1c1e", blend = false }
+    soft_fg = { color = "#d8ddd9", blend = false }
+    soft_surface = { color = "#2a2b2e", blend = false }
+    soft_surface2 = { color = "#3a3b3e", blend = false }
+    soft_muted = { color = "#7a827c", blend = false }
+    soft_urgent = { color = "#ffb4ab", blend = false }
+    soft_yellow = { color = "#c6a26e", blend = false }
+    soft_teal = { color = "#7eb8b0", blend = false }
+
+    # tmux reads the generated file with source-file (see .tmux.conf).
+    [theme.templates.user.tmux]
+    input_path = "$XDG_CONFIG_HOME/noctalia/templates/tmux-colors.conf"
+    output_path = "$XDG_CONFIG_HOME/tmux/noctalia-colors.conf"
+
 [wallpaper]
 fill_color = "#000000"
 
