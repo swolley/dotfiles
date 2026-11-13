@@ -28,7 +28,14 @@ open_kitty() {   # $1 = cartella iniziale (facoltativa)
     | sort -rn | head -1 | cut -d' ' -f2-)
   [ -n "$target" ] || target=$SESSION
   if [ -n "${1:-}" ]; then
-    setsid kitty -- tmux new-session -A -s "$target" -c "$1" >/dev/null 2>&1 &
+    # con una cartella serve una sessione nuova: "new-session -A" su una
+    # sessione esistente la riaggancia e ignora -c, e si finirebbe altrove
+    name=$(tmux new-session -d -P -F '#{session_name}' -c "$1" 2>/dev/null)
+    if [ -n "$name" ]; then
+      setsid kitty -- tmux attach-session -t "$name" >/dev/null 2>&1 &
+    else
+      setsid kitty -- tmux new-session -A -s "$target" -c "$1" >/dev/null 2>&1 &
+    fi
   else
     setsid kitty -- tmux new-session -A -s "$target" >/dev/null 2>&1 &
   fi
