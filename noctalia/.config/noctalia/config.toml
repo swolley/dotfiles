@@ -210,6 +210,12 @@ wallpaper_scheme = "m3-content"
     output_path = "$XDG_CONFIG_HOME/kitty/noctalia-colors.conf"
     post_hook = "pkill -USR1 -x kitty || true"
 
+    # gitmux has no include: noctalia writes the whole config to the cache and
+    # tmux.conf prefers it over ~/.gitmux.conf (the fallback in the dotfiles).
+    [theme.templates.user.gitmux]
+    input_path = "$XDG_CONFIG_HOME/noctalia/templates/gitmux.conf"
+    output_path = "$XDG_CACHE_HOME/noctalia/gitmux.conf"
+
     # starship reads a single file: noctalia generates the palette and the
     # script joins it with the prompt structure into ~/.config/starship.toml.
     [theme.templates.user.starship]
