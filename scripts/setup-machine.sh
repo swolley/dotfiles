@@ -438,6 +438,21 @@ configure_nautilus_terminal() {
   run gsettings set "$schema" new-tab false
 }
 
+configure_nm_applet() {
+  local schema=org.gnome.nm-applet
+  if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
+    warn "nm-applet non installato, salto"
+    return
+  fi
+  # nm-applet resta perche' fa da agente per le password di wifi e vpn, ma le
+  # sue notifiche di rete connessa e persa sono rumore: lo stato lo mostra gia'
+  # la barra di noctalia, e quelle restavano nel cassetto delle notifiche.
+  # Quelle della vpn no, quelle servono.
+  info "zitto nm-applet su connessione stabilita e persa"
+  run gsettings set "$schema" disable-connected-notifications true
+  run gsettings set "$schema" disable-disconnected-notifications true
+}
+
 # Name of the display manager enabled right now (gdm, sddm, greetd...), empty
 # if there is none: it is the target of the display-manager.service alias.
 current_display_manager() {
@@ -780,6 +795,9 @@ configure_monitors
 
 section "Nautilus"
 configure_nautilus_terminal
+
+section "Notifiche di rete"
+configure_nm_applet
 
 section "Login screen"
 configure_login_manager
