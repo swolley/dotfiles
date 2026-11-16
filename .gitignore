@@ -8,3 +8,11 @@ noctalia/.config/noctalia/90-monitors.local.toml
 # autoload/. Il file resta nel repo perche' stow lo linki, ma smette di
 # sporcare i diff.
 easyeffects/.config/easyeffects/db/easyeffectsrc
+
+# Disposizione dei monitor, scritta da nwg-displays: dipende dagli schermi
+# attaccati e dai connettori che il kernel assegna (lo stesso monitor e' stato
+# DP-2 e poi DP-3). config.kdl lo include, quindi su una macchina nuova
+# setup-machine.sh ne crea uno vuoto: senza il file l'include fallisce.
+# I ritocchi a mano stanno in outputs.local.kdl, che niri fonde con questo.
+niri/.config/niri/monitor.kdl
+niri/.config/niri/monitor.kdl.bak

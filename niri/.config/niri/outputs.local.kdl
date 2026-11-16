@@ -1,35 +1,20 @@
-// Per-machine monitor layout for niri.
-// Replica la disposizione attiva in GNOME (mutter, coordinate logiche),
-// tutti gli schermi a scala 1.25:
+// Ritocchi ai monitor scritti a mano.
 //
-//   +--------------------------+--------+
-//   |                          | eDP-1  |  y=748
-//   |      DP-2  LG 4K         +--------+
-//   |      (0,0) principale    | DP-1   |  y=1612
-//   +--------------------------+--------+
-//                              x=3072
+// La geometria — modo, scala, posizione — non sta qui: la genera nwg-displays
+// in monitor.kdl, che config.kdl include prima di questo file. monitor.kdl
+// dipende dai monitor attaccati a questa macchina e dai connettori che il
+// kernel gli assegna, quindi e' escluso dal repo.
 //
-// Backup del file precedente: outputs.local.kdl.bak-prima-layout-gnome
+// niri fonde i blocchi output con lo stesso nome invece di sostituirli: qui
+// bastano le chiavi che nwg-displays non sa scrivere, e la geometria resta
+// quella sua. Verificato: con questo file ridotto al solo focus-at-startup,
+// DP-3 conserva posizione e scala.
+//
+// Il connettore del monitor grande cambia a seconda della presa usata: e'
+// stato DP-2 e ora e' DP-3. Se un giorno il fuoco iniziale finisce sullo
+// schermo sbagliato, e' questo nome da aggiornare.
 
-// LG HDR 4K. GNOME lo tiene a 30 Hz; qui niente frequenza fissa,
-// cosi' niri usa quella preferita dal monitor (al primo avvio ha scelto 60 Hz).
-output "DP-2" {
-    mode "3840x2160"
-    scale 1.25
-    position x=0 y=0
+// LG HDR 4K: e' il monitor principale, ci nasce sopra il fuoco.
+output "DP-3" {
     focus-at-startup
-}
-
-// Schermo del portatile (AU Optronics)
-output "eDP-1" {
-    mode "1920x1080@60.049"
-    scale 1.25
-    position x=3072 y=748
-}
-
-// Striscia BOE 1920x515, sotto il portatile
-output "DP-1" {
-    mode "1920x515@60.075"
-    scale 1.25
-    position x=3072 y=1612
 }
