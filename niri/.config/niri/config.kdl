@@ -347,6 +347,11 @@ binds {
     XF86MyComputer { spawn-sh "nautilus"; }
     XF86Search     { spawn-sh "$HOME/.config/niri/launcher.sh"; }
     XF86Sleep      { spawn-sh "noctalia msg session suspend"; }
+    // Fn+F5: sulla tastiera e' il tasto delle impostazioni, che il kernel
+    // riporta come KEY_CONFIG e xkb traduce in XF86Tools. Qui non c'e' niente
+    // da configurare, quindi lo uso per Tidal. tidal-hifi tiene una sola
+    // istanza: se e' gia' aperto, rilanciarlo riporta su la finestra.
+    XF86Tools      { spawn-sh "gtk-launch tidal-hifi"; }
     // The power key opens the session menu (lock, suspend, logout, reboot,
     // shutdown) instead of powering off at once.
     XF86PowerOff   { spawn-sh "noctalia msg panel-toggle session"; }
