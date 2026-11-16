@@ -1,0 +1,136 @@
+# Generato da noctalia dal modello nei dotfiles
+# (noctalia/.config/noctalia/templates/kdeglobals). Non modificare qui.
+#
+# Tavolozza per le applicazioni KDE: kdeconnect, krita, easyeffects. Quelle
+# disegnano con qqc2-desktop-style, che i colori non li prende dalla QPalette
+# ne' da qt6ct ma da KColorScheme, cioe' da questo file. Senza, KColorScheme
+# ripiega sul Breeze chiaro compilato dentro, e le finestre KDE si vedono
+# bianche in mezzo a tutto il resto scuro.
+#
+# Le app Qt che KDE non e' (cmake-gui, gli strumenti del toolkit) non passano
+# di qui: leggono qt6ct, che ha un suo file di colori generato dal modello
+# "qt" di serie.
+
+[General]
+ColorScheme=Noctalia
+Name=Noctalia
+# Gli stessi caratteri che gsettings da' alle app GTK. In pratica a fornirli
+# e' qt6ct, verificato cambiando misura; queste righe restano come riserva per
+# quando qt6ct non c'e'.
+font=Adwaita Sans,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+fixed=AdwaitaMono Nerd Font,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+menuFont=Adwaita Sans,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+smallestReadableFont=Adwaita Sans,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+toolBarFont=Adwaita Sans,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+
+[WM]
+activeFont=Adwaita Sans,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+activeBackground={{ colors.surface_container.default.rgb_csv }}
+activeForeground={{ colors.on_surface.default.rgb_csv }}
+inactiveBackground={{ colors.surface.default.rgb_csv }}
+inactiveForeground={{ colors.on_surface_variant.default.rgb_csv }}
+
+[ColorEffects:Disabled]
+Color={{ colors.surface_container_high.default.rgb_csv }}
+ColorAmount=0
+ColorEffect=0
+ContrastAmount=0.65
+ContrastEffect=1
+IntensityAmount=0.1
+IntensityEffect=2
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color={{ colors.outline.default.rgb_csv }}
+ColorAmount=0.025
+ColorEffect=2
+ContrastAmount=0.1
+ContrastEffect=2
+Enable=false
+IntensityAmount=0
+IntensityEffect=0
+
+[Colors:Window]
+BackgroundNormal={{ colors.surface.default.rgb_csv }}
+BackgroundAlternate={{ colors.surface_container.default.rgb_csv }}
+DecorationFocus={{ colors.primary.default.rgb_csv }}
+DecorationHover={{ colors.primary.default.rgb_csv }}
+ForegroundNormal={{ colors.on_surface.default.rgb_csv }}
+ForegroundInactive={{ colors.on_surface_variant.default.rgb_csv }}
+ForegroundActive={{ colors.primary.default.rgb_csv }}
+ForegroundLink={{ colors.primary.default.rgb_csv }}
+ForegroundVisited={{ colors.soft_teal_source.default.rgb_csv }}
+ForegroundNegative={{ colors.error.default.rgb_csv }}
+ForegroundNeutral={{ colors.soft_yellow_source.default.rgb_csv }}
+ForegroundPositive={{ colors.primary.default.rgb_csv }}
+
+[Colors:View]
+BackgroundNormal={{ colors.surface.default.rgb_csv }}
+BackgroundAlternate={{ colors.surface_container_low.default.rgb_csv }}
+DecorationFocus={{ colors.primary.default.rgb_csv }}
+DecorationHover={{ colors.primary.default.rgb_csv }}
+ForegroundNormal={{ colors.on_surface.default.rgb_csv }}
+ForegroundInactive={{ colors.on_surface_variant.default.rgb_csv }}
+ForegroundActive={{ colors.primary.default.rgb_csv }}
+ForegroundLink={{ colors.primary.default.rgb_csv }}
+ForegroundVisited={{ colors.soft_teal_source.default.rgb_csv }}
+ForegroundNegative={{ colors.error.default.rgb_csv }}
+ForegroundNeutral={{ colors.soft_yellow_source.default.rgb_csv }}
+ForegroundPositive={{ colors.primary.default.rgb_csv }}
+
+[Colors:Button]
+BackgroundNormal={{ colors.surface_container.default.rgb_csv }}
+BackgroundAlternate={{ colors.surface_container_high.default.rgb_csv }}
+DecorationFocus={{ colors.primary.default.rgb_csv }}
+DecorationHover={{ colors.primary.default.rgb_csv }}
+ForegroundNormal={{ colors.on_surface.default.rgb_csv }}
+ForegroundInactive={{ colors.on_surface_variant.default.rgb_csv }}
+ForegroundActive={{ colors.primary.default.rgb_csv }}
+ForegroundLink={{ colors.primary.default.rgb_csv }}
+ForegroundVisited={{ colors.soft_teal_source.default.rgb_csv }}
+ForegroundNegative={{ colors.error.default.rgb_csv }}
+ForegroundNeutral={{ colors.soft_yellow_source.default.rgb_csv }}
+ForegroundPositive={{ colors.primary.default.rgb_csv }}
+
+[Colors:Selection]
+BackgroundNormal={{ colors.primary.default.rgb_csv }}
+BackgroundAlternate={{ colors.primary.default.rgb_csv }}
+DecorationFocus={{ colors.primary.default.rgb_csv }}
+DecorationHover={{ colors.primary.default.rgb_csv }}
+ForegroundNormal={{ colors.on_primary.default.rgb_csv }}
+ForegroundInactive={{ colors.on_primary.default.rgb_csv }}
+ForegroundActive={{ colors.on_primary.default.rgb_csv }}
+ForegroundLink={{ colors.on_primary.default.rgb_csv }}
+ForegroundVisited={{ colors.on_primary.default.rgb_csv }}
+ForegroundNegative={{ colors.error.default.rgb_csv }}
+ForegroundNeutral={{ colors.on_primary.default.rgb_csv }}
+ForegroundPositive={{ colors.on_primary.default.rgb_csv }}
+
+[Colors:Tooltip]
+BackgroundNormal={{ colors.surface_container.default.rgb_csv }}
+BackgroundAlternate={{ colors.surface_container_high.default.rgb_csv }}
+DecorationFocus={{ colors.primary.default.rgb_csv }}
+DecorationHover={{ colors.primary.default.rgb_csv }}
+ForegroundNormal={{ colors.on_surface.default.rgb_csv }}
+ForegroundInactive={{ colors.on_surface_variant.default.rgb_csv }}
+ForegroundActive={{ colors.primary.default.rgb_csv }}
+ForegroundLink={{ colors.primary.default.rgb_csv }}
+ForegroundVisited={{ colors.soft_teal_source.default.rgb_csv }}
+ForegroundNegative={{ colors.error.default.rgb_csv }}
+ForegroundNeutral={{ colors.soft_yellow_source.default.rgb_csv }}
+ForegroundPositive={{ colors.primary.default.rgb_csv }}
+
+[Colors:Complementary]
+BackgroundNormal={{ colors.surface.default.rgb_csv }}
+BackgroundAlternate={{ colors.surface_container.default.rgb_csv }}
+ForegroundNormal={{ colors.on_surface.default.rgb_csv }}
+ForegroundInactive={{ colors.on_surface_variant.default.rgb_csv }}
+
+[Colors:Header]
+BackgroundNormal={{ colors.surface_container.default.rgb_csv }}
+BackgroundAlternate={{ colors.surface.default.rgb_csv }}
+ForegroundNormal={{ colors.on_surface.default.rgb_csv }}
+ForegroundInactive={{ colors.on_surface_variant.default.rgb_csv }}
+
+[Icons]
+Theme=Qogir-Dark
