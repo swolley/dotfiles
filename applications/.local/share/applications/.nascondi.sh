@@ -47,10 +47,11 @@ nascondi gcm-picker             "prelievo colore di gnome-color-manager"
 nascondi gcm-import             "importa profili colore"
 nascondi vim                    "l'editor e' neovim; vim resta per il comando vi degli script"
 
-# KDE Connect: l'interfaccia e' il plugin phone-connect sulla barra di
+# KDE Connect: il grosso lo fa il plugin phone-connect sulla barra di
 # noctalia, accoppiamento compreso (il pannello mostra Accoppia accanto ai
-# dispositivi visti in rete). kdeconnect-app resta solo come riserva.
-nascondi org.kde.kdeconnect.app       "il telefono si governa dal widget di noctalia"
+# dispositivi visti in rete). La finestra vera resta pero' nel menu': e' l'unico
+# posto da cui si arriva alle impostazioni per dispositivo, ai plugin e allo
+# sfoglia file del telefono, che la barra non espone.
 nascondi org.kde.kdeconnect.nonplasma "indicatore per desktop senza plasma: lo fa gia' la barra"
 nascondi org.kde.kdeconnect.sms       "gli sms si mandano dal pannello di phone-connect"
 

@@ -16,3 +16,8 @@ easyeffects/.config/easyeffects/db/easyeffectsrc
 # I ritocchi a mano stanno in outputs.local.kdl, che niri fonde con questo.
 niri/.config/niri/monitor.kdl
 niri/.config/niri/monitor.kdl.bak
+
+# Backups that noctalia writes next to its own config when it rewrites it.
+# One of these ended up committed and, finding the twin on disk, blocked the
+# whole stow of the package: templates/ and palettes/ stayed unlinked.
+noctalia/.config/noctalia/*.bak-*

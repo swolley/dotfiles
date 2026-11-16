@@ -48,3 +48,13 @@ networkmanager
 # wireguard-tools provides wg and wg-quick on the command line
 networkmanager-openvpn
 wireguard-tools
+
+# Qt in mezzo a un desktop GTK: nessuno dice alle app Qt che tema usare, e
+# restano sul chiaro di fabbrica. qt6ct fa da tema di piattaforma e legge la
+# tavolozza che noctalia genera in ~/.config/qt6ct/colors/; lo accende la
+# variabile QT_QPA_PLATFORMTHEME in niri/config.kdl.
+#
+# Le app KDE (kdeconnect, krita, easyeffects) non passano di qui: i colori li
+# prendono da ~/.config/kdeglobals, scritto a mano nel pacchetto stow qt/.
+# Niente qt5ct: su questa macchina non resta piu' nessuna app Qt5.
+qt6ct

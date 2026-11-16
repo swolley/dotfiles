@@ -33,6 +33,11 @@ spawn-sh-at-startup "$HOME/.dotfiles/scripts/dotfiles-updates"
 
 environment {
     QT_QPA_PLATFORM "wayland"
+    // Le app Qt non-KDE non hanno nessuno che dia loro una tavolozza: senza
+    // questa riga restano sul chiaro di fabbrica. qt6ct legge i colori che
+    // noctalia genera in ~/.config/qt6ct/colors/. Le app KDE non la usano,
+    // prendono i colori da ~/.config/kdeglobals.
+    QT_QPA_PLATFORMTHEME "qt6ct"
     XWAYLAND "1"
     XDG_CURRENT_DESKTOP "niri"
     XDG_SESSION_TYPE "wayland"
