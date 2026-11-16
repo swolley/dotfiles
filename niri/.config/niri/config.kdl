@@ -330,6 +330,19 @@ binds {
         spawn-sh "noctalia msg brightness-down || brightnessctl s 10%-";
     }
 
+    // Special keys of the keyboard (multimedia/office row).
+    XF86HomePage { spawn-sh "firefox"; }
+    XF86WWW      { spawn-sh "firefox"; }
+    XF86Mail     { spawn-sh "gtk-launch outlook-for-linux"; }
+    XF86Calculator { spawn-sh "gnome-calculator"; }
+    XF86Explorer   { spawn-sh "nautilus"; }
+    XF86MyComputer { spawn-sh "nautilus"; }
+    XF86Search     { spawn-sh "$HOME/.config/niri/launcher.sh"; }
+    XF86Sleep      { spawn-sh "noctalia msg session suspend"; }
+    // The power key opens the session menu (lock, suspend, logout, reboot,
+    // shutdown) instead of powering off at once.
+    XF86PowerOff   { spawn-sh "noctalia msg panel-toggle session"; }
+
     Mod+N {
         spawn-sh "noctalia msg nightlight-toggle";
     }
