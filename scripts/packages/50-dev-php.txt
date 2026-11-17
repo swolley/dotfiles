@@ -7,5 +7,12 @@ php-redis
 php-sodium
 php-sqlite
 php-yaml
+# Database di lavoro: DB2 e Oracle. Vengono da AUR e si tirano dietro da soli
+# i driver nativi (db2-odbc-cli, oracle-instantclient), che sono il grosso del
+# download. A differenza delle estensioni di serie, queste due il loro file in
+# /etc/php/conf.d lo portano nel pacchetto: una volta installate sono gia'
+# attive, non c'e' niente da abilitare a mano.
+php-ibm_db2
+php-oci8
 xdebug
 composer
