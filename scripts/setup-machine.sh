@@ -438,6 +438,39 @@ configure_nautilus_terminal() {
   run gsettings set "$schema" new-tab false
 }
 
+configure_gtk_interface() {
+  local schema=org.gnome.desktop.interface
+  if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
+    warn "schema $schema missing, skipping"
+    return
+  fi
+  # Nothing here sets these: on this machine they survive from the GNOME
+  # session, and a fresh install would not get them. Verified that noctalia
+  # does not fill the gap: with sync_color_scheme = true and the theme
+  # reapplied, color-scheme stayed on "default".
+  #
+  # It matters beyond GTK. The Qt and KDE palettes in the qt/ stow package
+  # name Adwaita Sans and Qogir-Dark outright, so without these the Qt
+  # windows would be the only ones with the right font.
+  #
+  # Qogir is not a given: icons and cursors come from eos-qogir-icons, which
+  # lives in the endeavouros repo and on plain Arch does not exist. Where it
+  # is missing, fall back to Adwaita rather than naming a theme that is not
+  # there, which would leave the applications with no icons at all.
+  local icons=Qogir-Dark cursors=Qogir
+  [ -d /usr/share/icons/Qogir-Dark ] || { icons=Adwaita; warn "Qogir missing (eos-qogir-icons), icons stay on Adwaita"; }
+  [ -d /usr/share/icons/Qogir ] || cursors=Adwaita
+  info "dark theme, fonts and icons for the GTK applications"
+  run gsettings set "$schema" color-scheme prefer-dark
+  run gsettings set "$schema" gtk-theme Adwaita
+  run gsettings set "$schema" icon-theme "$icons"
+  run gsettings set "$schema" cursor-theme "$cursors"
+  run gsettings set "$schema" cursor-size 24
+  run gsettings set "$schema" font-name "Adwaita Sans 9"
+  run gsettings set "$schema" document-font-name "Adwaita Sans 9"
+  run gsettings set "$schema" monospace-font-name "AdwaitaMono Nerd Font 8"
+}
+
 configure_nm_applet() {
   local schema=org.gnome.nm-applet
   if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
@@ -816,6 +849,9 @@ configure_monitors
 
 section "Nautilus"
 configure_nautilus_terminal
+
+section "GTK appearance"
+configure_gtk_interface
 
 section "Notifiche di rete"
 configure_nm_applet

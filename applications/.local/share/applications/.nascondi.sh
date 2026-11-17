@@ -82,6 +82,7 @@ nascondi eos-update "aggiornamento di endeavouros: lo lancio dal terminale"
 # GParted: stessa precedenza, ma qui non si nasconde, si sostituisce il
 # comando. Il percorso del lanciatore va scritto per esteso, perche' nei file
 # .desktop non esistono ne' ~ ne' le variabili d'ambiente.
+if [ -f /usr/share/applications/gparted.desktop ]; then
 cat > gparted.desktop <<FINE
 [Desktop Entry]
 # lanciato tramite gparted-wayland: vedi i commenti in quello script
@@ -95,3 +96,4 @@ Keywords=Partition;Partizioni;Disco;
 Terminal=false
 StartupNotify=true
 FINE
+fi

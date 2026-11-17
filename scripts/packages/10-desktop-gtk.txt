@@ -39,6 +39,10 @@ xdg-user-dirs
 xdg-user-dirs-gtk
 xdg-utils
 adwaita-icon-theme
+# Adwaita Sans e AdwaitaMono: i caratteri che gsettings assegna alle app GTK e
+# che i file in qt/ nominano per Qt e KDE. Senza, quelle finestre sarebbero le
+# uniche con un carattere diverso.
+adwaita-fonts
 gnome-themes-extra
 cantarell-fonts
 power-profiles-daemon

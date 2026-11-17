@@ -44,8 +44,16 @@ eos-update() {
 		echo "❌ No AUR helper found (install paru or yay)"
 		return 1
 	fi
-	# eos-update accepts --paru / --yay (same as --helper=<name>)
-	command eos-update "--$AUR_HELPER" --descriptions "$@"
+	# eos-update e' di EndeavourOS: su Arch liscia non esiste. Quando c'e' lo
+	# uso, perche' oltre all'aggiornamento riordina i mirror e segnala le
+	# notizie; altrimenti ripiego sull'helper, che fa la parte che conta.
+	# Il nome resta questo per memoria muscolare.
+	if command -v eos-update >/dev/null 2>&1; then
+		# eos-update accepts --paru / --yay (same as --helper=<name>)
+		command eos-update "--$AUR_HELPER" --descriptions "$@"
+	else
+		"$AUR_HELPER" -Syu "$@"
+	fi
 }
 
 alias ports='netstat -tulanp'
