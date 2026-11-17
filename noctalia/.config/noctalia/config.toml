@@ -236,6 +236,9 @@ wallpaper_scheme = "m3-content"
     [theme.templates.user.kdeglobals]
     input_path = "$XDG_CONFIG_HOME/noctalia/templates/kdeglobals"
     output_path = "$XDG_CONFIG_HOME/kdeglobals"
+    # noctalia riconosce questo output e, con l'azione, avvisa le app KDE gia'
+    # aperte che la tavolozza e' cambiata: si ricolorano senza riaprirle.
+    post_action = "kde-color-scheme"
 
     # starship reads a single file: noctalia generates the palette and the
     # script joins it with the prompt structure into ~/.config/starship.toml.
