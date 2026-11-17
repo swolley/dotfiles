@@ -438,6 +438,48 @@ configure_nautilus_terminal() {
   run gsettings set "$schema" new-tab false
 }
 
+install_qogir() {
+  # The icon and cursor theme that configure_gtk_interface then selects. It is
+  # not in a package list because the name depends on the distribution:
+  # EndeavourOS has eos-qogir-icons in its own repo, plain Arch only the AUR
+  # build. They install the same paths, so whichever is already there wins and
+  # nothing else is touched.
+  if [ -d /usr/share/icons/Qogir-Dark ]; then
+    ok "Qogir already installed"
+    return
+  fi
+  local pkg=qogir-icon-theme
+  if pacman -Si eos-qogir-icons >/dev/null 2>&1; then
+    pkg=eos-qogir-icons
+  fi
+  info "icon and cursor theme: $pkg"
+  run "$HELPER" -S --needed --noconfirm "$pkg"
+}
+
+configure_php_extensions() {
+  local src="$REPO_DIR/scripts/php-conf.d"
+  local dst=/etc/php/conf.d
+  command -v php >/dev/null || { info "php not installed, skipping"; return; }
+  [ -d "$src" ] || { warn "$src missing, skipping"; return; }
+  # The extensions Arch builds into the php package do not switch themselves
+  # on: the package ships the module but not the file that loads it. Without a
+  # line in conf.d they stay off, and a fresh machine would install the whole
+  # php group and find itself without gd, intl, pdo_pgsql and the rest.
+  #
+  # Only the ones nobody owns: imagick, redis, yaml, igbinary, xdebug, ibm_db2
+  # and oci8 carry their own file in their package.
+  local f name
+  for f in "$src"/*.ini; do
+    [ -e "$f" ] || continue
+    name=$(basename "$f")
+    if cmp -s "$f" "$dst/$name"; then
+      continue
+    fi
+    info "enabling ${name%.ini}"
+    run sudo install -Dm644 "$f" "$dst/$name"
+  done
+}
+
 configure_gtk_interface() {
   local schema=org.gnome.desktop.interface
   if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
@@ -850,7 +892,11 @@ configure_monitors
 section "Nautilus"
 configure_nautilus_terminal
 
+section "PHP extensions"
+configure_php_extensions
+
 section "GTK appearance"
+install_qogir
 configure_gtk_interface
 
 section "Notifiche di rete"
