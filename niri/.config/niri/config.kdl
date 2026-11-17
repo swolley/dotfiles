@@ -55,7 +55,7 @@ environment {
 
 input {
     keyboard {
-        repeat-delay 200
+        repeat-delay 350
         repeat-rate 35
         xkb {
         }
