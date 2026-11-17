@@ -523,7 +523,7 @@ configure_nm_applet() {
   # sue notifiche di rete connessa e persa sono rumore: lo stato lo mostra gia'
   # la barra di noctalia, e quelle restavano nel cassetto delle notifiche.
   # Quelle della vpn no, quelle servono.
-  info "zitto nm-applet su connessione stabilita e persa"
+  info "silencing nm-applet on connected and disconnected"
   run gsettings set "$schema" disable-connected-notifications true
   run gsettings set "$schema" disable-disconnected-notifications true
 }
@@ -899,7 +899,7 @@ section "GTK appearance"
 install_qogir
 configure_gtk_interface
 
-section "Notifiche di rete"
+section "Network notifications"
 configure_nm_applet
 
 section "Login screen"
@@ -921,7 +921,6 @@ section "Done"
 cat <<'EOF'
     Still to do by hand, because they depend on choices or secrets:
 
-      - graphical session:  choose GNOME or Niri on the login screen
       - NVIDIA Optimus:     envycontrol -s integrated|hybrid|nvidia (then reboot)
       - monitor layout:     nwg-displays (the script has already configured the bar)
       - noctalia:           the settings tied to this machine (monitors,
