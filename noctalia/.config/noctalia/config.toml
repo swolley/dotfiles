@@ -67,7 +67,12 @@ fingerprint = false
 # Inattivita': blocco dopo 3 minuti, schermo spento a 4 (lo spegnimento deve
 # restare piu' alto del blocco, cosi' avviene a sessione gia' bloccata).
 # La sospensione resta spenta (idle.behavior.lock-and-suspend).
-grace_period_seconds = 10
+# Nessun periodo di grazia: con un valore > 0 qualunque tasto sblocca senza
+# password per quei secondi dopo il blocco.
+grace_period_seconds = 0
+# Blocca prima di ogni sospensione (tasto sospendi, chiusura schermo,
+# systemctl suspend), anche quando a sospendere e' logind e non noctalia.
+lock_before_suspend = true
 
 [idle.behavior.lock]
 enabled = true
