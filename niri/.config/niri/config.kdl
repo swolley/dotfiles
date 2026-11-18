@@ -273,7 +273,7 @@ binds {
         spawn-sh "nautilus";
     }
 
-    Mod+Alt+Space hotkey-overlay-title="Toggle floating window" {
+    Mod+Space hotkey-overlay-title="Toggle floating window" {
         toggle-window-floating;
     }
 
