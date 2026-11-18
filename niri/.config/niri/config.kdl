@@ -346,7 +346,7 @@ binds {
     XF86Explorer   { spawn-sh "nautilus"; }
     XF86MyComputer { spawn-sh "nautilus"; }
     XF86Search     { spawn-sh "$HOME/.config/niri/launcher.sh"; }
-    XF86Sleep      { spawn-sh "noctalia msg session suspend"; }
+    XF86Sleep      { spawn-sh "noctalia msg session lock-and-suspend"; }
     // Fn+F5: sulla tastiera e' il tasto delle impostazioni, che il kernel
     // riporta come KEY_CONFIG e xkb traduce in XF86Tools. Qui non c'e' niente
     // da configurare, quindi lo uso per Tidal. tidal-hifi tiene una sola
