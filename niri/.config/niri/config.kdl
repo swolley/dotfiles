@@ -356,7 +356,7 @@ binds {
     XF86Explorer   { spawn-sh "nautilus"; }
     XF86MyComputer { spawn-sh "nautilus"; }
     XF86Search     { spawn-sh "$HOME/.config/niri/launcher.sh"; }
-    XF86Sleep      { spawn-sh "noctalia msg session lock-and-suspend"; }
+    XF86Sleep      { spawn-sh "noctalia msg session lock"; }
     // Personal preference kept here temporarily; final decision (move it to a
     // local/override file or keep it as the default) is deferred.
     // Fn+F5: on the keyboard this is the settings key, which the kernel

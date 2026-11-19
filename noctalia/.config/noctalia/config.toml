@@ -67,7 +67,7 @@ fingerprint = false
 transition = ["fade"]
 transition_duration = 400
 
-# Inactivity: lock after 3 minutes, screen off at 4 (the screen-off timeout
+# Inactivity: lock after 2 minutes, screen off at 3 (the screen-off timeout
 # must stay higher than the lock one, so it happens with the session already
 # locked). Suspend stays off (idle.behavior.lock-and-suspend).
 # No grace period: with a value > 0 any key unlocks without a password for
@@ -77,13 +77,17 @@ grace_period_seconds = 0
 # even when it is logind that suspends and not noctalia.
 lock_before_suspend = true
 
+# "action" selects what the behavior does (lock, screen-off, suspend,
+# lock-and-suspend, custom); left empty the behavior does nothing.
 [idle.behavior.lock]
+action = "lock"
 enabled = true
-timeout = 180
+timeout = 120
 
 [idle.behavior.screen-off]
+action = "screen-off"
 enabled = true
-timeout = 240
+timeout = 180
 
 [plugin_settings."ayagmar/headroom"]
 # bar_style and bar_accounts were here up to 0.2; since 0.3 they are widget
