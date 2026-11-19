@@ -169,7 +169,10 @@ hotkey-overlay {
     skip-at-startup
 }
 
-screenshot-path "~/Immagini/Schermate/Screenshot from %Y-%m-%d %H-%M-%S.png"
+// Gli screenshot normali li fa noctalia, che salva nella cartella Immagini
+// dell'utente. Quello interno di niri (Ctrl+Print, riserva) non conosce le
+// cartelle XDG: lo tengo solo negli appunti, senza scrivere file.
+screenshot-path null
 
 animations {
 }
@@ -507,7 +510,7 @@ binds {
     Mod+Shift+8 { move-column-to-workspace 8; }
     Mod+Shift+9 { move-column-to-workspace 9; }
 
-    // Screenshot di noctalia, come su GNOME: salvano in ~/Immagini/Schermate.
+    // Screenshot di noctalia, come su GNOME: salvano nella cartella Immagini dell'utente (XDG).
     // Stamp = schermo intero, Alt+Stamp = finestra attiva, Maiusc+Stamp = area.
     Print       { spawn-sh "noctalia msg screenshot-fullscreen"; }
     Alt+Print   { spawn-sh "noctalia msg screenshot-window"; }
