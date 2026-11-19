@@ -876,6 +876,17 @@ if [ "$DO_STOW" -eq 1 ]; then
     fi
   fi
 
+  # config.kdl also includes outputs.local.kdl (hand-written tweaks, ignored by
+  # git, see outputs.local.kdl.example): same reason, create an empty one.
+  loc="$REPO_DIR/niri/.config/niri/outputs.local.kdl"
+  if [ ! -f "$loc" ]; then
+    info "creating an empty outputs.local.kdl"
+    if [ "$DRY_RUN" -eq 0 ]; then
+      printf '%s\n' "// Hand-written monitor tweaks of this machine. See outputs.local.kdl.example." > "$loc"
+      stow --restow niri >/dev/null 2>&1 || true
+    fi
+  fi
+
   # qt6ct wants an absolute path to the color file and expands neither ~ nor
   # $HOME: the one in the repo is written for this machine. Realign it to the
   # home of whoever is running, so the Qt apps are not left without a palette.

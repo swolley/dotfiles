@@ -24,3 +24,7 @@ noctalia/.config/noctalia/*.bak-*
 
 # Personal noctalia settings (avatar, wallpaper, paths): they depend on the home directory.
 noctalia/.config/noctalia/91-user.local.toml
+
+# Hand-written monitor tweaks of this machine (focus-at-startup...). See
+# outputs.local.kdl.example; setup-machine.sh creates an empty one.
+niri/.config/niri/outputs.local.kdl
