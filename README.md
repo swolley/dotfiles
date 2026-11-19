@@ -2,6 +2,8 @@
 
 Personal configuration files managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
+To use this on your own machine, read [docs/ADAPTING.md](docs/ADAPTING.md) first: it lists what is personal, what is generated per machine and what to change. Licensed under the [MIT license](LICENSE).
+
 Each top-level directory is a **stow package**. Stow creates symlinks from that package into `$HOME`, mirroring the directory tree inside the package.
 
 ## Structure
