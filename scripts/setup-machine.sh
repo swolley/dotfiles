@@ -536,6 +536,24 @@ configure_gtk_interface() {
   run gsettings set "$schema" monospace-font-name "AdwaitaMono Nerd Font 8"
 }
 
+# Turtle keeps its settings in dconf, not in a file, so they cannot live in
+# the dotfiles: they are applied here. Only the values that differ from the
+# defaults.
+configure_turtle() {
+  local schema=de.philippun1.turtle
+  if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
+    warn "turtle not installed, skipping"
+    return
+  fi
+  info "turtle: git menu and emblems only inside repos, status emblem on"
+  run gsettings set "$schema" enable-everywhere false
+  run gsettings set "$schema" restrict-to-home false
+  run gsettings set "$schema" show-compare false
+  run gsettings set "$schema" show-status-emblem true
+  run gsettings set "$schema" show-turtle-emblem false
+  run gsettings set "$schema" commit-show-ignored true
+}
+
 configure_nm_applet() {
   local schema=org.gnome.nm-applet
   if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
@@ -948,6 +966,7 @@ configure_user_settings
 
 section "Nautilus"
 configure_nautilus_terminal
+configure_turtle
 
 section "PHP extensions"
 configure_php_extensions
