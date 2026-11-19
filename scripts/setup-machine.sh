@@ -44,8 +44,9 @@ IDES=(
 )
 
 # System and user services to re-enable.
-# Those that do not exist on this machine (package not installed) are
-# skipped: the unit is checked first and only then enabled.
+# Those that do not exist on this machine (package not installed) are skipped
+# without a word: the unit is checked first and only then enabled, and a
+# missing one is the normal case for a list that covers several machines.
 # forticlient: without its service the FortiClient GUI does not show its window.
 # The login manager (greetd) is not here: configure_login_manager handles it,
 # because it must never run alongside another display manager.
@@ -882,7 +883,8 @@ if [ "$DO_SERVICES" -eq 1 ]; then
   section "Services"
   for s in "${SERVICES_SYSTEM[@]}"; do
     if ! systemctl cat "$s" >/dev/null 2>&1; then
-      warn "$s not installed, skipping"
+      # no unit, no package: an expected case, not worth a line of output
+      :
     elif systemctl is-enabled --quiet "$s" 2>/dev/null; then
       info "$s already enabled"
     else
@@ -891,7 +893,7 @@ if [ "$DO_SERVICES" -eq 1 ]; then
   done
   for s in "${SERVICES_USER[@]}"; do
     if ! systemctl --user cat "$s" >/dev/null 2>&1; then
-      warn "$s (user) not installed, skipping"
+      :
     elif systemctl --user is-enabled --quiet "$s" 2>/dev/null; then
       info "$s (user) already enabled"
     else
