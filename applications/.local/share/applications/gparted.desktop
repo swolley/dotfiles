@@ -3,7 +3,7 @@
 Type=Application
 Name=GParted
 Comment=Create, reorganize, and delete partitions
-Exec=/home/swolley/.local/share/applications/gparted-wayland %f
+Exec=sh -c "exec \"\\$HOME/.local/share/applications/gparted-wayland\" \"\\$@\"" sh %f
 Icon=gparted
 Categories=System;Filesystem;
 Keywords=Partition;Partizioni;Disco;
