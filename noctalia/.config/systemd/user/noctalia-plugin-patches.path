@@ -1,0 +1,11 @@
+[Unit]
+Description=Re-apply local plugin patches when noctalia re-materializes a plugin
+
+[Path]
+# The plugin directory is replaced when noctalia updates a plugin.
+PathChanged=%h/.local/state/noctalia/plugins/materialized/community
+TriggerLimitIntervalSec=30
+TriggerLimitBurst=1
+
+[Install]
+WantedBy=default.target

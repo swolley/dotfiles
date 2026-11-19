@@ -1,0 +1,7 @@
+[Unit]
+Description=Re-apply local patches to noctalia community plugins
+
+[Service]
+Type=oneshot
+# Let the plugin update finish writing before patching.
+ExecStart=/bin/sh -c 'sleep 3; exec "%h/.dotfiles/scripts/patch-plugins"'

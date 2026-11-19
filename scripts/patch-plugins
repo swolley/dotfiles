@@ -1,0 +1,26 @@
+#!/bin/sh
+# Re-apply the small local patches to noctalia community plugins.
+#
+# Community plugins are re-materialized from upstream whenever noctalia updates
+# them, which overwrites any edit made in place. The patches live here instead,
+# are idempotent, and are re-run by noctalia-plugin-patches.path whenever the
+# plugin directory changes.
+#
+# Patches:
+#   vpn-manager: clicking the shortcut with no default VPN set shows an error
+#   toast ("no default connection") on top of opening the panel. The panel is
+#   enough, so the toast is dropped.
+set -eu
+
+PLUGINS="${XDG_STATE_HOME:-$HOME/.local/state}/noctalia/plugins/materialized/community"
+
+patch_vpn_manager() {
+  f="$PLUGINS/vpn-manager/shortcut.luau"
+  [ -f "$f" ] || return 0
+  if /usr/bin/grep -q 'noctalia.notifyError(noctalia.tr("title"), noctalia.tr("notifications.no_default"))' "$f"; then
+    sed -i '/noctalia.notifyError(noctalia.tr("title"), noctalia.tr("notifications.no_default"))/d' "$f"
+    echo "patch-plugins: patched vpn-manager"
+  fi
+}
+
+patch_vpn_manager
