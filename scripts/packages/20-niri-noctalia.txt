@@ -8,6 +8,9 @@ nwg-displays
 # the gnome-terminal one is hardcoded and would open a new window
 nautilus
 nautilus-open-any-terminal
+# git status emblems and a git menu in the file manager (AUR); it depends on
+# meld for its diffs, so meld must not be in remove.txt
+turtle
 brightnessctl
 grim
 slurp

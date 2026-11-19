@@ -56,8 +56,8 @@ xorg-xkill
 # --- duplicates and replaced tools
 # the terminal is kitty
 xterm
-# file comparison is done with git difftool and lazygit
-meld
+# file comparison is done with git difftool and lazygit (meld stays: turtle,
+# the git integration of the file manager, depends on it)
 # btrfs snapshots are managed with snapper from the command line
 btrfs-assistant
 # polkit-gnome: noctalia provides the agent. Verified: its binary links
