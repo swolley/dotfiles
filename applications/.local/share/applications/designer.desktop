@@ -4,4 +4,5 @@ Type=Application
 Name=Qt Widgets Designer
 Exec=designer6 %F
 Icon=designer
+MimeType=application/x-designer;
 NoDisplay=true
