@@ -32,7 +32,7 @@ creates the first two; the others you create or let the tools write.
 | `~/.config/noctalia/90-monitors.local.toml` | which monitor shows bars, OSD, notifications | `setup-machine.sh` |
 | `~/.config/noctalia/91-user.local.toml` | terminal command, avatar, wallpaper (absolute paths) | `setup-machine.sh`; see `91-user.local.toml.example` |
 | `~/.config/niri/monitor.kdl` | monitor layout (mode, scale, position, rotation) | `nwg-displays`, or by hand; empty file on a new machine |
-| `~/.config/niri/outputs.local.kdl` | hand-written monitor tweaks (`focus-at-startup`...) | edit; see `outputs.local.kdl.example` |
+| `~/.config/niri/outputs.local.kdl` | hand-written monitor tweaks (`focus-at-startup`...) | empty from `setup-machine.sh`; edit, see `outputs.local.kdl.example` |
 
 niri merges `output` blocks with the same name, so `outputs.local.kdl` only
 needs the keys `nwg-displays` cannot write. Connector names (`DP-1`...) change
@@ -51,7 +51,15 @@ These are the author's preferences, marked with a comment in the files as
 - `zshrc/.zshrc_customs.zsh`: the `html` helper and `HTML_BASE_PATH` (the
   author's project folders).
 - `scripts/remove.txt` and `scripts/packages/`: which packages to install and
-  remove, including `30-nvidia.txt` (Optimus laptop) and the dev stacks.
+  remove, and the dev stacks. `30-nvidia.txt` is only installed when an NVIDIA GPU is
+  detected (`lspci`), so it needs no editing.
+- `easyeffects/`: presets, impulse responses and EQ curves for the author's
+  headphones and microphone (HIFIMAN Sundara, MEE Audio M6 Pro, RODE NTH-100,
+  Monolith M565C). Useless for other hardware; the decision on how to split it
+  out is deferred. Do not stow this package unless you have the same devices.
+- Noctalia plugins in `[plugins] enabled`: `phone-connect` (KDE Connect),
+  `headroom` (Claude usage), `vpn-manager`, `arch-updater`, `screen-toolkit`.
+  Keep what you use; the shared list is deferred like the items above.
 - Keyboard layout: `niri/.config/niri/config.kdl` `input { keyboard { xkb } }`
   is left empty (system default).
 
