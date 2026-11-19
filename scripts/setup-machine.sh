@@ -343,17 +343,17 @@ configure_monitors() {
 
   # Default on enter: the already configured primary, if it is still connected;
   # otherwise the largest monitor.
-  local attuale default=0 da_attuale=0 i=1 nota
-  attuale=$(current_primary "$target")
-  if [ -n "$attuale" ]; then
+  local current default=0 from_current=0 i=1 note
+  current=$(current_primary "$target")
+  if [ -n "$current" ]; then
     for m in "${mons[@]}"; do
-      [ "${m%%$'\t'*}" = "$attuale" ] && default=$i
+      [ "${m%%$'\t'*}" = "$current" ] && default=$i
       i=$((i+1))
     done
     if [ "$default" -gt 0 ]; then
-      da_attuale=1
+      from_current=1
     else
-      warn "the saved primary ($attuale) is not connected"
+      warn "the saved primary ($current) is not connected"
     fi
   fi
   [ "$default" -gt 0 ] || default=$(largest_monitor)
@@ -361,27 +361,27 @@ configure_monitors() {
   info "Detected monitors:"
   i=1
   for m in "${mons[@]}"; do
-    nota=""
+    note=""
     if [ "$i" -eq "$default" ]; then
-      if [ "$da_attuale" -eq 1 ]; then nota=" (current primary)"; else nota=" (the largest)"; fi
+      if [ "$from_current" -eq 1 ]; then note=" (current primary)"; else note=" (the largest)"; fi
     fi
-    printf '      %d) %-12s %s%s\n' "$i" "${m%%$'\t'*}" "${m#*$'\t'}" "$nota"
+    printf '      %d) %-12s %s%s\n' "$i" "${m%%$'\t'*}" "${m#*$'\t'}" "$note"
     i=$((i+1))
   done
 
-  local scelta=$default
+  local choice=$default
   if [ "$ASSUME_YES" -eq 0 ]; then
-    read -rp "    Which is the main monitor? [1-${#mons[@]}, enter = $default] " scelta </dev/tty || scelta=$default
-    [ -n "$scelta" ] || scelta=$default
+    read -rp "    Which is the main monitor? [1-${#mons[@]}, enter = $default] " choice </dev/tty || choice=$default
+    [ -n "$choice" ] || choice=$default
   fi
-  case "$scelta" in
-    ''|*[!0-9]*) warn "invalid choice, using $default"; scelta=$default ;;
+  case "$choice" in
+    ''|*[!0-9]*) warn "invalid choice, using $default"; choice=$default ;;
   esac
-  [ "$scelta" -ge 1 ] && [ "$scelta" -le ${#mons[@]} ] || { warn "out of range, using $default"; scelta=$default; }
+  [ "$choice" -ge 1 ] && [ "$choice" -le ${#mons[@]} ] || { warn "out of range, using $default"; choice=$default; }
 
-  local primario
-  primario="${mons[$((scelta-1))]%%$'\t'*}"
-  ok "main: $primario (fixed bar; auto-hide on the others)"
+  local primary
+  primary="${mons[$((choice-1))]%%$'\t'*}"
+  ok "main: $primary (fixed bar; auto-hide on the others)"
 
   if [ "$DRY_RUN" -eq 1 ]; then
     echo -e "    ${DIM}\$ writing $target${RESET}"
@@ -394,16 +394,16 @@ configure_monitors() {
     echo "# Not in the dotfiles. Re-run the script to regenerate it."
     echo
     echo "[notification]"
-    echo "monitors = [ \"$primario\" ]"
+    echo "monitors = [ \"$primary\" ]"
     echo
     echo "[osd]"
-    echo "monitors = [ \"$primario\" ]"
+    echo "monitors = [ \"$primary\" ]"
     echo
-    echo "[dock.monitor.$primario]"
+    echo "[dock.monitor.$primary]"
     echo "enabled = true"
     for m in "${mons[@]}"; do
       local conn="${m%%$'\t'*}"
-      [ "$conn" = "$primario" ] && continue
+      [ "$conn" = "$primary" ] && continue
       echo
       # Dock on the other screens: hidden until you move the pointer to the
       # edge (no "smart" mode, which would show it on every empty screen).
@@ -898,10 +898,10 @@ if [ "$DO_STOW" -eq 1 ]; then
   # nothing under niri. Stow only puts in place the files the script has
   # already generated; re-running it covers entries that appeared in the
   # meantime and those that have a different name on this machine.
-  nascondi="$HOME/.local/share/applications/.nascondi.sh"
-  if [ -x "$nascondi" ]; then
+  hide_apps="$HOME/.local/share/applications/.hide-apps.sh"
+  if [ -x "$hide_apps" ]; then
     info "hiding the useless menu entries"
-    run "$nascondi"
+    run "$hide_apps"
     run update-desktop-database "$HOME/.local/share/applications"
   fi
 fi

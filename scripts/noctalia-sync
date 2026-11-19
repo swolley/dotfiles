@@ -69,85 +69,85 @@ def render(bs):
 KEY = re.compile(r"^\s*([A-Za-z0-9_.\"'-]+)\s*=")
 
 
-def voci(blocco):
+def entries(block):
     """Split the body of a block into entries (key, lines).
 
     Comments and blank lines attach to the key that follows them, so a
     replaced key brings its own comment along. Keys whose value spans several
     lines (arrays) are recognized by counting the brackets still open.
     """
-    out, buf, sospese, chiave, aperte = [], [], [], None, 0
-    for riga in blocco[1:]:
-        commento = riga.lstrip().startswith("#")
-        if aperte == 0 and (commento or not riga.strip()):
-            sospese.append(riga)
+    out, buf, pending, key, open_brackets = [], [], [], None, 0
+    for line in block[1:]:
+        is_comment = line.lstrip().startswith("#")
+        if open_brackets == 0 and (is_comment or not line.strip()):
+            pending.append(line)
             continue
-        if aperte == 0 and KEY.match(riga):
+        if open_brackets == 0 and KEY.match(line):
             if buf:
-                out.append((chiave, buf))
-            buf, chiave = sospese + [riga], KEY.match(riga).group(1)
+                out.append((key, buf))
+            buf, key = pending + [line], KEY.match(line).group(1)
         else:
-            buf += sospese + [riga]
-        sospese = []
-        if not commento:
-            aperte += riga.count("[") - riga.count("]")
+            buf += pending + [line]
+        pending = []
+        if not is_comment:
+            open_brackets += line.count("[") - line.count("]")
     if buf:
-        out.append((chiave, buf))
-    if sospese:
-        out.append((None, sospese))
+        out.append((key, buf))
+    if pending:
+        out.append((None, pending))
     return out
 
 
-def rientra(righe, da, a):
-    """Re-indent a block of lines from indentation `da` to `a`.
+def reindent(lines, src, dst):
+    """Re-indent a block of lines from indentation `src` to `dst`.
 
     The state file writes nested tables without indentation, while the repo
     keeps them indented: without this every sync would flatten the file.
     """
-    if da == a:
-        return righe
-    return [a + r[len(da):] if r.startswith(da) else r for r in righe]
+    if src == dst:
+        return lines
+    return [dst + r[len(src):] if r.startswith(src) else r for r in lines]
 
 
-def spazi(riga):
-    return riga[: len(riga) - len(riga.lstrip())]
+def indent(line):
+    return line[: len(line) - len(line.lstrip())]
 
 
-def unisci(repo, stato):
+def merge(repo, state):
     """Merge a repo block with its namesake from the state file.
 
     The state wins on the keys it defines, but keys present only in the repo
     must be preserved: replacing the whole block would lose them and the
     effective configuration would change.
     """
-    da_stato = {k: righe for k, righe in voci(stato) if k is not None}
-    fuso, usate = [repo[0]], set()
-    for k, righe in voci(repo):
-        if k is not None and k in da_stato:
-            fuso += rientra(da_stato[k], spazi(da_stato[k][0]), spazi(righe[0]))
-            usate.add(k)
+    from_state = {k: lines for k, lines in entries(state) if k is not None}
+    merged, used = [repo[0]], set()
+    for k, lines in entries(repo):
+        if k is not None and k in from_state:
+            merged += reindent(from_state[k], indent(from_state[k][0]), indent(lines[0]))
+            used.add(k)
         else:
-            fuso += righe
-    for k, righe in voci(stato):
-        if k is not None and k not in usate:
-            fuso += righe
-    return fuso
+            merged += lines
+    for k, lines in entries(state):
+        if k is not None and k not in used:
+            merged += lines
+    return merged
 
 
-def separa(header, blocco):
+def split_block(header, block):
     """Split a block into (to move, to leave in the state file).
 
     Needed for blocks that are shared for almost everything except a few keys:
     those listed in LOCAL_KEYS stay where the shell wrote them.
     """
-    locali = LOCAL_KEYS.get(header)
-    if not locali:
-        return blocco, None
-    tieni, sposta = [blocco[0]], [blocco[0]]
-    for k, righe in voci(blocco):
-        (tieni if k in locali else sposta).extend(righe)
-    return (sposta if len(sposta) > 1 else None,
-            tieni if len(tieni) > 1 else None)
+    local_keys = LOCAL_KEYS.get(header)
+    if not local_keys:
+        return block, None
+    keep, move = [block[0]], [block[0]]
+    for k, lines in entries(block):
+        (keep if k in local_keys else move).extend(lines)
+    return (move if len(move) > 1 else None,
+            keep if len(keep) > 1 else None)
 
 
 def main():
@@ -164,15 +164,15 @@ def main():
     pre_state, st_blocks = blocks(STATE.read_text())
     pre_shared, sh_blocks = blocks(SHARED.read_text())
 
-    movable, trattenuti = [], []
+    movable, kept = [], []
     for h, b in st_blocks:
         if any(p.match(h) for p in LOCAL):
             continue
-        sposta, tieni = separa(h, b)
-        if sposta:
-            movable.append((h, sposta))
-        if tieni:
-            trattenuti.append((h, tieni))
+        move, keep = split_block(h, b)
+        if move:
+            movable.append((h, move))
+        if keep:
+            kept.append((h, keep))
     if not movable:
         print("nothing to move: the state file only contains settings specific to this machine")
         return
@@ -188,46 +188,46 @@ def main():
 
     # In the repo: replace namesake blocks, append new ones at the end.
     # Array tables ([[x]]) can repeat: they are moved as a group.
-    gruppi = {}
+    groups = {}
     for h, b in movable:
-        gruppi.setdefault(h, []).append(b)
+        groups.setdefault(h, []).append(b)
 
-    risultato, visti = [], set()
+    result, seen = [], set()
     for h, b in sh_blocks:
-        if h in gruppi:
-            if h not in visti:
+        if h in groups:
+            if h not in seen:
                 # A regular table is merged key by key; array tables ([[x]])
                 # repeat and have no comparable keys, so the whole group is
                 # replaced.
-                if h.startswith("[[") or len(gruppi[h]) > 1:
-                    risultato += [(h, x) for x in gruppi[h]]
+                if h.startswith("[[") or len(groups[h]) > 1:
+                    result += [(h, x) for x in groups[h]]
                 else:
-                    risultato.append((h, unisci(b, gruppi[h][0])))
-                visti.add(h)
+                    result.append((h, merge(b, groups[h][0])))
+                seen.add(h)
         else:
-            risultato.append((h, b))
-    for h, bs in gruppi.items():
-        if h not in visti:
-            risultato += [(h, x) for x in bs]
-            visti.add(h)
+            result.append((h, b))
+    for h, bs in groups.items():
+        if h not in seen:
+            result += [(h, x) for x in bs]
+            seen.add(h)
 
-    restano = [(h, b) for h, b in st_blocks
-               if any(p.match(h) for p in LOCAL)] + trattenuti
+    remaining = [(h, b) for h, b in st_blocks
+               if any(p.match(h) for p in LOCAL)] + kept
 
-    prima = subprocess.run(["noctalia", "config", "export", "full"],
+    before = subprocess.run(["noctalia", "config", "export", "full"],
                            capture_output=True, text=True).stdout
 
     shutil.copy2(STATE, str(STATE) + ".bak-sync")
     shutil.copy2(SHARED, str(SHARED) + ".bak-sync")
-    SHARED.write_text("\n".join(pre_shared).rstrip("\n") + "\n\n" + render(risultato))
-    STATE.write_text("\n".join(x for x in pre_state if x.strip()) + "\n\n" + render(restano))
+    SHARED.write_text("\n".join(pre_shared).rstrip("\n") + "\n\n" + render(result))
+    STATE.write_text("\n".join(x for x in pre_state if x.strip()) + "\n\n" + render(remaining))
 
     for f in (STATE, SHARED):
         tomllib.loads(f.read_text())
 
-    dopo = subprocess.run(["noctalia", "config", "export", "full"],
+    after = subprocess.run(["noctalia", "config", "export", "full"],
                           capture_output=True, text=True).stdout
-    if prima and prima != dopo:
+    if before and before != after:
         print("WARNING: the effective configuration changed. Restoring backups.",
               file=sys.stderr)
         shutil.copy2(str(STATE) + ".bak-sync", STATE)
