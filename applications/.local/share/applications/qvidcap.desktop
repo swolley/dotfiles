@@ -1,5 +1,5 @@
 [Desktop Entry]
-# cattura video di v4l-utils
+# video capture from v4l-utils
 Type=Application
 Name=Qt V4L2 video capture utility
 Exec=qvidcap

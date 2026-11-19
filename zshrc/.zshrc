@@ -83,16 +83,16 @@ export PATH=$PATH:$JAVA_HOME/bin
 eval "$(starship init zsh)"
 
 # Auto-start tmux if not already inside tmux and close it when exiting.
-# Solo in un terminale vero (stdin e stdout su tty), e non in quelli di VS Code /
-# Cursor (TERM_PROGRAM=vscode, VSCODE_INJECTION) ne' nelle shell di Claude Code
-# (CLAUDECODE) ne' nel pannello terminale dell'app Claude desktop
-# (CLAUDE_DESKTOP_STARTED_PATH): ogni shell aperta da li' attaccherebbe la sessione "default" e
-# creerebbe o selezionerebbe finestre in quella del terminale vero.
+# Only in a real terminal (stdin and stdout on a tty), and not in the VS Code /
+# Cursor ones (TERM_PROGRAM=vscode, VSCODE_INJECTION), nor in Claude Code shells
+# (CLAUDECODE), nor in the terminal panel of the Claude desktop app
+# (CLAUDE_DESKTOP_STARTED_PATH): every shell opened from there would attach to
+# the "default" session and create or select windows in the real terminal's one.
 if command -v tmux &> /dev/null && [ -z "$TMUX" ] \
    && [ -t 0 ] && [ -t 1 ] \
    && [ "$TERM_PROGRAM" != "vscode" ] && [ -z "$VSCODE_INJECTION" ] \
    && [ -z "$CLAUDECODE" ] && [ -z "$CLAUDE_DESKTOP_STARTED_PATH" ]; then
-    # Verifica che la directory corrente esista, altrimenti usa la home
+    # Check that the current directory exists, otherwise use the home directory
     if [ ! -d "$PWD" ]; then
         cd ~
     fi

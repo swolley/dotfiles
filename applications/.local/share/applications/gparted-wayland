@@ -1,18 +1,18 @@
 #!/bin/sh
-# Apre GParted come root restando su wayland.
+# Opens GParted as root while staying on wayland.
 #
-# Il lanciatore di sistema si eleva con pkexec, che ripulisce l'ambiente e
-# lascia passare solo DISPLAY: root finisce quindi su xwayland. Li' nessun
-# window manager pubblica _NET_WORKAREA, GTK non sa quanto spazio ha e
-# accorcia i menu' mettendoci le frecce di scorrimento.
+# The system launcher elevates itself with pkexec, which cleans the environment
+# and lets only DISPLAY through: root therefore ends up on xwayland. There no
+# window manager publishes _NET_WORKAREA, GTK does not know how much space it
+# has and shortens the menus by adding scroll arrows.
 #
-# Passando a mano il socket wayland, GParted ci parla diretto: scala giusta e
-# menu' interi. Il tema scuro non si impone qui: lo prende da
-# /root/.config/gtk-3.0/settings.ini, che scrive setup-machine.sh.
+# By passing the wayland socket by hand, GParted talks to it directly: correct
+# scaling and full menus. The dark theme is not forced here: it is taken from
+# /root/.config/gtk-3.0/settings.ini, which setup-machine.sh writes.
 #
-# Si invoca /usr/bin/gparted e non il binario: quello script, quando gira
-# gia' da root, maschera le unita' di mount per impedire l'automount durante
-# le operazioni. Saltarlo sarebbe pericoloso.
+# /usr/bin/gparted is invoked and not the binary: that script, when it already
+# runs as root, masks the mount units to prevent automount during the
+# operations. Skipping it would be dangerous.
 exec pkexec env \
   WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}" \
   XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" \

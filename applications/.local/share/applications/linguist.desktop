@@ -1,5 +1,5 @@
 [Desktop Entry]
-# strumento di traduzione qt
+# Qt translation tool
 Type=Application
 Name=Qt Linguist
 Exec=linguist6 %F

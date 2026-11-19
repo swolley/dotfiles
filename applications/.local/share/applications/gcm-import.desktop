@@ -1,5 +1,5 @@
 [Desktop Entry]
-# importa profili colore
+# imports color profiles
 Type=Application
 Name=ICC Profile Installer
 Exec=/usr/bin/gcm-import %F

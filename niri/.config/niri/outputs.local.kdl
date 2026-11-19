@@ -1,20 +1,20 @@
-// Ritocchi ai monitor scritti a mano.
+// Hand-written monitor tweaks.
 //
-// La geometria — modo, scala, posizione — non sta qui: la genera nwg-displays
-// in monitor.kdl, che config.kdl include prima di questo file. monitor.kdl
-// dipende dai monitor attaccati a questa macchina e dai connettori che il
-// kernel gli assegna, quindi e' escluso dal repo.
+// The geometry (mode, scale, position) does not live here: nwg-displays
+// generates it in monitor.kdl, which config.kdl includes before this file.
+// monitor.kdl depends on the monitors attached to this machine and on the
+// connectors the kernel assigns them, so it is excluded from the repo.
 //
-// niri fonde i blocchi output con lo stesso nome invece di sostituirli: qui
-// bastano le chiavi che nwg-displays non sa scrivere, e la geometria resta
-// quella sua. Verificato: con questo file ridotto al solo focus-at-startup,
-// DP-3 conserva posizione e scala.
+// niri merges output blocks with the same name instead of replacing them:
+// only the keys nwg-displays cannot write are needed here, and the geometry
+// stays the one it wrote. Verified: with this file reduced to just
+// focus-at-startup, DP-3 keeps its position and scale.
 //
-// Il connettore del monitor grande cambia a seconda della presa usata: e'
-// stato DP-2 e ora e' DP-3. Se un giorno il fuoco iniziale finisce sullo
-// schermo sbagliato, e' questo nome da aggiornare.
+// The big monitor's connector changes depending on the port used: it was
+// DP-2 and is now DP-3. If the initial focus ever lands on the wrong screen,
+// this is the name to update.
 
-// LG HDR 4K: e' il monitor principale, ci nasce sopra il fuoco.
+// LG HDR 4K: this is the main monitor, focus starts on it.
 output "DP-3" {
     focus-at-startup
 }

@@ -2,5 +2,5 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
--- numeri di riga assoluti (LazyVim di default li mette relativi)
+-- absolute line numbers (LazyVim defaults to relative ones)
 vim.opt.relativenumber = false

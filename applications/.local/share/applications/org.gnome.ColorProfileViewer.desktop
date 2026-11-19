@@ -1,5 +1,5 @@
 [Desktop Entry]
-# profili colore: nessuno e' configurato
+# color profiles: none are configured
 Type=Application
 Name=Color Profile Viewer
 Exec=gcm-viewer

@@ -1,5 +1,5 @@
 [Desktop Entry]
-# ispettore dbus di qt
+# Qt D-Bus inspector
 Type=Application
 Name=Qt D-Bus Viewer
 Exec=qdbusviewer6

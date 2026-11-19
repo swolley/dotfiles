@@ -1,9 +1,9 @@
 #!/bin/sh
-# Rigenera gli override che nascondono dal launcher le voci di sistema inutili.
-# Un file con lo stesso nome in ~/.local/share/applications ha la precedenza su
-# quello in /usr/share: NoDisplay=true toglie l'icona ma lascia intatte le
-# associazioni ai tipi di file, cosi' quei programmi restano apribili dai file
-# che gestiscono. Serve ripassarlo se un aggiornamento aggiunge voci nuove.
+# Regenerates the overrides that hide useless system entries from the launcher.
+# A file with the same name in ~/.local/share/applications takes precedence over
+# the one in /usr/share: NoDisplay=true removes the icon but leaves the file
+# type associations intact, so those programs can still be opened from the
+# files they handle. Run it again if an update adds new entries.
 set -eu
 cd "$(dirname "$0")"
 
@@ -24,75 +24,75 @@ nascondi() {
   } > "$nome.desktop"
 }
 
-nascondi yad-settings           "yad disegna le finestre degli script eos, non si usa a mano"
-nascondi yad-icon-browser       "sfoglia-icone di yad, strumento per chi scrive script"
-nascondi cmake-gui              "cmake si usa da riga di comando"
-nascondi electron34             "runtime, non un programma da aprire"
-nascondi electron37             "runtime, non un programma da aprire"
-nascondi java-java-openjdk      "runtime java, lanciato dai programmi"
-nascondi jconsole-java-openjdk  "console di diagnostica della jvm"
-nascondi jshell-java-openjdk    "shell java interattiva, si usa dal terminale"
-nascondi org.freedesktop.IBus.Setup "metodo di input non usato"
-nascondi assistant              "manuale delle api qt, per chi sviluppa in qt"
-nascondi designer               "editor di interfacce qt"
-nascondi linguist               "strumento di traduzione qt"
-nascondi qdbusviewer            "ispettore dbus di qt"
-nascondi qv4l2                  "test delle webcam, strumento di v4l-utils"
-nascondi qvidcap                "cattura video di v4l-utils"
-nascondi stoken-gui             "token rsa securid, non in uso"
-nascondi stoken-gui-small       "token rsa securid, non in uso"
-nascondi gnome-display-panel    "impostazioni schermo di gnome: sotto niri si usa nwg-displays"
-nascondi org.gnome.ColorProfileViewer "profili colore: nessuno e' configurato"
-nascondi gcm-picker             "prelievo colore di gnome-color-manager"
-nascondi gcm-import             "importa profili colore"
-nascondi vim                    "l'editor e' neovim; vim resta per il comando vi degli script"
+nascondi yad-settings           "yad draws the windows of the eos scripts, not meant to be used directly"
+nascondi yad-icon-browser       "yad icon browser, a tool for people writing scripts"
+nascondi cmake-gui              "cmake is used from the command line"
+nascondi electron34             "runtime, not a program to open"
+nascondi electron37             "runtime, not a program to open"
+nascondi java-java-openjdk      "Java runtime, launched by other programs"
+nascondi jconsole-java-openjdk  "JVM diagnostics console"
+nascondi jshell-java-openjdk    "interactive Java shell, used from the terminal"
+nascondi org.freedesktop.IBus.Setup "input method not in use"
+nascondi assistant              "Qt API manual, for Qt developers"
+nascondi designer               "Qt interface editor"
+nascondi linguist               "Qt translation tool"
+nascondi qdbusviewer            "Qt D-Bus inspector"
+nascondi qv4l2                  "webcam test tool from v4l-utils"
+nascondi qvidcap                "video capture from v4l-utils"
+nascondi stoken-gui             "RSA SecurID token, not in use"
+nascondi stoken-gui-small       "RSA SecurID token, not in use"
+nascondi gnome-display-panel    "GNOME display settings: under niri, nwg-displays is used"
+nascondi org.gnome.ColorProfileViewer "color profiles: none are configured"
+nascondi gcm-picker             "color picker from gnome-color-manager"
+nascondi gcm-import             "imports color profiles"
+nascondi vim                    "the editor is neovim; vim stays for the vi command used by scripts"
 
-# KDE Connect: il grosso lo fa il plugin phone-connect sulla barra di
-# noctalia, accoppiamento compreso (il pannello mostra Accoppia accanto ai
-# dispositivi visti in rete). La finestra vera resta pero' nel menu': e' l'unico
-# posto da cui si arriva alle impostazioni per dispositivo, ai plugin e allo
-# sfoglia file del telefono, che la barra non espone.
-nascondi org.kde.kdeconnect.nonplasma "indicatore per desktop senza plasma: lo fa gia' la barra"
-nascondi org.kde.kdeconnect.sms       "gli sms si mandano dal pannello di phone-connect"
+# KDE Connect: most of the work is done by the phone-connect plugin on the
+# noctalia bar, pairing included (the panel shows Pair next to the devices
+# seen on the network). The real window stays in the menu though: it is the
+# only way to reach the per-device settings, the plugins and the phone file
+# browser, which the bar does not expose.
+nascondi org.kde.kdeconnect.nonplasma "indicator for non-Plasma desktops: the bar already does this"
+nascondi org.kde.kdeconnect.sms       "SMS are sent from the phone-connect panel"
 
-# Visualizzatori: restano i programmi predefiniti per immagini e PDF, quindi
-# si aprono con un doppio clic da nautilus. Nel menu' non servono: non e' da
-# li' che si parte, si parte sempre dal file.
-nascondi org.gnome.Loupe  "visualizzatore immagini: si apre dal file, non dal menu'"
-nascondi org.gnome.Papers "visualizzatore pdf: si apre dal file, non dal menu'"
+# Viewers: they remain the default programs for images and PDFs, so they open
+# with a double click from nautilus. They are not needed in the menu: that is
+# not where you start from, you always start from the file.
+nascondi org.gnome.Loupe  "image viewer: opened from the file, not from the menu"
+nascondi org.gnome.Papers "PDF viewer: opened from the file, not from the menu"
 
-# hwloc: disegna la topologia di cpu e memoria. Arriva come dipendenza (lo usa
-# pipewire), non e' un programma che si apre dal menu'; da riga di comando
-# resta `lstopo`.
-nascondi lstopo "mappa della topologia hardware, strumento da riga di comando"
+# hwloc: draws the CPU and memory topology. It comes in as a dependency (used
+# by pipewire), it is not a program to open from the menu; from the command
+# line `lstopo` remains.
+nascondi lstopo "hardware topology map, a command-line tool"
 
-# nvtop: il `top` della gpu, arriva come dipendenza di mission-center, che e'
-# l'interfaccia che uso davvero. Resta il comando `nvtop` nel terminale.
-nascondi nvtop "monitor gpu da terminale: la finestra e' mission-center"
+# nvtop: the GPU `top`, it comes in as a dependency of mission-center, which is
+# the interface I actually use. The `nvtop` command remains in the terminal.
+nascondi nvtop "terminal GPU monitor: the window is mission-center"
 
-# gestore archivi: si apre sempre da nautilus, con "Estrai qui" o doppio clic
-# su uno zip. Resta il programma predefinito per gli archivi.
-nascondi org.gnome.FileRoller "gestore archivi: si apre dal file, non dal menu'"
+# archive manager: always opened from nautilus, with "Extract here" or a double
+# click on a zip. It remains the default program for archives.
+nascondi org.gnome.FileRoller "archive manager: opened from the file, not from the menu"
 
 
-# eos-update: apre un terminale per fare quello che faccio a mano quando mi
-# va, con un conto alla rovescia di 60 secondi alla fine.
-nascondi eos-update "aggiornamento di endeavouros: lo lancio dal terminale"
+# eos-update: opens a terminal to do what I do by hand when I feel like it,
+# with a 60-second countdown at the end.
+nascondi eos-update "EndeavourOS update: I run it from the terminal"
 
-# GParted: stessa precedenza, ma qui non si nasconde, si sostituisce il
-# comando. Il percorso del lanciatore va scritto per esteso, perche' nei file
-# .desktop non esistono ne' ~ ne' le variabili d'ambiente.
+# GParted: same precedence, but here it is not hidden, the command is
+# replaced. The launcher path has to be written out in full, because in
+# .desktop files neither ~ nor environment variables exist.
 if [ -f /usr/share/applications/gparted.desktop ]; then
 cat > gparted.desktop <<FINE
 [Desktop Entry]
-# lanciato tramite gparted-wayland: vedi i commenti in quello script
+# launched through gparted-wayland: see the comments in that script
 Type=Application
 Name=$(grep -m1 '^Name=' /usr/share/applications/gparted.desktop | cut -d= -f2-)
 Comment=$(grep -m1 '^Comment=' /usr/share/applications/gparted.desktop | cut -d= -f2-)
 Exec=$HOME/.local/share/applications/gparted-wayland %f
 Icon=$(grep -m1 '^Icon=' /usr/share/applications/gparted.desktop | cut -d= -f2-)
 Categories=System;Filesystem;
-Keywords=Partition;Partizioni;Disco;
+Keywords=Partition;Partitions;Disk;
 Terminal=false
 StartupNotify=true
 FINE

@@ -1,5 +1,5 @@
 [Desktop Entry]
-# runtime, non un programma da aprire
+# runtime, not a program to open
 Type=Application
 Name=Electron 37
 Exec=electron37 %u

@@ -29,40 +29,40 @@ gui:
       - "#c01c28"
     defaultFgColor:
       - "#ffffff"
-  nerdFontsVersion: "3" # hai AdwaitaMono Nerd Font: icone attive
-  showFileTree: true # file ad albero invece che lista piatta (toggle: `
+  nerdFontsVersion: "3" # you have AdwaitaMono Nerd Font: icons enabled
+  showFileTree: true # files as a tree instead of a flat list (toggle: `
   showRandomTip: false
-  showCommandLog: false # più spazio ai pannelli; riaprilo con @
+  showCommandLog: false # more room for the panels; reopen it with @
   showBottomLine: true
-  expandFocusedSidePanel: true # il pannello attivo si allarga da solo
+  expandFocusedSidePanel: true # the focused panel expands by itself
   mainPanelSplitMode: flexible
   scrollHeight: 2
   mouseEvents: true
   skipDiscardChangeWarning: false
   skipStashWarning: false
 os:
-  editPreset: "nvim" # `e` e i reword lunghi aprono nvim (non nano)
+  editPreset: "nvim" # `e` and long rewords open nvim (not nano)
 git:
-  parseEmoji: true # rende :emoji: nei messaggi
-  autoFetch: true # fetch automatico in background
+  parseEmoji: true # renders :emoji: in messages
+  autoFetch: true # automatic background fetch
   fetchAll: true
   diffRenderers:
     - colorArg: always
-      # DELTA non è installato. Dopo `sudo pacman -S git-delta` togli il commento
-      # alle due righe sotto per diff affiancati e syntax-highlight:
+      # DELTA is not installed. After `sudo pacman -S git-delta` uncomment
+      # the two lines below for side-by-side diffs and syntax highlighting:
       # pager: delta --dark --paging=never --line-numbers
       # useConfig: false
 
       type: rawGit
-# Comportamento generale
-disableStartupPopups: true # niente popup di versione all'avvio
-promptToReturnFromSubprocess: false # non chiede "premi invio" dopo ogni comando
+# General behavior
+disableStartupPopups: true # no version popups at startup
+promptToReturnFromSubprocess: false # does not ask to "press enter" after each command
 quitOnTopLevelReturn: false
 
-# Esempio: aggancia comandi tuoi a un tasto. Sblocca e adatta.
+# Example: bind your own commands to a key. Uncomment and adapt.
 # customCommands:
 #   - key: "<c-a>"
 #     context: "files"
 #     command: "git commit --amend --no-edit"
-#     description: "Amend rapido senza editor"
+#     description: "Quick amend without an editor"
 #     loadingText: "amending..."

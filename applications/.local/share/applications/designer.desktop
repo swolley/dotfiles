@@ -1,5 +1,5 @@
 [Desktop Entry]
-# editor di interfacce qt
+# Qt interface editor
 Type=Application
 Name=Qt Widgets Designer
 Exec=designer6 %F

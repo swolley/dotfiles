@@ -1,5 +1,5 @@
 [Desktop Entry]
-# yad disegna le finestre degli script eos, non si usa a mano
+# yad draws the windows of the eos scripts, not meant to be used directly
 Type=Application
 Name=YAD settings
 Exec=yad-settings

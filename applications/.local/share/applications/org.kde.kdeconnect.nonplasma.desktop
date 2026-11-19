@@ -1,5 +1,5 @@
 [Desktop Entry]
-# indicatore per desktop senza plasma: lo fa gia' la barra
+# indicator for non-Plasma desktops: the bar already does this
 Type=Application
 Name=KDE Connect Indicator
 Exec=kdeconnect-indicator

@@ -1,5 +1,5 @@
 [Desktop Entry]
-# visualizzatore pdf: si apre dal file, non dal menu'
+# PDF viewer: opened from the file, not from the menu
 Type=Application
 Name=Document Viewer
 Exec=papers %U

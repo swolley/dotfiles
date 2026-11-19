@@ -1,11 +1,11 @@
 [Desktop Entry]
-# lanciato tramite gparted-wayland: vedi i commenti in quello script
+# launched through gparted-wayland: see the comments in that script
 Type=Application
 Name=GParted
 Comment=Create, reorganize, and delete partitions
 Exec=sh -c "exec \"\\$HOME/.local/share/applications/gparted-wayland\" \"\\$@\"" sh %f
 Icon=gparted
 Categories=System;Filesystem;
-Keywords=Partition;Partizioni;Disco;
+Keywords=Partition;Partitions;Disk;
 Terminal=false
 StartupNotify=true

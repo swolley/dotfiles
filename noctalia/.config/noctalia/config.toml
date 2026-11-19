@@ -1,6 +1,6 @@
-# Configurazione noctalia condivisa (dotfiles).
-# Gli override specifici della macchina stanno in
-# ~/.local/state/noctalia/settings.toml, che ha la precedenza su questo file.
+# Shared noctalia configuration (dotfiles).
+# Machine-specific overrides live in
+# ~/.local/state/noctalia/settings.toml, which takes precedence over this file.
 
 [accessibility]
 ui_scale = 1.0
@@ -32,7 +32,7 @@ thickness = 26
 center = [ "clock", "notifications" ]
 
 [brightness]
-# luminosita' dei monitor esterni via DDC/CI (richiede ddcutil)
+# brightness of external monitors via DDC/CI (requires ddcutil)
 enable_ddcutil = true
 sync_all_monitors = true
 
@@ -49,8 +49,8 @@ widget_order = []
     [desktop_widgets.widget]
 
 [dock]
-# le icone appuntate stanno nello stato locale: dipendono da cosa e'
-# installato su questa macchina
+# pinned icons live in the local state: they depend on what is
+# installed on this machine
 enabled = false
 reserve_space = false
 show_dots = true
@@ -63,18 +63,18 @@ cross_axis_padding = 6
 
 [lockscreen]
 fingerprint = false
-# Solo dissolvenza al blocco e allo sblocco (di default ne sceglie una a caso).
+# Fade only, on lock and on unlock (by default it picks one at random).
 transition = ["fade"]
 transition_duration = 400
 
-# Inattivita': blocco dopo 3 minuti, schermo spento a 4 (lo spegnimento deve
-# restare piu' alto del blocco, cosi' avviene a sessione gia' bloccata).
-# La sospensione resta spenta (idle.behavior.lock-and-suspend).
-# Nessun periodo di grazia: con un valore > 0 qualunque tasto sblocca senza
-# password per quei secondi dopo il blocco.
+# Inactivity: lock after 3 minutes, screen off at 4 (the screen-off timeout
+# must stay higher than the lock one, so it happens with the session already
+# locked). Suspend stays off (idle.behavior.lock-and-suspend).
+# No grace period: with a value > 0 any key unlocks without a password for
+# that many seconds after locking.
 grace_period_seconds = 0
-# Blocca prima di ogni sospensione (tasto sospendi, chiusura schermo,
-# systemctl suspend), anche quando a sospendere e' logind e non noctalia.
+# Lock before every suspend (suspend key, lid close, systemctl suspend),
+# even when it is logind that suspends and not noctalia.
 lock_before_suspend = true
 
 [idle.behavior.lock]
@@ -86,9 +86,9 @@ enabled = true
 timeout = 240
 
 [plugin_settings."ayagmar/headroom"]
-# bar_style e bar_accounts stavano qui fino alla 0.2; dalla 0.3 sono
-# impostazioni del widget, cosi' due capsule sulla stessa barra possono
-# mostrare cose diverse. Si trovano sotto [widget.usage].
+# bar_style and bar_accounts were here up to 0.2; since 0.3 they are widget
+# settings, so two capsules on the same bar can show different things. They
+# are found under [widget.usage].
 provider_antigravity = "off"
 
 notify = false
@@ -96,12 +96,13 @@ notify_reset_credits = false
 warn_percent = 75
 
 [plugin_settings."yuuto/arch-updater"]
-# aur_check_cmd e update_cmd restano vuoti di proposito: il primo vale solo con
-# aur_helper = "custom", il secondo scavalcherebbe ignore_packages e romperebbe
-# l'aggiornamento in background, che dev'essere non interattivo.
+# aur_check_cmd and update_cmd are left empty on purpose: the first only
+# applies with aur_helper = "custom", the second would override
+# ignore_packages and break the background update, which must be
+# non-interactive.
 aur_helper = "paru"
-# terminal = ... sta in 91-user.local.toml: serve il percorso assoluto dello
-# script niri/terminal.sh, che dipende dalla home.
+# terminal = ... is in 91-user.local.toml: it needs the absolute path of the
+# niri/terminal.sh script, which depends on the home.
 auto_check_hours = 1
 check_arch_news = false
 flatpak_enabled = false
@@ -111,6 +112,8 @@ show_download_size = false
 
 config_review = false
 
+# Personal preference kept here temporarily (community plugin list); final
+# decision (move to a local/override file or keep as default) deferred.
 [plugins]
 enabled = [
     "alexander/screen-toolkit",
@@ -125,25 +128,29 @@ button_borders = false
 card_borders = false
 date_format = "%A %d %B %Y"
 font_family = "Adwaita Sans"
+# Personal preference kept here temporarily; final decision (move to a
+# local/override file or keep as default) deferred.
 lang = "it"
 niri_overview_close_on_launch_enabled = true
 niri_overview_type_to_launch_enabled = true
-# Agente polkit: risponde alle richieste di password di pkexec (FortiClient,
-# gparted...). Prima lo faceva polkit-gnome, disinstallato con la pulizia:
-# senza nessuno dei due quelle finestre non compaiono piu'.
+# Personal preference kept here temporarily; final decision (move to a
+# local/override file or keep as default) deferred.
+# Polkit agent: answers pkexec password requests (FortiClient, gparted...).
+# polkit-gnome used to do it, but it was uninstalled in the cleanup: with
+# neither of the two, those windows no longer appear.
 polkit_agent = true
 
-    # Il launcher fa da menu applicazioni: stretto, in elenco, con le
-    # categorie come sole icone. Si apre al centro dello schermo, dalla lente
-    # sulla barra o con Mod+D, che alla seconda pressione passa all'overview
-    # delle finestre.
+    # The launcher acts as the applications menu: narrow, as a list, with
+    # categories as icons only. It opens in the center of the screen, from the
+    # magnifier on the bar or with Mod+D, which on the second press switches
+    # to the window overview.
 
 external_ip_enabled = true
 
     [shell.launcher]
     app_grid = false
-    # categorie come sole icone: a questa larghezza le etichette si
-    # troncherebbero e diventerebbero illeggibili.
+    # categories as icons only: at this width the labels would be truncated
+    # and become unreadable.
     categories = true
     category_icons_only = true
     compact = true
@@ -173,6 +180,9 @@ wallpaper_scheme = "m3-content"
 
     [theme.templates]
     builtin_ids = [ "gtk3", "gtk4", "niri", "qt" ]
+    # Personal preference kept here temporarily (community template list);
+    # final decision (move to a local/override file or keep as default)
+    # deferred.
     community_ids = [ "bat", "claude-code", "codex", "fzf", "inkscape", "lazygit", "obsidian", "pywalfox", "vscode" ]
 
     # Extra palette colors (the soft tones used by tmux, starship, kitty, nvim).
@@ -229,15 +239,16 @@ wallpaper_scheme = "m3-content"
     input_path = "$XDG_CONFIG_HOME/noctalia/templates/gitmux.conf"
     output_path = "$XDG_CACHE_HOME/noctalia/gitmux.conf"
 
-    # Le app KDE leggono i colori da kdeglobals, non da qt6ct: finche' era
-    # scritto a mano restava indietro a ogni cambio di tema. Il file e' tutto
-    # generato, percio' ~/.config/kdeglobals non e' piu' un collegamento al
-    # repo (lo sovrascriverebbe); nel repo ci sta solo il modello.
+    # KDE apps read their colors from kdeglobals, not from qt6ct: while it was
+    # hand-written it fell behind at every theme change. The file is fully
+    # generated, so ~/.config/kdeglobals is no longer a link to the repo (it
+    # would overwrite it); only the template lives in the repo.
     [theme.templates.user.kdeglobals]
     input_path = "$XDG_CONFIG_HOME/noctalia/templates/kdeglobals"
     output_path = "$XDG_CONFIG_HOME/kdeglobals"
-    # noctalia riconosce questo output e, con l'azione, avvisa le app KDE gia'
-    # aperte che la tavolozza e' cambiata: si ricolorano senza riaprirle.
+    # noctalia recognizes this output and, with the action, notifies the KDE
+    # apps already open that the palette changed: they recolor without being
+    # reopened.
     post_action = "kde-color-scheme"
 
     # starship reads a single file: noctalia generates the palette and the
@@ -282,8 +293,8 @@ show_vpn_label = true
 
 [widget.usage]
 type = "ayagmar/headroom:usage"
-# "full" (il valore di fabbrica) mette anche un anello di avanzamento accanto
-# a ogni percentuale; "value" lascia solo logo e numero.
+# "full" (the factory value) also puts a progress ring next to each
+# percentage; "value" leaves only the logo and the number.
 bar_style = "value"
 
 [widget.volume]
@@ -291,17 +302,19 @@ enabled = false
 
 [widget.wallpaper]
 enabled = false
-    # Barra a scomparsa solo sui monitor secondari; sull'LG (DP-2) resta fissa.
+    # Auto-hiding bar only on the secondary monitors; on the LG (DP-2) it stays fixed.
 
 [notification]
-# scala del riquadro, testo compreso: non esiste un font_size a parte
+# scale of the popup, text included: there is no separate font_size
 scale = 0.85
 
-# I filtri in fondo al file si leggono in quest'ordine e vince il primo che
-# combacia: gli altri non vengono nemmeno guardati. L'ordine va scritto a
-# mano, perche' senza filter_order noctalia se lo inventa e "tutte", che
-# combacia sempre, finiva davanti agli altri annullandoli. I due specifici
-# vanno per primi, il catch-all in coda.
+# Personal preference kept here temporarily (Claude / Laravel Mix filters);
+# final decision (move to a local/override file or keep as default) deferred.
+# The filters at the bottom of the file are read in this order and the first
+# one that matches wins: the others are not even looked at. The order must be
+# written by hand, because without filter_order noctalia makes one up and
+# "tutte", which always matches, ended up ahead of the others and cancelled
+# them. The two specific ones go first, the catch-all last.
 filter_order = [ "claude", "laravel-mix", "tutte" ]
 
 [audio]
@@ -339,8 +352,9 @@ sidebar_section = "full"
 width = 800
 
 [shell.panel]
-# Il launcher si apre al centro dello schermo, non appeso alla barra: ci si
-# scrive dentro e conviene averlo sott'occhio invece che in un angolo.
+# The launcher opens in the center of the screen, not attached to the bar:
+# you type into it and it is better to have it in front of you than in a
+# corner.
 launcher_placement = "floating"
 launcher_position = "center"
 open_near_click_control_center = true
@@ -363,8 +377,8 @@ enabled = true
     [calendar.account.personal_google]
     type = "google"
 
-# Nella barra i workspace si leggono col loro numero: "name" mostrerebbe il
-# nome, che qui nessun workspace ha.
+# On the bar the workspaces are read by their number: "name" would show the
+# name, which no workspace has here.
 
 [widget.workspaces]
 label_source = "id"
@@ -395,38 +409,41 @@ enabled = false
 [plugin_settings."icefish/phone-connect"]
 enable_charging_animation = false
 
-# Le notifiche di Claude Code e di Laravel Mix compaiono come toast ma non
-# finiscono nella cronologia: sono avvisi del momento, riaprirli dal cassetto
-# non serve a niente. Ripetono la durata di "tutte" perche', vincendo loro,
-# quel filtro non viene applicato.
+# Personal preference kept here temporarily (Claude / Laravel Mix filters);
+# final decision (move to a local/override file or keep as default) deferred.
+# Claude Code and Laravel Mix notifications show up as toasts but do not end
+# up in the history: they are momentary alerts, reopening them from the
+# drawer is pointless. They repeat the duration of "tutte" because, when they
+# win, that filter is not applied.
 #
-# Claude si prende con match, che guarda il nome dell'applicazione (qui
-# "Claude") e non il testo: il titolo e il corpo cambiano a ogni avviso e la
-# parola "Claude" non e' detto che ci sia.
+# Claude is matched with match, which looks at the application name (here
+# "Claude") and not at the text: the title and body change with every alert
+# and the word "Claude" is not necessarily there.
 [notification.filter.claude]
 match = "claude"
 save_history = false
 override_duration = 3000
 
-# Laravel Mix invece notifica attraverso node, quindi dal nome
-# dell'applicazione non si riconosce: resta la regex sul testo, racchiusa in
-# ".*" cosi' funziona sia come ricerca sia come corrispondenza intera.
+# Laravel Mix, on the other hand, notifies through node, so it cannot be
+# recognized by the application name: the regex on the text remains,
+# wrapped in ".*" so it works both as a search and as a full match.
 [notification.filter.laravel-mix]
 match_content = ".*[Ll]aravel [Mm]ix.*"
 save_history = false
 override_duration = 3000
 
-# Durata dei toast. noctalia non ha un'impostazione globale: la durata la
-# decide chi manda la notifica, e l'unico modo per scavalcarla e' un filtro.
-# match_content e' una regex sul testo, e ".*" prende tutto; con match = ""
-# invece non si aggancia niente. I cinque secondi di prima erano troppi.
+# Toast duration. noctalia has no global setting: the duration is decided by
+# whoever sends the notification, and the only way to override it is a
+# filter. match_content is a regex on the text, and ".*" catches everything;
+# with match = "" instead nothing gets hooked. The previous five seconds were
+# too many.
 [notification.filter.tutte]
 match_content = ".*"
 override_duration = 3000
 
-# Manda sfondo, palette e disposizione dei monitor a noctalia-greeter a ogni
-# cambio di tema, cosi' la schermata di accesso non resta indietro. Serve
-# un'autorizzazione: scrive in /var/lib/noctalia-greeter.
+# Sends the wallpaper, palette and monitor layout to noctalia-greeter at
+# every theme change, so the login screen does not fall behind. It needs an
+# authorization: it writes to /var/lib/noctalia-greeter.
 
 [shell.greeter_sync]
 auto_sync = true

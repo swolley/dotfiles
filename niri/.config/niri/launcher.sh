@@ -1,11 +1,11 @@
 #!/bin/sh
-# Mod+D in stile gnome: un ciclo a tre passi.
-#   chiuso   -> launcher di noctalia
-#   launcher -> overview delle finestre
-#   overview -> chiuso
+# Mod+D, GNOME style: a three-step cycle.
+#   closed   -> noctalia launcher
+#   launcher -> window overview
+#   overview -> closed
 #
-# Lo stato del pannello lo dice la shell: `noctalia msg status` riporta quale
-# pannello e' attivo. Quello di niri sta in `niri msg overview-state`.
+# The shell reports the panel state: `noctalia msg status` says which panel is
+# active. niri's own state is in `niri msg overview-state`.
 
 launcher_aperto() {
   noctalia msg status 2>/dev/null | grep -q '"activePanelId":[[:space:]]*"launcher"'

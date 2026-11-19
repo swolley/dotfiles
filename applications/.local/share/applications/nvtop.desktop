@@ -1,5 +1,5 @@
 [Desktop Entry]
-# monitor gpu da terminale: la finestra e' mission-center
+# terminal GPU monitor: the window is mission-center
 Type=Application
 Name=nvtop
 Exec=nvtop

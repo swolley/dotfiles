@@ -1,5 +1,5 @@
 [Desktop Entry]
-# console di diagnostica della jvm
+# JVM diagnostics console
 Type=Application
 Name=OpenJDK Java 27 Console
 Exec=/usr/lib/jvm/java-27-openjdk/bin/jconsole

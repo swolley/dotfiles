@@ -1,7 +1,7 @@
 #!/bin/sh
-# Accende/spegne i temi scritti dai template noctalia a seconda della sessione.
-#   theme-session.sh gnome  -> GTK e Obsidian tornano ai temi di GNOME
-#   theme-session.sh niri   -> riattiva i temi noctalia
+# Turns the themes written by the noctalia templates on/off depending on the session.
+#   theme-session.sh gnome  -> GTK and Obsidian go back to the GNOME themes
+#   theme-session.sh niri   -> re-enables the noctalia themes
 mode="$1"
 IMPORT='@import url("noctalia.css");'
 

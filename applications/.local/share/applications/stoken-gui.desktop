@@ -1,5 +1,5 @@
 [Desktop Entry]
-# token rsa securid, non in uso
+# RSA SecurID token, not in use
 Type=Application
 Name=Software Token
 Exec=stoken-gui

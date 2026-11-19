@@ -1,5 +1,5 @@
 [Desktop Entry]
-# metodo di input non usato
+# input method not in use
 Type=Application
 Name=IBus Preferences
 Exec=ibus-setup

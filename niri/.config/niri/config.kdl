@@ -10,33 +10,33 @@ include "monitor.kdl"
 
 prefer-no-csd
 
-// noctalia v5 integra polkit agent, wallpaper daemon, idle manager e lock
-// screen: niente helper esterni (erano polkit-gnome, swaybg, swayidle).
-// Per riattivarli: config.kdl.bak-v4-quickshell.
+// noctalia v5 integrates the polkit agent, wallpaper daemon, idle manager and
+// lock screen: no external helpers (they used to be polkit-gnome, swaybg,
+// swayidle). To re-enable them: config.kdl.bak-v4-quickshell.
 
 spawn-at-startup "xwayland-satellite"
 
 // Shell UI (bar/dock/launcher/notifiche/lock).
-// Lo script avvia noctalia e, se muore, apre una kitty con le ultime righe
-// di log e scrive sul journal. NON usa notify-send: in v5 il demone di
-// notifica e' noctalia stesso, quindi non puo' annunciare il proprio
-// fallimento e ti ritroveresti col desktop vuoto senza spiegazione.
+// The script starts noctalia and, if it dies, opens a kitty with the last log
+// lines and writes to the journal. It does NOT use notify-send: in v5 the
+// notification daemon is noctalia itself, so it cannot announce its own
+// failure and you would be left with an empty desktop and no explanation.
 spawn-sh-at-startup "$HOME/.config/niri/start-noctalia.sh"
 
-// Notifica se nel repo dei dotfiles ci sono commit da scaricare (solo fetch).
+// Notify if the dotfiles repo has commits to pull (fetch only).
 spawn-sh-at-startup "$HOME/.dotfiles/scripts/dotfiles-updates"
 
-// Niente terminale all'accesso: lo apri quando serve con Ctrl+Alt+T o
-// Super+Return. Come rete di sicurezza non serviva piu', se ne occupa
-// start-noctalia.sh.
+// No terminal at login: you open it when needed with Ctrl+Alt+T or
+// Super+Return. It was no longer needed as a safety net, start-noctalia.sh
+// takes care of that.
 // spawn-sh-at-startup "$HOME/.config/niri/terminal.sh focus"
 
 environment {
     QT_QPA_PLATFORM "wayland"
-    // Le app Qt non-KDE non hanno nessuno che dia loro una tavolozza: senza
-    // questa riga restano sul chiaro di fabbrica. qt6ct legge i colori che
-    // noctalia genera in ~/.config/qt6ct/colors/. Le app KDE non la usano,
-    // prendono i colori da ~/.config/kdeglobals.
+    // Non-KDE Qt apps have nobody to give them a palette: without this line
+    // they stay on the factory light theme. qt6ct reads the colors that
+    // noctalia generates in ~/.config/qt6ct/colors/. KDE apps do not use it,
+    // they take their colors from ~/.config/kdeglobals.
     QT_QPA_PLATFORMTHEME "qt6ct"
     XWAYLAND "1"
     XDG_CURRENT_DESKTOP "niri"
@@ -73,16 +73,16 @@ input {
     trackpoint {
     }
 
-    // Il fuoco cambia solo su click. Con focus-follows-mouse la striscia scorre
-    // da sola quando il puntatore tocca il bordo o attraversa un altro monitor,
-    // e dopo un po' stanca. Niri non ha un ritardo, solo max-scroll-amount.
-    // Per riprovarlo: togli il commento.
+    // Focus changes only on click. With focus-follows-mouse the strip scrolls
+    // by itself when the pointer touches the edge or crosses to another
+    // monitor, and it gets tiring after a while. niri has no delay, only
+    // max-scroll-amount. To try it again: uncomment.
     // focus-follows-mouse max-scroll-amount="0%"
 }
 
 gestures {
-    // Niente overview passando col mouse nell'angolo in alto a sinistra:
-    // ci si finiva senza volerlo. Resta su Mod+X e come secondo passo di Mod+D.
+    // No overview when moving the mouse into the top-left corner: it was
+    // triggered by accident. It stays on Mod+X and as the second step of Mod+D.
     hot-corners {
         off
     }
@@ -92,10 +92,10 @@ overview {
     // Fallback tint; Noctalia wallpaper sits in the backdrop via layer-rule below.
     backdrop-color "#1c1c1e"
 
-    // Un contorno intorno a ogni workspace: senza, nell'overview i workspace
-    // vuoti si confondono con lo sfondo e non si capisce quanti ce ne sono.
-    // softness a zero: bordo pieno, niente sfumatura. Gli angoli restano
-    // vivi, un raggio niri non lo espone.
+    // An outline around every workspace: without it, empty workspaces blend
+    // into the background in the overview and you cannot tell how many there
+    // are. softness at zero: solid border, no blur. The corners stay sharp,
+    // niri does not expose a radius.
     workspace-shadow {
         softness 0
         spread 3
@@ -111,6 +111,8 @@ layer-rule {
 }
 
 cursor {
+    // Personal preference kept here temporarily; final decision (move it to a
+    // local/override file or keep it as the default) is deferred.
     // Same cursor family as GNOME (org.gnome.desktop.interface cursor-theme)
     xcursor-theme "Qogir"
     xcursor-size 24
@@ -129,8 +131,8 @@ layout {
 
     center-focused-column "on-overflow"
 
-    // Con una sola finestra aperta la tiene al centro invece che a sinistra:
-    // riduce lo spaesamento arrivando da un desktop tradizionale.
+    // With a single window open, keep it centered instead of on the left:
+    // it reduces disorientation when coming from a traditional desktop.
     always-center-single-column
 
     preset-column-widths {
@@ -169,9 +171,9 @@ hotkey-overlay {
     skip-at-startup
 }
 
-// Gli screenshot normali li fa noctalia, che salva nella cartella Immagini
-// dell'utente. Quello interno di niri (Ctrl+Print, riserva) non conosce le
-// cartelle XDG: lo tengo solo negli appunti, senza scrivere file.
+// Regular screenshots are taken by noctalia, which saves to the user's
+// Pictures folder. niri's built-in one (Ctrl+Print, fallback) does not know
+// the XDG folders: I keep it clipboard-only, without writing files.
 screenshot-path null
 
 animations {
@@ -201,17 +203,20 @@ window-rule {
     open-floating true
 }
 
-// I workspace di niri nascono e muoiono da soli: ne resta sempre uno vuoto in
-// coda a ogni monitor, e gli altri campano finche' contengono finestre. Il
-// vuoto in coda non si puo' togliere, quindi il minimo e' uno pieno piu' uno
-// vuoto; la striscia, che resta senza finestre, ne tiene uno solo appunto
-// perche' non ha nessun workspace nominato che la inchiodi a due.
+// niri workspaces are created and destroyed automatically: there is always an
+// empty one at the end of each monitor, and the others live as long as they
+// contain windows. The trailing empty one cannot be removed, so the minimum
+// is one full plus one empty; the strip, which stays without windows, keeps
+// just one precisely because it has no named workspace pinning it at two.
 //
-// Nessun workspace nominato: un nome compare al posto del numero nella barra,
-// e qui non aggiunge niente. Firefox si ancora al monitor, non al workspace.
+// No named workspaces: a name replaces the number in the bar, and here it
+// adds nothing. Firefox is anchored to the monitor, not to the workspace.
 
-// Firefox nasce sullo schermo integrato grande, sul suo primo workspace.
-// Spostarlo a mano resta possibile: la regola vale solo all'apertura.
+// Personal preference kept here temporarily; final decision (move it to a
+// local/override file or keep it as the default) is deferred.
+// Firefox opens on the big built-in screen, on its first workspace.
+// Moving it by hand is still possible: the rule only applies on open.
+// (No Teams/Outlook-specific window rules exist in this config.)
 window-rule {
     match app-id=r#"^firefox$"#
     open-on-output "eDP-1"
@@ -237,8 +242,8 @@ window-rule {
     default-window-height { fixed 920; }
 }
 
-// Finestra di login delle VPN OpenConnect di NetworkManager (password, codice
-// 2FA, SSO): un popup al centro invece di una colonna a tutta altezza.
+// Login window of NetworkManager's OpenConnect VPNs (password, 2FA code,
+// SSO): a centered popup instead of a full-height column.
 window-rule {
     match app-id="^nm-openconnect-auth-dialog$"
     open-floating true
@@ -246,7 +251,7 @@ window-rule {
     default-window-height { fixed 680; }
 }
 
-// Editor delle connessioni di rete (modifica delle VPN, wifi, ecc.).
+// Network connection editor (editing VPNs, wifi, etc.).
 window-rule {
     match app-id="^nm-connection-editor$"
     open-floating true
@@ -254,8 +259,8 @@ window-rule {
     default-window-height { fixed 720; }
 }
 
-// Finestre "Apri file" / "Apri cartella" / "Salva con nome": le apre il portale
-// GTK per conto di qualsiasi app. Popup al centro invece di una colonna intera.
+// "Open file" / "Open folder" / "Save as" windows: opened by the GTK portal
+// on behalf of any app. Centered popup instead of a full column.
 window-rule {
     match app-id="^xdg-desktop-portal-gtk$"
     open-floating true
@@ -281,7 +286,7 @@ binds {
     }
 
     // Terminal (GNOME-style Ctrl+Alt+T + tiling Mod+Return)
-    // Terminale unico: se c'e' gia' una kitty le da' il focus.
+    // Single terminal: if a kitty already exists, it gets the focus.
     Ctrl+Alt+T       { spawn-sh "$HOME/.config/niri/terminal.sh focus"; }
     Mod+Return       { spawn-sh "$HOME/.config/niri/terminal.sh focus"; }
     Mod+Shift+Return { spawn-sh "$HOME/.config/niri/terminal.sh new"; }
@@ -290,8 +295,8 @@ binds {
         maximize-column;
     }
 
-    // Come su gnome: prima pressione il launcher, seconda l'overview delle
-    // finestre, terza chiude.
+    // Like on GNOME: first press opens the launcher, second the window
+    // overview, third closes it.
     // Noctalia v5 IPC: https://docs.noctalia.dev/noctalia/ipc/
     Mod+D {
         spawn-sh "$HOME/.config/niri/launcher.sh";
@@ -344,16 +349,20 @@ binds {
     // Special keys of the keyboard (multimedia/office row).
     XF86HomePage { spawn-sh "firefox"; }
     XF86WWW      { spawn-sh "firefox"; }
+    // Personal preference kept here temporarily; final decision (move it to a
+    // local/override file or keep it as the default) is deferred.
     XF86Mail     { spawn-sh "gtk-launch outlook-for-linux"; }
     XF86Calculator { spawn-sh "gnome-calculator"; }
     XF86Explorer   { spawn-sh "nautilus"; }
     XF86MyComputer { spawn-sh "nautilus"; }
     XF86Search     { spawn-sh "$HOME/.config/niri/launcher.sh"; }
     XF86Sleep      { spawn-sh "noctalia msg session lock-and-suspend"; }
-    // Fn+F5: sulla tastiera e' il tasto delle impostazioni, che il kernel
-    // riporta come KEY_CONFIG e xkb traduce in XF86Tools. Qui non c'e' niente
-    // da configurare, quindi lo uso per Tidal. tidal-hifi tiene una sola
-    // istanza: se e' gia' aperto, rilanciarlo riporta su la finestra.
+    // Personal preference kept here temporarily; final decision (move it to a
+    // local/override file or keep it as the default) is deferred.
+    // Fn+F5: on the keyboard this is the settings key, which the kernel
+    // reports as KEY_CONFIG and xkb translates to XF86Tools. There is nothing
+    // to configure here, so I use it for Tidal. tidal-hifi keeps a single
+    // instance: if it is already open, relaunching it brings the window up.
     XF86Tools      { spawn-sh "gtk-launch tidal-hifi"; }
     // The power key opens the session menu (lock, suspend, logout, reboot,
     // shutdown) instead of powering off at once.
@@ -431,21 +440,21 @@ binds {
         spawn-sh "noctalia msg wallpaper-random";
     }
 
-    // Mod+A e' libero: era `wallpaper toggleAutomation` di noctalia v4,
-    // senza equivalente in v5.
+    // Mod+A is free: it was noctalia v4's `wallpaper toggleAutomation`,
+    // with no equivalent in v5.
 
-    // Larghezza colonne: preset 1/3, 1/2, 2/3 (vedi preset-column-widths)
+    // Column width: presets 1/3, 1/2, 2/3 (see preset-column-widths)
     Mod+R       { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-column-width-back; }
-    // layout it: + e' un tasto diretto, = e' Shift+0. Stessi comandi sul tastierino.
+    // Italian layout: + is a direct key, = is Shift+0. Same commands on the keypad.
     Mod+Minus       { set-column-width "-10%"; }
     Mod+plus        { set-column-width "+10%"; }
     Mod+KP_Subtract { set-column-width "-10%"; }
     Mod+KP_Add      { set-column-width "+10%"; }
     Mod+Ctrl+F  { expand-column-to-available-width; }
 
-    // Altezza: ha effetto solo quando la colonna contiene piu' finestre
-    // impilate, perche' una finestra sola occupa gia' tutta l'altezza.
+    // Height: only has an effect when the column contains several stacked
+    // windows, because a single window already fills the whole height.
     Mod+Shift+Minus       { set-window-height "-10%"; }
     Mod+Shift+plus        { set-window-height "+10%"; }
     Mod+Shift+KP_Subtract { set-window-height "-10%"; }
@@ -458,16 +467,16 @@ binds {
     Mod+Up    { focus-window-up; }
     Mod+Right { focus-column-right; }
 
-    // Rotellina col Mod: scorre la striscia di colonne senza dover cliccare,
-    // ora che il fuoco non segue piu' il mouse. Ctrl+rotellina cambia workspace.
+    // Mod+wheel: scrolls the strip of columns without having to click, now
+    // that focus no longer follows the mouse. Ctrl+wheel changes workspace.
     Mod+WheelScrollDown      cooldown-ms=100 { focus-column-right; }
     Mod+WheelScrollUp        cooldown-ms=100 { focus-column-left; }
     Mod+WheelScrollRight     cooldown-ms=100 { focus-column-right; }
     Mod+WheelScrollLeft      cooldown-ms=100 { focus-column-left; }
     Mod+Ctrl+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
-    // Stessa azione da tastiera. Mod+Ctrl+Su/Giu' sono gia' di move-window-*,
-    // quindi si usano Pag Su/Giu', come nella config di default di niri.
+    // Same action from the keyboard. Mod+Ctrl+Up/Down already belong to
+    // move-window-*, so Page Up/Down are used, as in niri's default config.
     Mod+Page_Down      { focus-workspace-down; }
     Mod+Page_Up        { focus-workspace-up; }
     Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
@@ -478,7 +487,7 @@ binds {
     Mod+Ctrl+Up    { move-window-up; }
     Mod+Ctrl+Right { move-column-right; }
 
-    // Monitor: LG a sinistra, portatile a destra, striscia BOE sotto il portatile
+    // Monitors: LG on the left, laptop on the right, BOE strip below the laptop
     Mod+Shift+Left       { focus-monitor-left; }
     Mod+Shift+Right      { focus-monitor-right; }
     Mod+Shift+Up         { focus-monitor-up; }
@@ -510,16 +519,16 @@ binds {
     Mod+Shift+8 { move-column-to-workspace 8; }
     Mod+Shift+9 { move-column-to-workspace 9; }
 
-    // Screenshot di noctalia, come su GNOME: salvano nella cartella Immagini dell'utente (XDG).
-    // Stamp = schermo intero, Alt+Stamp = finestra attiva, Maiusc+Stamp = area.
+    // noctalia screenshots, like on GNOME: they save to the user's Pictures folder (XDG).
+    // Print = full screen, Alt+Print = active window, Shift+Print = area.
     Print       { spawn-sh "noctalia msg screenshot-fullscreen"; }
     Alt+Print   { spawn-sh "noctalia msg screenshot-window"; }
     Shift+Print { spawn-sh "noctalia msg screenshot-region"; }
     Mod+Shift+S { spawn-sh "noctalia msg screenshot-region"; }
     Mod+Shift+A { spawn-sh "noctalia msg screenshot-annotate"; }
-    // Pannello screen-toolkit: OCR, QR, palette, color picker, registrazione.
+    // screen-toolkit panel: OCR, QR, palette, color picker, recording.
     Mod+Print   { spawn-sh "noctalia msg panel-toggle alexander/screen-toolkit:panel"; }
-    // Riserva interna di niri, se la shell non sta girando.
+    // niri's built-in fallback, if the shell is not running.
     Ctrl+Print  { screenshot-screen; }
 
     Mod+Escape allow-inhibiting=false {

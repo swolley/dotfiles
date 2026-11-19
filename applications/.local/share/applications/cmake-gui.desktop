@@ -1,5 +1,5 @@
 [Desktop Entry]
-# cmake si usa da riga di comando
+# cmake is used from the command line
 Type=Application
 Name=CMake
 Exec=cmake-gui %f

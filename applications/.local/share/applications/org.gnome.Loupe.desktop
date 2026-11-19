@@ -1,5 +1,5 @@
 [Desktop Entry]
-# visualizzatore immagini: si apre dal file, non dal menu'
+# image viewer: opened from the file, not from the menu
 Type=Application
 Name=Image Viewer
 Exec=loupe %U

@@ -1,5 +1,5 @@
 [Desktop Entry]
-# manuale delle api qt, per chi sviluppa in qt
+# Qt API manual, for Qt developers
 Type=Application
 Name=Qt Assistant
 Exec=assistant6

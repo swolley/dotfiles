@@ -1,15 +1,15 @@
 #!/bin/sh
-# Un solo terminale. Mod+Return gli da' il focus invece di aprirne un altro;
-# Mod+Shift+Return crea una nuova sessione tmux dentro la stessa finestra.
-#   terminal.sh focus      -> focus alla kitty esistente, o la apre su tmux
-#   terminal.sh new        -> nuova sessione tmux, e focus alla finestra
-#   terminal.sh cwd [dir]  -> come new, ma nella cartella indicata (default: $PWD);
-#                             la usa Nautilus per "Apri nel terminale"
-#   terminal.sh run <cmd>  -> esegue il comando in una nuova sessione tmux
-#                             dentro la finestra esistente. Lo usano i
-#                             programmi che vogliono "aprire un terminale",
-#                             come il plugin arch-updater: accetta anche il
-#                             separatore -e che molti passano per abitudine.
+# A single terminal. Mod+Return focuses it instead of opening another one;
+# Mod+Shift+Return creates a new tmux session inside the same window.
+#   terminal.sh focus      -> focus the existing kitty, or open one on tmux
+#   terminal.sh new        -> new tmux session, and focus the window
+#   terminal.sh cwd [dir]  -> like new, but in the given directory (default: $PWD);
+#                             used by Nautilus for "Open in Terminal"
+#   terminal.sh run <cmd>  -> runs the command in a new tmux session inside
+#                             the existing window. Used by programs that want
+#                             to "open a terminal", like the arch-updater
+#                             plugin: it also accepts the -e separator that
+#                             many pass out of habit.
 SESSION=main
 
 kitty_id() {
@@ -17,19 +17,19 @@ kitty_id() {
     | jq -r 'map(select(.app_id == "kitty")) | sort_by(.id) | .[0].id // empty'
 }
 
-last_client() {  # il client tmux usato piu' di recente
+last_client() {  # the most recently used tmux client
   tmux list-clients -F '#{client_activity} #{client_name}' 2>/dev/null \
     | sort -rn | head -1 | cut -d' ' -f2-
 }
 
-open_kitty() {   # $1 = cartella iniziale (facoltativa)
-                 # si aggancia a una sessione esistente, altrimenti la crea
+open_kitty() {   # $1 = initial directory (optional)
+                 # attaches to an existing session, otherwise creates one
   target=$(tmux ls -F '#{session_last_attached} #{session_name}' 2>/dev/null \
     | sort -rn | head -1 | cut -d' ' -f2-)
   [ -n "$target" ] || target=$SESSION
   if [ -n "${1:-}" ]; then
-    # con una cartella serve una sessione nuova: "new-session -A" su una
-    # sessione esistente la riaggancia e ignora -c, e si finirebbe altrove
+    # with a directory we need a new session: "new-session -A" on an
+    # existing session reattaches it and ignores -c, and we would end up elsewhere
     name=$(tmux new-session -d -P -F '#{session_name}' -c "$1" 2>/dev/null)
     if [ -n "$name" ]; then
       setsid kitty -- tmux attach-session -t "$name" >/dev/null 2>&1 &
@@ -70,11 +70,11 @@ case "${1:-focus}" in
   run)
     shift
     [ "${1:-}" = "-e" ] && shift
-    [ $# -gt 0 ] || { echo "uso: $0 run [-e] <comando...>" >&2; exit 1; }
+    [ $# -gt 0 ] || { echo "usage: $0 run [-e] <command...>" >&2; exit 1; }
     if [ -n "$id" ] && tmux has-session 2>/dev/null; then
       name=$(tmux new-session -d -P -F '#{session_name}' "$@")
-      # il pannello resta visibile dopo la fine del comando: senza questo un
-      # errore sparirebbe prima che tu possa leggerlo
+      # the pane stays visible after the command ends: without this an
+      # error would vanish before you could read it
       tmux set-option -t "$name" remain-on-exit on
       client=$(last_client)
       [ -n "$client" ] && tmux switch-client -c "$client" -t "$name"
@@ -84,5 +84,5 @@ case "${1:-focus}" in
     fi
     ;;
   *)
-    echo "uso: $0 {focus|new|cwd [dir]|run <comando>}" >&2; exit 1 ;;
+    echo "usage: $0 {focus|new|cwd [dir]|run <command>}" >&2; exit 1 ;;
 esac

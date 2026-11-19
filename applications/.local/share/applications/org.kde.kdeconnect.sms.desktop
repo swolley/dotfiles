@@ -1,5 +1,5 @@
 [Desktop Entry]
-# gli sms si mandano dal pannello di phone-connect
+# SMS are sent from the phone-connect panel
 Type=Application
 Name=KDE Connect SMS
 Exec=kdeconnect-sms

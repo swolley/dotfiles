@@ -1,5 +1,5 @@
 [Desktop Entry]
-# impostazioni schermo di gnome: sotto niri si usa nwg-displays
+# GNOME display settings: under niri, nwg-displays is used
 Type=Application
 Name=Displays
 Exec=gnome-control-center display

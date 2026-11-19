@@ -1,5 +1,5 @@
 [Desktop Entry]
-# mappa della topologia hardware, strumento da riga di comando
+# hardware topology map, a command-line tool
 Type=Application
 Name=Hardware Locality lstopo
 Exec=lstopo

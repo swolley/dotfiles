@@ -10,7 +10,7 @@ else
 fi
 export AUR_HELPER
 
-# AUR scripts live in the shared dotfiles repo (not ~/Documenti).
+# AUR scripts live in the shared dotfiles repo (not ~/Documents).
 DOTFILES_SCRIPTS="${DOTFILES_SCRIPTS:-$HOME/.dotfiles/scripts}"
 AUR_WRAP="${AUR_WRAP:-$DOTFILES_SCRIPTS/aur-wrap}"
 PKG_BIN="${PKG_BIN:-$DOTFILES_SCRIPTS/pkg}"
@@ -44,10 +44,10 @@ eos-update() {
 		echo "❌ No AUR helper found (install paru or yay)"
 		return 1
 	fi
-	# eos-update e' di EndeavourOS: su Arch liscia non esiste. Quando c'e' lo
-	# uso, perche' oltre all'aggiornamento riordina i mirror e segnala le
-	# notizie; altrimenti ripiego sull'helper, che fa la parte che conta.
-	# Il nome resta questo per memoria muscolare.
+	# eos-update is an EndeavourOS tool: it does not exist on plain Arch. When
+	# it is there I use it, because besides updating it re-ranks the mirrors and
+	# reports the news; otherwise I fall back to the helper, which does the part
+	# that matters. The name stays this way out of muscle memory.
 	if command -v eos-update >/dev/null 2>&1; then
 		# eos-update accepts --paru / --yay (same as --helper=<name>)
 		command eos-update "--$AUR_HELPER" --descriptions "$@"
@@ -63,8 +63,8 @@ alias art="php artisan"
 # alias ff="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 alias ff="fzf --preview 'bat -n --color=always {}' --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
-# Colori fzf generati dal template noctalia: va sourciato dopo le altre
-# opzioni, perche' accoda i colori a FZF_DEFAULT_OPTS.
+# fzf colors generated from the noctalia template: it must be sourced after the
+# other options, because it appends the colors to FZF_DEFAULT_OPTS.
 [[ -r "$HOME/.config/fzf/themes/noctalia.sh" ]] && source "$HOME/.config/fzf/themes/noctalia.sh"
 
 alias ..="cd .."
@@ -91,6 +91,9 @@ eos-search() {
 	aur search "$@"
 }
 
+# Personal helper for the author's project folders (the `html` command, its
+# HTML_BASE_PATH logic and its completion). Kept here temporarily; the final
+# decision (move it to a local file or drop it) is deferred.
 # Web root of the projects: $HOME-independent, first existing directory among
 # $HTML_BASE_PATH (if set), /srv/http, /usr/share/nginx/html, /var/www/html.
 _html_base() {
@@ -126,8 +129,8 @@ _html() {
 }
 compdef _html html
 
-# Porta nei dotfiles le impostazioni di noctalia cambiate dall'interfaccia:
-# la shell scrive in ~/.local/state/noctalia/settings.toml, che non e' nel repo.
+# Brings into the dotfiles the noctalia settings changed from the UI:
+# the shell writes to ~/.local/state/noctalia/settings.toml, which is not in the repo.
 alias noctalia-sync="$DOTFILES_SCRIPTS/noctalia-sync"
 alias accent-sync="$DOTFILES_SCRIPTS/accent-sync"
 alias pa="php artisan"
