@@ -1,0 +1,34 @@
+[Desktop Entry]
+# Local override of /usr/share/applications/firefox.desktop (translations
+# dropped). Only the Exec lines differ: "env -u GDK_BACKEND" stops a Firefox
+# started by xdg-open from an Electron app (Outlook, Teams: they run with
+# GDK_BACKEND=x11) from inheriting X11. Under XWayland the page ignores the
+# per-monitor scale and everything looks too small on the scaled screens.
+Version=1.0
+Type=Application
+Name=Firefox
+GenericName=Web Browser
+Comment=Fast and private browser
+Keywords=Internet;WWW;Browser;Web;Explorer;
+Exec=env -u GDK_BACKEND /usr/lib/firefox/firefox %u
+Terminal=false
+X-MultipleArgs=false
+Icon=firefox
+StartupWMClass=firefox
+DBusActivatable=false
+Categories=GNOME;GTK;Network;WebBrowser;
+MimeType=application/json;application/pdf;application/rdf+xml;application/rss+xml;application/x-xpinstall;application/xhtml+xml;application/xml;audio/flac;audio/ogg;audio/webm;image/avif;image/gif;image/jpeg;image/png;image/svg+xml;image/webp;text/html;text/xml;video/ogg;video/webm;x-scheme-handler/chrome;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/mailto;
+StartupNotify=true
+Actions=new-window;new-private-window;open-profile-manager;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=env -u GDK_BACKEND /usr/lib/firefox/firefox --new-window %u
+
+[Desktop Action new-private-window]
+Name=New Private Window
+Exec=env -u GDK_BACKEND /usr/lib/firefox/firefox --private-window %u
+
+[Desktop Action open-profile-manager]
+Name=Open Profile Manager
+Exec=env -u GDK_BACKEND /usr/lib/firefox/firefox --ProfileManager
