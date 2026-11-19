@@ -222,10 +222,15 @@ Niri + Noctalia direction (and the soft green accent idea) was inspired by:
 This repo is **not** a fork: shell stack stays zsh/tmux/starship, configs are managed with
 GNU Stow, and package/UI choices differ (e.g. Nautilus instead of Dolphin for now).
 
-## Niri installer
+## Installers
 
-Stow-safe helper for Arch / EndeavourOS (does **not** wipe `~/.config`, does **not**
-replace GNOME):
+`scripts/setup-machine.sh` is the full installer for a new Arch / EndeavourOS
+machine (packages by group, stow, per-machine files, login manager, cleanup). See
+[docs/ADAPTING.md](docs/ADAPTING.md) before running it.
+
+`scripts/install-niri.sh` is the older, minimal helper: it only installs the niri
+packages and stows `kitty` and `niri`. It does **not** wipe `~/.config` and does
+**not** replace GNOME.
 
 ```bash
 cd ~/.dotfiles
@@ -233,33 +238,19 @@ cd ~/.dotfiles
 ./scripts/install-niri.sh --no-update
 ```
 
-What it installs:
-- pacman: `niri`, `noctalia` (v5 from `extra/`), `xwayland-satellite`, portals,
-  swaybg/swayidle, grim/slurp, pipewire stack, `kitty`, `polkit-gnome`, …
-- stow: `kitty` and `niri` (config + portals)
-- optionally removes leftover Noctalia v4 AUR packages (`noctalia-shell`,
-  `noctalia-qs`, `quickshell`, `quickshell-git`)
+It installs `niri`, `noctalia` (v5 from `extra/`), `xwayland-satellite`, portals,
+the pipewire stack, `kitty`, grim/slurp, and optionally removes leftover Noctalia v4
+AUR packages (`noctalia-shell`, `noctalia-qs`, `quickshell`, `quickshell-git`).
 
-What it deliberately skips:
-- Dolphin, Ark, Breeze / KDE Qt stack, Bibata cursors, JetBrains Mono, fish
-- Blind copy of third-party nvim/fish configs
-- Replacing GNOME **Qogir** cursor / **Qogir-Dark** icons (kept as-is)
+## Defaults worth knowing
 
-## Niri notes (future)
-
-- Cursor / icons: keep GNOME **Qogir** + **Qogir-Dark** for now (`config.kdl` sets
-  `xcursor-theme "Qogir"`). Noctalia bar/dock icons can be pointed at the same theme
-  later from noctalia settings (`Mod+S`) if needed.
-- For now keep **Nautilus** + **File Roller** (GNOME). Do **not** install Dolphin or Ark
-  with the first niri setup; `config.kdl` binds `Mod+E` to `nautilus`.
-- Later optional trial: **Dolphin** + **Ark** (+ Breeze) as a more power-user file manager /
-  archive stack. Worth trying if split panes, folder filters, or richer context actions are
-  missing from Nautilus — then switch the niri bind from Nautilus to Dolphin.
-- Stow package `niri/` is ready. Run `./scripts/install-niri.sh` when you want
-  packages, then `stow niri` (the installer does this), log into Niri, and tune
-  monitor/wallpaper (wallpaper is owned by Noctalia v5, not swaybg).
-- Kitty starts with the Niri session (`spawn-at-startup`); also `Ctrl+Alt+T` and
-  `Super+Return`.
+- **Cursor / icons**: GNOME **Qogir** + **Qogir-Dark** (`config.kdl` sets
+  `xcursor-theme "Qogir"`). Change it there if you prefer another theme.
+- **File manager**: Nautilus + File Roller (`Mod+E` runs `nautilus`). Dolphin and Ark
+  are not installed; switch the bind in `config.kdl` if you want them.
+- **Terminal**: kitty with tmux, started with the niri session (`spawn-at-startup`);
+  also `Ctrl+Alt+T` and `Super+Return`.
+- **Wallpaper** is owned by Noctalia v5, not swaybg.
 
 ## Troubleshooting
 
@@ -281,15 +272,15 @@ What it deliberately skips:
 
 ### Monitors differ between PCs
 
-Shared `config.kdl` must not hardcode one machine’s layout. Use
-`niri/.config/niri/outputs.local.kdl` after `niri msg outputs` (see
-`outputs.local.kdl.example`). Leave it empty for auto-placement. Keep host-specific
-edits uncommitted, or add `hosts/<hostname>.kdl` and:
+Shared `config.kdl` must not hardcode one machine's layout. Two ignored files hold it:
 
-```bash
-cd ~/.config/niri   # or the stow package dir
-ln -sfn "hosts/$(hostname -s).kdl" outputs.local.kdl
-```
+- `niri/.config/niri/monitor.kdl`: mode, scale, position, rotation. Written by
+  `nwg-displays` (or by hand). `setup-machine.sh` creates it empty.
+- `niri/.config/niri/outputs.local.kdl`: hand-written tweaks that `nwg-displays`
+  cannot write (such as `focus-at-startup`). See `outputs.local.kdl.example`.
+
+Find the output names with `niri msg outputs`. niri accepts the connector (`DP-1`) or
+the `"Make Model Serial"` string, which survives a change of port.
 
 ### Kitty has no GNOME title bar
 
