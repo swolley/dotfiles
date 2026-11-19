@@ -1,15 +1,16 @@
-# Estensioni PHP da abilitare a mano
+# PHP extensions to enable by hand
 
-Le estensioni che Arch compila dentro al pacchetto `php` non si accendono da
-sole: il pacchetto spedisce il modulo ma non il file che lo carica. Senza una
-riga `extension=` in `/etc/php/conf.d` restano spente, e una macchina nuova
-installerebbe tutto il gruppo php ritrovandosi senza gd, intl, pdo_pgsql e il
-resto.
+The extensions that Arch compiles into the `php` package do not turn on by
+themselves: the package ships the module but not the file that loads it.
+Without an `extension=` line in `/etc/php/conf.d` they stay off, and a new
+machine would install the whole php group and still end up without gd, intl,
+pdo_pgsql and the rest.
 
-Qui dentro ci sono quei file. `configure_php_extensions` in `setup-machine.sh`
-li copia in `/etc/php/conf.d`, saltando quelli che un pacchetto porta gia' di
-suo: `imagick`, `redis`, `yaml`, `igbinary`, `xdebug`, `ibm_db2` e `oci8` il
-proprio file ce l'hanno nel pacchetto e non vanno toccati.
+The files for those extensions are in this directory.
+`configure_php_extensions` in `setup-machine.sh` copies them to
+`/etc/php/conf.d`, skipping the ones a package already ships: `imagick`,
+`redis`, `yaml`, `igbinary`, `xdebug`, `ibm_db2` and `oci8` have their own
+file in the package and must not be touched.
 
-I nomi sono scritti senza `.so`: PHP lo aggiunge da se', e le due forme sono
-equivalenti.
+The names are written without `.so`: PHP adds it by itself, and the two forms
+are equivalent.

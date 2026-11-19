@@ -26,7 +26,7 @@ BLUE="\033[1;34m"; CYAN="\033[1;36m"; DIM="\033[2m"; RESET="\033[0m"
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKG_DIR="$REPO_DIR/scripts/packages"
-RIMUOVI="$REPO_DIR/scripts/rimuovi.txt"
+REMOVE_LIST="$REPO_DIR/scripts/remove.txt"
 
 ASSUME_YES=0
 DRY_RUN=0
@@ -537,13 +537,13 @@ configure_gtk_interface() {
 configure_nm_applet() {
   local schema=org.gnome.nm-applet
   if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
-    warn "nm-applet non installato, salto"
+    warn "nm-applet not installed, skipping"
     return
   fi
-  # nm-applet resta perche' fa da agente per le password di wifi e vpn, ma le
-  # sue notifiche di rete connessa e persa sono rumore: lo stato lo mostra gia'
-  # la barra di noctalia, e quelle restavano nel cassetto delle notifiche.
-  # Quelle della vpn no, quelle servono.
+  # nm-applet stays because it acts as the agent for wifi and vpn passwords,
+  # but its connected and disconnected notifications are noise: the noctalia
+  # bar already shows the state, and those would pile up in the notification
+  # drawer. The vpn ones are kept, since those are useful.
   info "silencing nm-applet on connected and disconnected"
   run gsettings set "$schema" disable-connected-notifications true
   run gsettings set "$schema" disable-disconnected-notifications true
@@ -614,9 +614,9 @@ configure_login_manager() {
 }
 
 # Packages preinstalled by EndeavourOS that are not needed under niri. Listed
-# in scripts/rimuovi.txt; here only those actually present are removed.
+# in scripts/remove.txt; here only those actually present are removed.
 remove_packages() {
-  [ -f "$RIMUOVI" ] || { info "no removal list"; return; }
+  [ -f "$REMOVE_LIST" ] || { info "no removal list"; return; }
   local da_togliere=()
   local pkg
   local dm
@@ -635,7 +635,7 @@ remove_packages() {
       continue
     fi
     da_togliere+=("$pkg")
-  done < <(packages_of "$RIMUOVI")
+  done < <(packages_of "$REMOVE_LIST")
 
   if [ ${#da_togliere[@]} -eq 0 ]; then
     ok "nothing to remove"

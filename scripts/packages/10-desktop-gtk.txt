@@ -1,5 +1,5 @@
 # The GTK applications I use every day. The session is niri only: gnome-shell
-# and gdm are gone (they are in rimuovi.txt), login is handled by greetd with
+# and gdm are gone (they are in remove.txt), login is handled by greetd with
 # noctalia-greeter. These programs do not depend on the shell, only on the
 # libraries, and keep working exactly the same.
 #
@@ -39,9 +39,9 @@ xdg-user-dirs
 xdg-user-dirs-gtk
 xdg-utils
 adwaita-icon-theme
-# Adwaita Sans e AdwaitaMono: i caratteri che gsettings assegna alle app GTK e
-# che i file in qt/ nominano per Qt e KDE. Senza, quelle finestre sarebbero le
-# uniche con un carattere diverso.
+# Adwaita Sans and AdwaitaMono: the fonts that gsettings assigns to GTK apps
+# and that the files in qt/ name for Qt and KDE. Without them, those windows
+# would be the only ones with a different font.
 adwaita-fonts
 gnome-themes-extra
 cantarell-fonts
@@ -53,12 +53,13 @@ networkmanager
 networkmanager-openvpn
 wireguard-tools
 
-# Qt in mezzo a un desktop GTK: nessuno dice alle app Qt che tema usare, e
-# restano sul chiaro di fabbrica. qt6ct fa da tema di piattaforma e legge la
-# tavolozza che noctalia genera in ~/.config/qt6ct/colors/; lo accende la
-# variabile QT_QPA_PLATFORMTHEME in niri/config.kdl.
+# Qt in the middle of a GTK desktop: nothing tells Qt apps which theme to use,
+# so they stay on the factory light one. qt6ct acts as the platform theme and
+# reads the palette that noctalia generates in ~/.config/qt6ct/colors/; it is
+# switched on by the QT_QPA_PLATFORMTHEME variable in niri/config.kdl.
 #
-# Le app KDE (kdeconnect, krita, easyeffects) non passano di qui: i colori li
-# prendono da ~/.config/kdeglobals, scritto a mano nel pacchetto stow qt/.
-# Niente qt5ct: su questa macchina non resta piu' nessuna app Qt5.
+# KDE apps (kdeconnect, krita, easyeffects) do not go through here: they take
+# their colors from ~/.config/kdeglobals, written by hand in the qt/ stow
+# package.
+# No qt5ct: no Qt5 app is left on this machine.
 qt6ct

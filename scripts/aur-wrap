@@ -51,6 +51,8 @@ resolve_helper() {
 }
 
 # pacman/paru/yay messages (localized: IT + EN) for Instant Client pin break
+# NOTE: the Italian alternatives in the pattern below are intentional: they match
+# pacman's localized (Italian) output and must stay as they are.
 is_oracle_pin_failure() {
   local logf=$1
   grep -Eq 'oracle-instantclient-basic' "$logf" || return 1

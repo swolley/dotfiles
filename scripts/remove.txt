@@ -60,11 +60,11 @@ xterm
 meld
 # btrfs snapshots are managed with snapper from the command line
 btrfs-assistant
-# polkit-gnome: l'agente lo fa noctalia. Verificato: il binario linka
-# libpolkit-agent-1 e ha un suo NoctaliaPolkitListener, nessun processo
-# polkit-gnome-authentication-agent-1 e' in esecuzione, e la finestra della
-# password che compare lanciando gparted con pkexec e' la sua. Resta polkitd,
-# che e' il demone di sistema e non si tocca.
+# polkit-gnome: noctalia provides the agent. Verified: its binary links
+# libpolkit-agent-1 and has its own NoctaliaPolkitListener, no
+# polkit-gnome-authentication-agent-1 process is running, and the password
+# window that appears when launching gparted with pkexec is noctalia's. polkitd
+# stays, since it is the system daemon and must not be touched.
 polkit-gnome
 
 # --- GNOME: the session is now niri only, login is handled by greetd with
