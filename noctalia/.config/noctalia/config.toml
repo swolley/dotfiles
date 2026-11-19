@@ -63,6 +63,9 @@ cross_axis_padding = 6
 
 [lockscreen]
 fingerprint = false
+# Solo dissolvenza al blocco e allo sblocco (di default ne sceglie una a caso).
+transition = ["fade"]
+transition_duration = 400
 
 # Inattivita': blocco dopo 3 minuti, schermo spento a 4 (lo spegnimento deve
 # restare piu' alto del blocco, cosi' avviene a sessione gia' bloccata).
