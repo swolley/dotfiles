@@ -503,6 +503,23 @@ configure_php_extensions() {
   done
 }
 
+configure_tidal() {
+  local src="$REPO_DIR/scripts/tidal-hifi/config.json"
+  local dst="$HOME/.config/tidal-hifi/config.json"
+  [ -f "$src" ] || { warn "$src missing, skipping"; return; }
+  # These settings cannot be stowed: tidal-hifi saves through electron-store,
+  # which writes a temporary file and renames it over the target, and a rename
+  # replaces a symlink with a real file. The link would break at the first
+  # settings change, silently. So the template is copied, and only onto a
+  # machine that has none: an existing file is the user's own and stays.
+  if [ -e "$dst" ]; then
+    ok "tidal-hifi already configured"
+    return
+  fi
+  info "tidal-hifi settings"
+  run install -Dm644 "$src" "$dst"
+}
+
 configure_gtk_interface() {
   local schema=org.gnome.desktop.interface
   if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
@@ -970,6 +987,9 @@ configure_turtle
 
 section "PHP extensions"
 configure_php_extensions
+
+section "Tidal"
+configure_tidal
 
 section "GTK appearance"
 install_qogir

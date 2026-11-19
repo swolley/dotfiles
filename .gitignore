@@ -28,3 +28,7 @@ noctalia/.config/noctalia/91-user.local.toml
 # Hand-written monitor tweaks of this machine (focus-at-startup...). See
 # outputs.local.kdl.example; setup-machine.sh creates an empty one.
 niri/.config/niri/outputs.local.kdl
+
+# Backups left next to config.kdl when it gets rewritten, same story as the
+# noctalia ones: a committed copy would block the stow of the whole package.
+niri/.config/niri/*.bak-*
