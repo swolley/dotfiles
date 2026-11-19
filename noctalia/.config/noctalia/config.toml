@@ -100,9 +100,8 @@ warn_percent = 75
 # aur_helper = "custom", il secondo scavalcherebbe ignore_packages e romperebbe
 # l'aggiornamento in background, che dev'essere non interattivo.
 aur_helper = "paru"
-# il terminale unico: invece di aprire una kitty nuova, crea una sessione tmux
-# in quella gia' aperta e le da' il focus
-terminal = "/home/swolley/.config/niri/terminal.sh run"
+# terminal = ... sta in 91-user.local.toml: serve il percorso assoluto dello
+# script niri/terminal.sh, che dipende dalla home.
 auto_check_hours = 1
 check_arch_news = false
 flatpak_enabled = false
@@ -122,7 +121,6 @@ enabled = [
 ]
 
 [shell]
-avatar_path = "/home/swolley/Scaricati/grafiche/swolley/DALL·E 2024-12-13 23.38.18 - A refined illustration of a microprocessor component with a black plastic casing and metallic pins surrounding it, placed on a sleek digital backgroun.webp"
 button_borders = false
 card_borders = false
 date_format = "%A %d %B %Y"
@@ -160,7 +158,6 @@ external_ip_enabled = true
 
     [shell.screenshot]
     confirm_region = true
-    directory = "/home/swolley/Immagini/Schermate"
     remember_last_region = true
 
     [shell.window_switcher]
@@ -260,7 +257,6 @@ enabled = false
     recursive = false
 
     [wallpaper.default]
-    path = "/home/swolley/Immagini/swolley.jpg"
 
 [widget.battery]
 display_mode = "glyph"

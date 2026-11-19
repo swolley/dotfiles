@@ -425,6 +425,27 @@ configure_monitors() {
   fi
 }
 
+# Personal noctalia settings that hold absolute paths (the single terminal for
+# the updates widget, optionally avatar and wallpaper): they depend on the home
+# of whoever runs this, so they live in a local file outside the repo.
+configure_user_settings() {
+  local target="$HOME/.config/noctalia/91-user.local.toml"
+  if [ -e "$target" ]; then
+    return
+  fi
+  info "creating $target"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    return
+  fi
+  cat > "$target" <<EOF2
+# Personal settings of this user/machine. Not in the dotfiles: the paths
+# depend on the home. See 91-user.local.toml.example for what else can go here.
+
+[plugin_settings."yuuto/arch-updater"]
+terminal = "$HOME/.config/niri/terminal.sh run"
+EOF2
+}
+
 configure_nautilus_terminal() {
   local schema=com.github.stunkymonkey.nautilus-open-any-terminal
   local cmd="$HOME/.config/niri/terminal.sh cwd"
@@ -888,6 +909,7 @@ setup_shell
 
 section "Monitors and bar"
 configure_monitors
+configure_user_settings
 
 section "Nautilus"
 configure_nautilus_terminal

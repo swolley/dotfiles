@@ -21,3 +21,6 @@ niri/.config/niri/monitor.kdl.bak
 # One of these ended up committed and, finding the twin on disk, blocked the
 # whole stow of the package: templates/ and palettes/ stayed unlinked.
 noctalia/.config/noctalia/*.bak-*
+
+# Impostazioni personali di noctalia (avatar, sfondo, percorsi): dipendono dalla home.
+noctalia/.config/noctalia/91-user.local.toml

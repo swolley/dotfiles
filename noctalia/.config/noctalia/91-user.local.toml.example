@@ -1,0 +1,13 @@
+# Copia in ~/.config/noctalia/91-user.local.toml (non va nel repo) e adatta:
+# i percorsi dipendono dalla tua home.
+
+[shell]
+# avatar_path = "/home/TUO_UTENTE/Immagini/avatar.png"
+
+[wallpaper.default]
+# path = "/home/TUO_UTENTE/Immagini/sfondo.jpg"
+
+# Il terminale unico: invece di aprire una kitty nuova, crea una sessione tmux
+# in quella gia' aperta e le da' il focus.
+[plugin_settings."yuuto/arch-updater"]
+terminal = "/home/TUO_UTENTE/.config/niri/terminal.sh run"
