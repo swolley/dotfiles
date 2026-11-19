@@ -14,6 +14,10 @@ turtle
 brightnessctl
 grim
 slurp
+# media keys: the niri bindings ask playerctl first, so that Tidal gets them
+# even when it is not the player noctalia considers active, and fall back to
+# noctalia when playerctl answers nothing
+playerctl
 # fonts used by the shell and the terminal
 ttf-adwaitamono-nerd
 noto-fonts
