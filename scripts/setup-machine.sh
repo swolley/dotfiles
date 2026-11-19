@@ -560,6 +560,27 @@ current_display_manager() {
   printf '%s' "${target%.service}"
 }
 
+# greetd does not unlock the gnome-keyring by itself: without these two PAM
+# lines the keyring asks for its password again after every login. Idempotent;
+# the file is backed up before the first change.
+configure_greetd_keyring() {
+  local pam=/etc/pam.d/greetd
+  [ -f "$pam" ] || return
+  if [ ! -e /usr/lib/security/pam_gnome_keyring.so ]; then
+    warn "pam_gnome_keyring.so missing (install gnome-keyring), skipping keyring unlock"
+    return
+  fi
+  grep -q pam_gnome_keyring "$pam" && { info "greetd already unlocks the keyring"; return; }
+  info "unlocking the gnome-keyring at login (greetd PAM)"
+  run sudo cp -n "$pam" "$pam.bak-setup"
+  run sudo sed -i '/^auth .*include.*system-local-login/a auth       optional     pam_gnome_keyring.so' "$pam"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "  [dry-run] append session line to $pam"
+  else
+    echo 'session    optional     pam_gnome_keyring.so auto_start' | sudo tee -a "$pam" >/dev/null
+  fi
+}
+
 # Login screen: greetd with noctalia-greeter. Changing display manager can
 # leave the machine without a graphical login, so:
 #  - nothing happens unless greetd and the greeter are installed;
@@ -604,6 +625,7 @@ configure_login_manager() {
     run sudo sed -i "/^\[default_session\]/,/^\[/ s|^command = .*|command = \"$session\"|" "$conf"
   fi
   run sudo noctalia-greeter-apply-appearance --setup-system
+  configure_greetd_keyring
 
   if [ -n "$current" ] && [ "$current" != greetd ]; then
     run sudo systemctl disable "$current.service"
@@ -619,7 +641,7 @@ configure_login_manager() {
 # in scripts/remove.txt; here only those actually present are removed.
 remove_packages() {
   [ -f "$REMOVE_LIST" ] || { info "no removal list"; return; }
-  local da_togliere=()
+  local to_remove=()
   local pkg
   local dm
   dm=$(current_display_manager)
@@ -636,22 +658,22 @@ remove_packages() {
       warn "keeping gnome-shell: gdm still depends on it"
       continue
     fi
-    da_togliere+=("$pkg")
+    to_remove+=("$pkg")
   done < <(packages_of "$REMOVE_LIST")
 
-  if [ ${#da_togliere[@]} -eq 0 ]; then
+  if [ ${#to_remove[@]} -eq 0 ]; then
     ok "nothing to remove"
     return
   fi
 
-  info "to remove: ${da_togliere[*]}"
+  info "to remove: ${to_remove[*]}"
   if ! ask "Remove them?"; then
     warn "skipping the removal"
     return
   fi
   # -Rns also removes dependencies left orphaned. --noconfirm only because
   # we already asked the question ourselves above.
-  run sudo pacman -Rns --noconfirm "${da_togliere[@]}"
+  run sudo pacman -Rns --noconfirm "${to_remove[@]}"
 }
 
 configure_wifi_powersave() {
