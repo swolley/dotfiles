@@ -1,0 +1,73 @@
+#!/bin/bash
+# Repository checks: syntax of every script and config that can be checked
+# offline, plus hygiene rules that keep the repo usable by other people.
+#   scripts/check            run everything
+# Exit status is non-zero if anything fails. Tools that are not installed
+# (shellcheck, niri, noctalia) are skipped with a note.
+cd "$(dirname "$0")/.." || exit 1
+
+fail=0
+bad()  { echo "FAIL: $*"; fail=1; }
+note() { echo "skip: $*"; }
+files() { git ls-files "$@"; }
+
+# --- syntax ---------------------------------------------------------------
+while IFS= read -r f; do
+  [ -f "$f" ] && grep -qI . "$f" || continue   # skip missing and binary files
+  first=$(head -n1 "$f")
+  case "$first" in
+    *zsh*)     zsh -n "$f"  2>/dev/null || bad "zsh syntax: $f" ;;
+    *bash*)    bash -n "$f" 2>/dev/null || bad "bash syntax: $f" ;;
+    "#!/bin/sh"*|*env\ sh*) sh -n "$f" 2>/dev/null || bad "sh syntax: $f" ;;
+    *python*)  python3 -c "import sys; compile(open(sys.argv[1]).read(), sys.argv[1], 'exec')" "$f" 2>/dev/null \
+                 || bad "python syntax: $f" ;;
+  esac
+done < <(files)
+for f in zshrc/.zshrc zshrc/.zshrc_customs.zsh; do
+  zsh -n "$f" 2>/dev/null || bad "zsh syntax: $f"
+done
+
+if command -v shellcheck >/dev/null; then
+  # Only real errors: warnings and style are too noisy for config-like scripts.
+  while IFS= read -r f; do
+    head -n1 "$f" | grep -qE '^#!.*(ba|z)?sh' || continue
+    shellcheck -S error "$f" >/dev/null 2>&1 || bad "shellcheck: $f"
+  done < <(files 'scripts/*' 'niri/*.sh' 'applications/*.sh')
+else
+  note "shellcheck not installed"
+fi
+
+if command -v niri >/dev/null; then
+  niri validate >/dev/null 2>&1 || bad "niri validate"
+else note "niri not installed"; fi
+if command -v noctalia >/dev/null; then
+  noctalia config validate 2>&1 | grep -q "is valid" || bad "noctalia config validate"
+else note "noctalia not installed"; fi
+
+# --- hygiene --------------------------------------------------------------
+text() { files | grep -vE '\.(png|jpe?g|svg|webp|ico|ttf|otf|woff2?|irs|wav)$|^easyeffects/' ; }
+
+# No absolute home of a specific user (LICENSE, the guide and the examples
+# may mention one; qt6ct.conf is realigned to the user's home by
+# setup-machine.sh).
+hits=$(text | grep -vE '^(LICENSE|docs/|.*\.example$|qt/.config/qt6ct/qt6ct\.conf$)' | tr '\n' '\0' \
+  | xargs -0 grep -nI "/home/[a-z]" 2>/dev/null | grep -v "/home/YOUR_USER")
+[ -z "$hits" ] || { bad "hardcoded /home/<user> paths:"; echo "$hits" | sed 's/^/    /'; }
+
+# Backups and per-machine files must not be tracked.
+bak=$(files | grep -E '\.bak|\.local\.(kdl|toml)$|monitor\.kdl$')
+[ -z "$bak" ] || { bad "tracked backup/local files:"; echo "$bak" | sed 's/^/    /'; }
+
+# Everything is written in English: no accented Italian letters or the usual
+# Italian words written with a trailing apostrophe (perche', piu'...). aur-wrap matches
+# localized pacman output on purpose.
+ita=$(text | grep -vE '^scripts/aur-wrap$|^LICENSE$' | tr '\n' '\0' \
+  | xargs -0 grep -nIE "[àèéìòù]|\b(perche|cioe|piu|gia|puo|cosi|pero|quest)'" 2>/dev/null)
+[ -z "$ita" ] || { bad "Italian text:"; echo "$ita" | head -10 | sed 's/^/    /'; }
+
+# No obvious secrets.
+sec=$(text | tr '\n' '\0' | xargs -0 grep -nIiE "(api[_-]?key|secret|token|password)[\"']?\s*[=:]\s*[\"'][A-Za-z0-9/+_-]{16,}" 2>/dev/null)
+[ -z "$sec" ] || { bad "possible secrets:"; echo "$sec" | sed 's/^/    /'; }
+
+[ "$fail" -eq 0 ] && echo "all checks passed"
+exit "$fail"

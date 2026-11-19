@@ -82,3 +82,11 @@ These are the author's preferences, marked with a comment in the files as
 - The installer targets Arch (pacman/AUR); other distributions are not
   supported.
 - niri + noctalia is the only supported desktop.
+
+## 6. Checking your changes
+
+`scripts/check` verifies the syntax of every script and config that can be
+checked offline (bash, sh, zsh, python, `shellcheck` errors, `niri validate`,
+`noctalia config validate`) and a few hygiene rules: no hardcoded
+`/home/<user>` paths, no tracked backups or per-machine files, no Italian text,
+no obvious secrets. Run it before committing.
