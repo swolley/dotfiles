@@ -1,8 +1,0 @@
-[Desktop Entry]
-# QT_SCALE_FACTOR compensates for the scaling niri applies to XWayland
-Type=Application
-Name=Vial
-Exec=env QT_SCALE_FACTOR=0.8 DESKTOPINTEGRATION=false /usr/bin/Vial
-Icon=Vial
-Categories=Utility;
-Terminal=false

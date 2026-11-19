@@ -101,31 +101,3 @@ Terminal=false
 StartupNotify=true
 EOF
 fi
-
-# Vial: same here, the command is replaced instead of hidden. The AppImage is
-# PyQt5 and carries no Qt plugin for Wayland (only libqxcb.so and friends), so
-# it can only run on XWayland, which knows nothing about fractional scaling:
-# it draws at 1x and niri enlarges the window by the monitor scale, 1.25 here,
-# leaving everything oversized. 0.8 is the inverse of 1.25, so Qt draws
-# smaller and the compositor brings it back to the right size. The price is
-# sharpness, since the window ends up rescaled. Change the factor, or drop the
-# whole thing, if the monitors stop being at 1.25.
-if [ -f /usr/share/applications/Vial.desktop ]; then
-  vial_exec=$(grep -m1 '^Exec=' /usr/share/applications/Vial.desktop | cut -d= -f2-)
-  # the packaged Exec already goes through env: reuse it instead of nesting a
-  # second one, so the line stays readable
-  case "$vial_exec" in
-    env\ *) vial_exec="env QT_SCALE_FACTOR=0.8 ${vial_exec#env }" ;;
-    *)      vial_exec="env QT_SCALE_FACTOR=0.8 $vial_exec" ;;
-  esac
-  cat > Vial.desktop <<EOF
-[Desktop Entry]
-# QT_SCALE_FACTOR compensates for the scaling niri applies to XWayland
-Type=Application
-Name=$(grep -m1 '^Name=' /usr/share/applications/Vial.desktop | cut -d= -f2-)
-Exec=$vial_exec
-Icon=$(grep -m1 '^Icon=' /usr/share/applications/Vial.desktop | cut -d= -f2-)
-Categories=Utility;
-Terminal=false
-EOF
-fi
