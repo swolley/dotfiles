@@ -61,7 +61,7 @@ bak=$(files | grep -E '\.bak|\.local\.(kdl|toml)$|monitor\.kdl$')
 # Everything is written in English: no accented Italian letters or the usual
 # Italian words written with a trailing apostrophe (perche', piu'...). aur-wrap matches
 # localized pacman output on purpose.
-ita=$(text | grep -vE '^scripts/aur-wrap$|^LICENSE$' | tr '\n' '\0' \
+ita=$(text | grep -vE '^scripts/(aur-wrap|check)$|^LICENSE$' | tr '\n' '\0' \
   | xargs -0 grep -nIE "[àèéìòù]|\b(perche|cioe|piu|gia|puo|cosi|pero|quest)'" 2>/dev/null)
 [ -z "$ita" ] || { bad "Italian text:"; echo "$ita" | head -10 | sed 's/^/    /'; }
 
