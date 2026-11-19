@@ -11,3 +11,9 @@
 # session in the one already open and focuses it.
 [plugin_settings."yuuto/arch-updater"]
 terminal = "/home/YOUR_USER/.config/niri/terminal.sh run"
+
+# Optional: an Obsidian vault outside $HOME (the community template only finds
+# vaults under $HOME). Renders the repo's templates/obsidian.css into it.
+# [theme.templates.user.obsidian]
+# input_path = "$XDG_CONFIG_HOME/noctalia/templates/obsidian.css"
+# output_path = "/path/to/vault/.obsidian/snippets/noctalia.css"

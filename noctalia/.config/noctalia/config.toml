@@ -183,7 +183,7 @@ wallpaper_scheme = "m3-content"
     # Personal preference kept here temporarily (community template list);
     # final decision (move to a local/override file or keep as default)
     # deferred.
-    community_ids = [ "bat", "claude-code", "codex", "fzf", "inkscape", "lazygit", "obsidian", "pywalfox", "vscode" ]
+    community_ids = [ "bat", "claude-code", "codex", "fzf", "inkscape", "lazygit", "pywalfox", "vscode" ]
 
     # Extra palette colors (the soft tones used by tmux, starship, kitty, nvim).
     # blend = false keeps the exact hue; templates read them as
