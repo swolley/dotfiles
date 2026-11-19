@@ -335,9 +335,9 @@ binds {
         spawn-sh "noctalia msg mic-mute";
     }
 
-    XF86AudioPlay { spawn-sh "noctalia msg media toggle"; }
-    XF86AudioNext { spawn-sh "noctalia msg media next"; }
-    XF86AudioPrev { spawn-sh "noctalia msg media previous"; }
+    XF86AudioPlay { spawn-sh "playerctl --player=tidal-hifi,%any play-pause || noctalia msg media toggle"; }
+    XF86AudioNext { spawn-sh "playerctl --player=tidal-hifi,%any next || noctalia msg media next"; }
+    XF86AudioPrev { spawn-sh "playerctl --player=tidal-hifi,%any previous || noctalia msg media previous"; }
 
     XF86MonBrightnessUp allow-when-locked=true {
         spawn-sh "noctalia msg brightness-up || brightnessctl s +10%";
