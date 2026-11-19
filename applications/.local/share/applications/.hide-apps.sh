@@ -20,6 +20,10 @@ hide_app() {
     echo "Exec=$(grep -m1 '^Exec=' "$source" | cut -d= -f2-)"
     icon=$(grep -m1 '^Icon=' "$source" | cut -d= -f2- || true)
     [ -n "$icon" ] && echo "Icon=$icon"
+    # without MimeType the override would also drop the file associations
+    # (a local file replaces the system one entirely)
+    mime=$(grep -m1 '^MimeType=' "$source" | cut -d= -f2- || true)
+    [ -n "$mime" ] && echo "MimeType=$mime"
     echo "NoDisplay=true"
   } > "$name.desktop"
 }

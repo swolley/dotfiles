@@ -4,4 +4,5 @@ Type=Application
 Name=CMake
 Exec=cmake-gui %f
 Icon=CMakeSetup
+MimeType=application/x-cmakecache;
 NoDisplay=true
