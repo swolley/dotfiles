@@ -68,11 +68,36 @@ alias ff="fzf --preview 'bat -n --color=always {}' --bind 'ctrl-/:change-preview
 # other options, because it appends the colors to FZF_DEFAULT_OPTS.
 [[ -r "$HOME/.config/fzf/themes/noctalia.sh" ]] && source "$HOME/.config/fzf/themes/noctalia.sh"
 
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias .....="cd ../../../.."
-alias ......="cd ../../../../.."
+# _cdup <levels> [name]: go up <levels> directories and, if a directory called
+# <name> exists there, enter it (handy to jump to a sibling: "cd .. && cd x" in
+# one go). Without a name it just goes up. Not called "_cd" because that is the
+# name of zsh's own completion function for cd, and defining it would break
+# completion.
+_cdup() {
+  local levels=$1 name=$2 dest="" i
+  for ((i = 0; i < levels; i++)); do dest+="../"; done
+  if [[ -n "$name" ]]; then
+    if [[ -d "$dest$name" ]]; then
+      dest+="$name"
+    else
+      print -u2 "_cdup: no directory '$name' $levels level(s) up, going up only"
+    fi
+  fi
+  cd "$dest"
+}
+# Tab completion for the name: the directories found <levels> up. Aliases are
+# expanded before completion, so ".. <Tab>" is completed as "_cdup 1 <Tab>".
+_cdup_complete() {
+  local dest="" i
+  for ((i = 0; i < ${words[2]:-1}; i++)); do dest+="../"; done
+  _path_files -/ -W "$dest"
+}
+(( $+functions[compdef] )) && compdef _cdup_complete _cdup
+alias ..="_cdup 1"
+alias ...="_cdup 2"
+alias ....="_cdup 3"
+alias .....="_cdup 4"
+alias ......="_cdup 5"
 
 alias service-status='SYSTEMD_COLORS=16 systemctl list-units --type=service --all --no-pager | grep --color=never -vE "systemd-|dracut-|initrd-|modprobe@|getty@|user@"'
 
