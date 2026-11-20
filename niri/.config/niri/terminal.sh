@@ -73,9 +73,10 @@ case "${1:-focus}" in
     [ $# -gt 0 ] || { echo "usage: $0 run [-e] <command...>" >&2; exit 1; }
     if [ -n "$id" ] && tmux has-session 2>/dev/null; then
       name=$(tmux new-session -d -P -F '#{session_name}' "$@")
-      # the pane stays visible after the command ends: without this an
-      # error would vanish before you could read it
-      tmux set-option -t "$name" remain-on-exit on
+      # on success the pane closes with the command, as in a normal terminal;
+      # on failure it stays visible, otherwise the error would vanish before
+      # you could read it
+      tmux set-option -t "$name" remain-on-exit failed
       client=$(last_client)
       [ -n "$client" ] && tmux switch-client -c "$client" -t "$name"
       niri msg action focus-window --id "$id"
