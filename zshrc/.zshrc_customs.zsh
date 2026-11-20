@@ -10,8 +10,9 @@ else
 fi
 export AUR_HELPER
 
-# AUR scripts live in the shared dotfiles repo (not ~/Documents).
+# AUR scripts live in the shared dotfiles repo (not ~/Android
 DOTFILES_SCRIPTS="${DOTFILES_SCRIPTS:-$HOME/.dotfiles/scripts}"
+DOTFILES_FOLDER="$DOTFILES_SCRIPTS/.."
 AUR_WRAP="${AUR_WRAP:-$DOTFILES_SCRIPTS/aur-wrap}"
 PKG_BIN="${PKG_BIN:-$DOTFILES_SCRIPTS/pkg}"
 export DOTFILES_SCRIPTS AUR_WRAP
@@ -91,6 +92,13 @@ eos-search() {
 	aur search "$@"
 }
 
+dot-update() {
+  CUR_FOLDER="${pwd}"
+  cd "${DOTFILES_FOLDER}"
+  git pull
+  cd "${CUR_FOLDER}"
+}
+
 # Personal helper for the author's project folders (the `html` command, its
 # HTML_BASE_PATH logic and its completion). Kept here temporarily; the final
 # decision (move it to a local file or drop it) is deferred.
@@ -127,10 +135,11 @@ _html() {
 	base=$(_html_base) || return 1
 	_files -W "$base" -/
 }
+
 compdef _html html
 
 # Brings into the dotfiles the noctalia settings changed from the UI:
 # the shell writes to ~/.local/state/noctalia/settings.toml, which is not in the repo.
 alias noctalia-sync="$DOTFILES_SCRIPTS/noctalia-sync"
-alias accent-sync="$DOTFILES_SCRIPTS/accent-sync"
+alias accent-sync=i"$DOTFILES_SCRIPTS/accent-sync"
 alias pa="php artisan"
