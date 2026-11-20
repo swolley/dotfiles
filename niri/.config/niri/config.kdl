@@ -335,10 +335,11 @@ binds {
         spawn-sh "noctalia msg mic-mute";
     }
 
-    // Li tiene noctalia, che segue il player attivo del momento: il tasto
-    // arriva a chi sta suonando davvero. Provato a dare la precedenza a Tidal
-    // con playerctl e --player=tidal-hifi,%any, ma cosi' Tidal se li prendeva
-    // anche da fermo, mentre il video stava suonando altrove.
+    // noctalia handles these: it follows whichever player is active at the
+    // moment, so the key reaches whoever is really playing. I tried giving
+    // Tidal priority with playerctl and --player=tidal-hifi,%any, but then
+    // Tidal grabbed the keys even while paused, while a video was playing
+    // elsewhere.
     XF86AudioPlay { spawn-sh "noctalia msg media toggle"; }
     XF86AudioNext { spawn-sh "noctalia msg media next"; }
     XF86AudioPrev { spawn-sh "noctalia msg media previous"; }
