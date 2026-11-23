@@ -1,0 +1,13 @@
+[Unit]
+Description=Rebind the internal USB controller when the Corne keyboard is missing
+# The keyboard, if it comes up at all, is there well before this point: waiting
+# for multi-user means we only act once the normal enumeration has given up.
+After=multi-user.target
+ConditionPathExists=/sys/bus/pci/devices/0000:00:14.0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/corne-usb-rescan
+
+[Install]
+WantedBy=multi-user.target

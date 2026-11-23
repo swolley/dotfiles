@@ -521,6 +521,31 @@ configure_tidal() {
   run install -Dm644 "$src" "$dst"
 }
 
+configure_corne_usb_rescan() {
+  local dir="$REPO_DIR/scripts/corne-usb-rescan"
+  local xhci=0000:00:14.0
+  [ -d "$dir" ] || { warn "$dir missing, skipping"; return; }
+  # Only on the machine that has that controller: elsewhere the service would
+  # be dead weight. See the README next to the script for the why.
+  if [ ! -e "/sys/bus/pci/devices/$xhci" ]; then
+    return
+  fi
+  if ! cmp -s "$dir/corne-usb-rescan.sh" /usr/local/bin/corne-usb-rescan; then
+    info "keyboard rescan script"
+    run sudo install -Dm755 "$dir/corne-usb-rescan.sh" /usr/local/bin/corne-usb-rescan
+  fi
+  if ! cmp -s "$dir/corne-usb-rescan.service" /etc/systemd/system/corne-usb-rescan.service; then
+    info "keyboard rescan unit"
+    run sudo install -Dm644 "$dir/corne-usb-rescan.service" /etc/systemd/system/corne-usb-rescan.service
+    run sudo systemctl daemon-reload
+  fi
+  if systemctl is-enabled --quiet corne-usb-rescan.service 2>/dev/null; then
+    ok "corne-usb-rescan already enabled"
+  else
+    run sudo systemctl enable corne-usb-rescan.service
+  fi
+}
+
 configure_gtk_interface() {
   local schema=org.gnome.desktop.interface
   if ! gsettings list-schemas 2>/dev/null | grep -qx "$schema"; then
@@ -992,6 +1017,9 @@ configure_php_extensions
 
 section "Tidal"
 configure_tidal
+
+section "Keyboard"
+configure_corne_usb_rescan
 
 section "GTK appearance"
 install_qogir
