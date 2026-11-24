@@ -661,7 +661,7 @@ configure_faillock() {
 configure_earlyoom() {
   local conf=/etc/default/earlyoom
   command -v earlyoom >/dev/null || { info "earlyoom not installed, skipping"; return; }
-  grep -q -- '--avoid' "$conf" 2>/dev/null && { info "earlyoom already configured"; return; }
+  grep -q noctalia "$conf" 2>/dev/null && { info "earlyoom already configured"; return; }
   info "configuring earlyoom (protect niri/noctalia, prefer php/electron)"
   [ -f "$conf" ] && run sudo cp -n "$conf" "$conf.bak-setup"
   if [ "$DRY_RUN" -eq 1 ]; then
