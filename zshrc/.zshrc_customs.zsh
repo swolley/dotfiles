@@ -118,10 +118,7 @@ eos-search() {
 }
 
 dot-update() {
-  CUR_FOLDER="${pwd}"
-  cd "${DOTFILES_FOLDER}"
-  git pull
-  cd "${CUR_FOLDER}"
+  git -C "${DOTFILES_FOLDER}" pull --rebase
 }
 
 # Personal helper for the author's project folders (the `html` command, its
