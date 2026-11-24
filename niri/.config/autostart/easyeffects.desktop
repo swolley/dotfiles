@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Easy Effects
+Comment=Audio effects, started in the background without a window
+Exec=easyeffects --service-mode
+Icon=com.github.wwmm.easyeffects
+NoDisplay=true
