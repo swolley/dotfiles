@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# cleanup — reclaim disk space: package caches, language caches, old tool
+# versions, old trash, Docker leftovers. Every section is skipped when its
+# tool is not installed.
+#   scripts/cleanup -n    dry run: show what would be removed, change nothing
+#   scripts/cleanup       do it (asks for sudo for pacman cache and journal)
+#
+# Never touched: Docker containers and volumes (unused volumes are only
+# listed), ~/.gradle (slow to rebuild), anything outside the caches below.
+set -uo pipefail
+
+DRY=0
+case "${1:-}" in
+  -n|--dry-run) DRY=1 ;;
+  "") ;;
+  *) echo "usage: ${0##*/} [-n|--dry-run]" >&2; exit 2 ;;
+esac
+
+have() { command -v "$1" >/dev/null 2>&1; }
+sec()  { printf '\n== %s\n' "$*"; }
+size() { du -sh "$@" 2>/dev/null | awk '{print $1}'; }
+# act "<description>" cmd...: runs the command, or only prints it in dry-run
+act() {
+  local desc=$1; shift
+  if [ "$DRY" = 1 ]; then echo "  would: $desc"; else echo "  $desc"; "$@" || echo "  (failed: $*)"; fi
+}
+
+free_before=$(df --output=avail -B1 "$HOME" | tail -n1)
+
+# --- pacman and AUR helpers ------------------------------------------------
+sec "pacman cache"
+if have paccache; then
+  if [ "$DRY" = 1 ]; then
+    paccache -dk2 | tail -n1
+    paccache -duk0 | tail -n1
+  else
+    sudo paccache -rk2
+    sudo paccache -ruk0
+  fi
+else
+  echo "  skipped: paccache missing (pacman-contrib)"
+fi
+
+for d in "$HOME/.cache/paru/clone" "$HOME/.cache/yay"; do
+  [ -d "$d" ] || continue
+  sec "AUR build dirs not used for 30 days: $d"
+  # oracle-* packages are skipped: their sources are fetched by hand (aur-wrap)
+  find "$d" -mindepth 1 -maxdepth 1 -type d -mtime +30 ! -name 'oracle-*' -print | while IFS= read -r p; do
+    echo "  $(size "$p")  $p"
+    [ "$DRY" = 1 ] || rm -rf -- "$p"
+  done
+done
+
+sec "systemd journal (keep 2 weeks)"
+if have journalctl; then
+  journalctl --disk-usage 2>/dev/null | sed 's/^/  /'
+  [ "$DRY" = 1 ] && echo "  would: journalctl --vacuum-time=2weeks" || sudo journalctl --vacuum-time=2weeks 2>&1 | tail -n1 | sed 's/^/  /'
+fi
+
+# --- language caches ---------------------------------------------------------
+sec "language caches"
+have npm  && { echo "  npm   $(size "$HOME/.npm")";  act "npm cache clean" npm cache clean --force; }
+have go   && { echo "  go    $(size "$(go env GOCACHE 2>/dev/null)")"; act "go clean -cache" go clean -cache; }
+have yarn && act "yarn cache clean" yarn cache clean
+have pnpm && act "pnpm store prune" pnpm store prune
+have pip  && act "pip cache purge" pip cache purge
+have cargo && [ -d "$HOME/.cargo/registry/cache" ] && echo "  cargo registry cache $(size "$HOME/.cargo/registry/cache") (kept: rebuilding needs the network)"
+
+# --- old tool versions: keep the newest only ---------------------------------
+sec "electron downloads (keep newest)"
+if [ -d "$HOME/.cache/electron" ]; then
+  ls -t "$HOME/.cache/electron"/electron-v*.zip 2>/dev/null | tail -n +2 | while IFS= read -r f; do
+    echo "  $(size "$f")  ${f##*/}"
+    [ "$DRY" = 1 ] || rm -f -- "$f"
+  done
+fi
+
+sec "Cypress binaries (keep newest version)"
+if [ -d "$HOME/.cache/Cypress" ]; then
+  ls -v "$HOME/.cache/Cypress" 2>/dev/null | grep -E '^[0-9]+\.' | head -n -1 | while IFS= read -r v; do
+    echo "  $(size "$HOME/.cache/Cypress/$v")  $v"
+    [ "$DRY" = 1 ] || rm -rf -- "$HOME/.cache/Cypress/$v"
+  done
+fi
+
+sec "composer cache (files older than 60 days)"
+if [ -d "$HOME/.cache/composer" ]; then
+  n=$(find "$HOME/.cache/composer" -type f -mtime +60 | wc -l)
+  echo "  $n files"
+  [ "$DRY" = 1 ] || find "$HOME/.cache/composer" -type f -mtime +60 -delete
+fi
+
+# --- trash older than 30 days --------------------------------------------------
+sec "trash (older than 30 days)"
+T="$HOME/.local/share/Trash"
+if [ -d "$T/info" ]; then
+  find "$T/info" -name '*.trashinfo' -mtime +30 -print | while IFS= read -r i; do
+    name=$(basename "$i" .trashinfo)
+    echo "  $(size "$T/files/$name")  $name"
+    [ "$DRY" = 1 ] || rm -rf -- "$T/files/$name" "$i"
+  done
+fi
+
+# --- docker -------------------------------------------------------------------
+sec "docker"
+if have docker && docker info >/dev/null 2>&1; then
+  docker system df | sed 's/^/  /'
+  act "remove dangling images" docker image prune -f
+  act "remove build cache older than 7 days" docker builder prune -f --filter until=168h
+  # keep only the newest image of each repository; images used by a
+  # container are refused by docker itself and stay
+  docker image ls --format '{{.Repository}} {{.ID}} {{.Tag}}' | awk '$1 != "<none>" && seen[$1]++ { print $2, $1":"$3 }' | while read -r id ref; do
+    act "remove older image $ref" docker rmi "$id"
+  done
+  unused=$(docker volume ls -qf dangling=true)
+  if [ -n "$unused" ]; then
+    echo "  unused volumes (NOT removed, delete by hand with: docker volume rm <name>):"
+    echo "$unused" | sed 's/^/    /'
+  fi
+else
+  echo "  skipped: docker missing or not reachable"
+fi
+
+# --- result -------------------------------------------------------------------
+free_after=$(df --output=avail -B1 "$HOME" | tail -n1)
+sec "result"
+if [ "$DRY" = 1 ]; then
+  echo "  dry run: nothing removed"
+else
+  echo "  freed in /home: $(numfmt --to=iec $((free_after - free_before)) 2>/dev/null)"
+fi
+df -h / "$HOME" | sed 's/^/  /'
