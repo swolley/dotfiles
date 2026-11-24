@@ -47,12 +47,14 @@ IDES=(
 # Those that do not exist on this machine (package not installed) are skipped
 # without a word: the unit is checked first and only then enabled, and a
 # missing one is the normal case for a list that covers several machines.
+# earlyoom: kills the biggest process before the kernel OOM killer does, so a
+# runaway job (parallel test workers) cannot take the whole niri session down.
 # forticlient: without its service the FortiClient GUI does not show its window.
 # The login manager (greetd) is not here: configure_login_manager handles it,
 # because it must never run alongside another display manager.
 SERVICES_SYSTEM=(NetworkManager firewalld avahi-daemon lm_sensors
                  power-profiles-daemon fstrim.timer paccache.timer
-                 forticlient)
+                 forticlient earlyoom)
 # ssh-agent.socket: the systemd SSH agent; SSH_AUTH_SOCK is set by the stow
 # package ssh (~/.config/environment.d/ssh-agent.conf).
 # arch-updater-recheck.path: tells the noctalia update widget to re-check when
@@ -653,6 +655,22 @@ configure_faillock() {
   run sudo sed -i -E 's/^#?\s*deny\s*=.*/deny = 0/' "$conf"
 }
 
+# earlyoom: never kill the desktop itself, prefer the usual memory hogs.
+# Without this the kernel killed app-niri-sh.scope (niri, noctalia and every
+# app in the session) when RAM and swap ran out.
+configure_earlyoom() {
+  local conf=/etc/default/earlyoom
+  command -v earlyoom >/dev/null || { info "earlyoom not installed, skipping"; return; }
+  grep -q -- '--avoid' "$conf" 2>/dev/null && { info "earlyoom already configured"; return; }
+  info "configuring earlyoom (protect niri/noctalia, prefer php/electron)"
+  [ -f "$conf" ] && run sudo cp -n "$conf" "$conf.bak-setup"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "  [dry-run] write $conf"
+  else
+    printf '%s\n' "EARLYOOM_ARGS=\"-r 3600 --avoid '(^|/)(niri|noctalia|xwayland-satellite|greetd|systemd)\$' --prefer '(^|/)(php|electron|node)\$'\"" | sudo tee "$conf" >/dev/null
+  fi
+}
+
 # Login screen: greetd with noctalia-greeter. Changing display manager can
 # leave the machine without a graphical login, so:
 #  - nothing happens unless greetd and the greeter are installed;
@@ -914,6 +932,9 @@ if [ ${#IDE_PKGS[@]} -gt 0 ]; then
   info "${BLUE}ide${RESET}: ${#IDE_PKGS[@]} packages (those already present are skipped)"
   run "$HELPER" -S --needed --noconfirm "${IDE_PKGS[@]}"
 fi
+
+section "Memory"
+configure_earlyoom
 
 if [ "$DO_SERVICES" -eq 1 ]; then
   section "Services"

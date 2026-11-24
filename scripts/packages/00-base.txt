@@ -61,3 +61,5 @@ aspell-it
 aspell-en
 # proxy that cuts token usage in Claude sessions (see CLAUDE.md)
 rtk-bin
+# memory: kills the biggest process before the kernel OOM killer takes the session
+earlyoom
