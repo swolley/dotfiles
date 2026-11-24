@@ -16,6 +16,9 @@ prefer-no-csd
 
 spawn-at-startup "xwayland-satellite"
 
+// Trims spaces and newlines at the edges of copied text.
+spawn-sh-at-startup "$HOME/.config/niri/clipboard-trim.sh"
+
 // Shell UI (bar/dock/launcher/notifiche/lock).
 // The script starts noctalia and, if it dies, opens a kitty with the last log
 // lines and writes to the journal. It does NOT use notify-send: in v5 the
