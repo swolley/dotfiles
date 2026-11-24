@@ -14,5 +14,7 @@ php-yaml
 # nothing to enable by hand.
 php-ibm_db2
 php-oci8
+# Code coverage driver (AUR); also ships its own conf.d file.
+php-pcov
 xdebug
 composer
