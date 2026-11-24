@@ -13,8 +13,8 @@ Each top-level directory is a **stow package**. Stow creates symlinks from that 
 ├── gitmux/          → ~/.gitmux.conf
 ├── code/            → ~/.config/code-flags.conf
 ├── easyeffects/     → ~/.config/easyeffects/db/, ~/.local/share/easyeffects/
-├── kitty/           → ~/.config/kitty/, ~/.config/xdg-terminals.list
-├── niri/            → ~/.config/niri/, ~/.config/xdg-desktop-portal/
+├── kitty/           → ~/.config/kitty/
+├── niri/            → ~/.config/niri/, ~/.config/xdg-desktop-portal/, ~/.config/xdg-terminals.list, ~/.config/autostart/easyeffects.desktop
 ├── noctalia/        → ~/.config/noctalia/
 ├── nvim/            → ~/.config/nvim/
 ├── ssh/             → ~/.config/environment.d/ssh-agent.conf
@@ -159,9 +159,9 @@ SSH and GPG keys, monitor layout, NVIDIA mode and the noctalia overrides in
 | `gitmux` | `~/.gitmux.conf` |
 | `code` | `~/.config/code-flags.conf` (keyring under niri) |
 | `easyeffects` | `~/.config/easyeffects/db/`, `~/.local/share/easyeffects/` (presets, impulses, autoload), autostart |
-| `kitty` | `~/.config/kitty/`, `~/.config/xdg-terminals.list` |
+| `kitty` | `~/.config/kitty/` |
 | `lazygit` | `~/.config/lazygit/config.yml` |
-| `niri` | `~/.config/niri/`, `~/.config/xdg-desktop-portal/niri-portals.conf` |
+| `niri` | `~/.config/niri/`, `~/.config/xdg-desktop-portal/niri-portals.conf`, `~/.config/xdg-terminals.list`, `~/.local/share/applications/terminal-single.desktop`, autostart |
 | `noctalia` | `~/.config/noctalia/config.toml`, `~/.config/noctalia/palettes/`, autostart |
 | `nvim` | `~/.config/nvim/` |
 | `ssh` | `~/.config/environment.d/ssh-agent.conf` (`SSH_AUTH_SOCK` for the systemd agent) |
