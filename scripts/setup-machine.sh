@@ -642,6 +642,17 @@ configure_greetd_keyring() {
   fi
 }
 
+# Disable the faillock lockout (default: 3 failed attempts lock the account
+# for 10 minutes, even for the right password). Chosen on purpose: deny = 0.
+configure_faillock() {
+  local conf=/etc/security/faillock.conf
+  [ -f "$conf" ] || return
+  grep -qE '^deny\s*=\s*0\s*$' "$conf" && { info "faillock lockout already disabled"; return; }
+  info "disabling the faillock lockout (deny = 0)"
+  run sudo cp -n "$conf" "$conf.bak-setup"
+  run sudo sed -i -E 's/^#?\s*deny\s*=.*/deny = 0/' "$conf"
+}
+
 # Login screen: greetd with noctalia-greeter. Changing display manager can
 # leave the machine without a graphical login, so:
 #  - nothing happens unless greetd and the greeter are installed;
@@ -1030,6 +1041,7 @@ configure_nm_applet
 
 section "Login screen"
 configure_login_manager
+configure_faillock
 
 section "Cleanup"
 remove_packages
