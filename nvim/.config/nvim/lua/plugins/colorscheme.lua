@@ -22,9 +22,9 @@ local function apply_noctalia()
   })
   -- Indent guides (snacks.indent): by default they link to NonText, which is
   -- the comment color and stands out too much. Keep them barely above the
-  -- background; the current scope gets the dim accent.
+  -- background; the current scope is just one step lighter, still grey.
   vim.api.nvim_set_hl(0, "SnacksIndent", { fg = palette.surface })
-  vim.api.nvim_set_hl(0, "SnacksIndentScope", { fg = palette.accent_dim })
+  vim.api.nvim_set_hl(0, "SnacksIndentScope", { fg = palette.surface2 })
   vim.g.colors_name = "noctalia-green"
 end
 
