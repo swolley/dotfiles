@@ -201,6 +201,14 @@ window-rule {
     opacity 0.95
 }
 
+// Floating windows (PiP, dialogs, popups) stay fully opaque: they sit on top
+// of other windows and the transparency made them hard to read. Must come
+// after the two rules above, since later rules win.
+window-rule {
+    match is-floating=true
+    opacity 1.0
+}
+
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     open-floating true
