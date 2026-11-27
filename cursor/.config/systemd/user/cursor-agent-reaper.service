@@ -1,0 +1,13 @@
+[Unit]
+Description=Kill cursor-agent workers left orphaned by closed Cursor windows
+
+# Cursor starts a cursor-agent worker per window and does not stop it when the
+# window closes: the worker gets reparented to this systemd --user manager and
+# lingers for days (12 of them held ~3 GB, mostly swap, and earlyoom ended up
+# killing live Cursor windows). A live worker's parent is a Cursor process, so
+# "parent is the user manager" ($MANAGERPID) only matches the orphans.
+# The [c] keeps the pattern from matching this very shell, which is also a
+# child of the manager and has the pattern in its own command line.
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'pids=$$(pgrep -P "$$MANAGERPID" -f "[c]ursor-agent-worker/agent-cli") || exit 0; echo "killing orphaned cursor-agent:" $$pids; kill $$pids'

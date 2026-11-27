@@ -1,0 +1,9 @@
+[Unit]
+Description=Hourly cleanup of orphaned cursor-agent workers
+
+[Timer]
+OnStartupSec=15min
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target

@@ -61,7 +61,7 @@ SERVICES_SYSTEM=(NetworkManager firewalld avahi-daemon lm_sensors
 # pacman changes packages (unit in the noctalia stow package).
 # noctalia-plugin-patches.path: re-applies scripts/patch-plugins when noctalia
 # updates a community plugin.
-SERVICES_USER=(ssh-agent.socket arch-updater-recheck.path noctalia-plugin-patches.path)
+SERVICES_USER=(ssh-agent.socket arch-updater-recheck.path noctalia-plugin-patches.path cursor-agent-reaper.timer)
 
 # Stow packages to apply (every repo folder that is not scripts/).
 # easyeffects: db/ is per-machine state (home vs office); we will pick it up later.
