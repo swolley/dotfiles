@@ -967,6 +967,12 @@ if [ "$DO_STOW" -eq 1 ]; then
     p="${d%/}"
     case " $STOW_SKIP " in *" $p "*) continue ;; esac
     [ -d "$p" ] || continue
+    # cursor/ only holds the orphaned cursor-agent reaper: pointless without
+    # Cursor. Not stowed means no unit, so the Services loop skips the timer too.
+    if [ "$p" = cursor ] && ! command -v cursor >/dev/null; then
+      info "Cursor not installed: skipping stow cursor"
+      continue
+    fi
     info "stow $p"
     # set -e would stop the whole script: a conflict on one package must not
     # cancel the following stows nor the later sections (shell, monitors…).
